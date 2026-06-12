@@ -21,6 +21,8 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
+import { Link } from "react-router-dom";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 
 const materialOptions = [
   "Cement",
@@ -55,7 +57,7 @@ export default function MaterialRequest({ mrDetails }) {
   const [requiredDate, setRequiredDate] = useState(dayjs());
   const [purpose, setPurpose] = useState("");
   const [rows, setRows] = useState([emptyRow()]);
-
+  const [open, setOpen] = useState(false);
   const handleCancel = () => {
     setRequiredDate("");
     setPurpose("");
@@ -157,7 +159,7 @@ export default function MaterialRequest({ mrDetails }) {
       </Box>
       <Box
         sx={{
-          backgroundColor: "#eef0fb",
+          backgroundColor: "#F1F5F9",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -175,7 +177,7 @@ export default function MaterialRequest({ mrDetails }) {
             maxWidth: 1100,
             borderRadius: "10px",
             border: "1px solid #e4e7ec",
-            // backgroundColor: "#eef0fb",
+            // backgroundColor: "#F1F5F9",
             p: 2,
             mb: 2,
             display: "flex",
@@ -288,7 +290,7 @@ export default function MaterialRequest({ mrDetails }) {
             maxWidth: 1100,
             borderRadius: "10px",
             border: "1px solid #e4e7ec",
-            // backgroundColor: "#eef0fb",
+            // backgroundColor: "#F1F5F9",
             p: 2,
             mb: 3,
           }}
@@ -450,6 +452,9 @@ export default function MaterialRequest({ mrDetails }) {
           Cancel
         </Button>
       </Box> */}
+      <hr
+        style={{ textAlign: "center", marginTop: "30px", width: "900px" }}
+      ></hr>
       <Paper
         elevation={0}
         sx={{
@@ -457,185 +462,149 @@ export default function MaterialRequest({ mrDetails }) {
           maxWidth: 1100,
           borderRadius: "10px",
           //   border: "1px solid #e4e7ec",
-          // backgroundColor: "#eef0fb",
+          // backgroundColor: "#F1F5F9",
           p: 2,
           mb: 3,
         }}
       >
-        <Typography
-          variant="h6"
-          sx={{ fontFamily: "Poppins", fontSize: "15px" }}
+        <Box
+          onClick={() => setOpen((prev) => !prev)}
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            height: "35px",
+            cursor: "pointer",
+          }}
         >
-          Activity Timeline
-        </Typography>
-        {/* <TableContainer>
-          <Table>
-            <TableBody>
-              <TableRow>
-                <TableCell
-                  sx={{
-                    ...bodyCellSx,
-                    fontWeight: 600,
-                    borderBotton: "none",
-                  }}
-                >
-                  Fulfilled
-                </TableCell>
-                <TableCell sx={{ ...bodyCellSx, borderBotton: "none" }}>
-                  27 April 2026, Benita
-                </TableCell>
-                <TableCell
-                  sx={{
-                    ...bodyCellSx,
-                    borderBotton: "none",
-                  }}
-                >
-                  -
-                </TableCell>
-              </TableRow>
+          <Typography
+            variant="h6"
+            sx={{ fontFamily: "Poppins", fontSize: "15px" }}
+          >
+            Activity Timeline
+          </Typography>
 
-              <TableRow>
-                <TableCell
-                  sx={{
-                    ...bodyCellSx,
-                    fontWeight: 600,
-                    borderBotton: "none",
-                  }}
-                >
-                  Approved(L2)
-                </TableCell>
-                <TableCell
-                  sx={{
-                    ...bodyCellSx,
-                    borderBotton: "none",
-                  }}
-                >
-                  -
-                </TableCell>
-                <TableCell
-                  sx={{
-                    ...bodyCellSx,
-                    borderBotton: "none",
-                  }}
-                >
-                  -
-                </TableCell>
-              </TableRow>
+          <ArrowDropDownIcon
+            sx={{
+              transform: open ? "rotate(180deg)" : "rotate(0deg)",
+              transition: "0.3s ease",
+            }}
+          />
+        </Box>
+        {open && (
+          <TableContainer>
+            <Table size="small">
+              <TableBody>
+                <TableRow>
+                  <TableCell
+                    sx={{
+                      ...bodyCellSx,
+                      borderBottom: "none",
+                      fontWeight: 600,
+                    }}
+                  >
+                    Fulfilled
+                  </TableCell>
+                  <TableCell sx={{ ...bodyCellSx, borderBottom: "none" }}>
+                    27 April 2026,10:12AM*Benita
+                  </TableCell>
+                  <TableCell sx={{ ...bodyCellSx, borderBottom: "none" }}>
+                    -
+                  </TableCell>
+                </TableRow>
 
-              <TableRow>
-                <TableCell
-                  sx={{
-                    ...bodyCellSx,
-                    fontWeight: 600,
-                    borderBotton: "none",
-                  }}
-                >
-                  Resubmitted
-                </TableCell>
-                <TableCell
-                  sx={{
-                    ...bodyCellSx,
-                    borderBotton: "none",
-                  }}
-                >
-                  Rima
-                </TableCell>
-                <TableCell
-                  sx={{
-                    ...bodyCellSx,
-                    borderBotton: "none",
-                  }}
-                >
-                  -
-                </TableCell>
-              </TableRow>
-
-              <TableRow>
-                <TableCell
-                  sx={{
-                    ...bodyCellSx,
-                    fontWeight: 600,
-                    borderBotton: "none",
-                  }}
-                >
-                  Rejected(L2){" "}
-                </TableCell>
-                <TableCell
-                  sx={{
-                    ...bodyCellSx,
-                    borderBotton: "none",
-                  }}
-                >
-                  25 April 2026
-                </TableCell>
-                <TableCell
-                  sx={{
-                    ...bodyCellSx,
-                    borderBotton: "none",
-                  }}
-                >
-                  -
-                </TableCell>
-              </TableRow>
-
-              <TableRow>
-                <TableCell
-                  sx={{
-                    ...bodyCellSx,
-                    fontWeight: 600,
-                    borderBotton: "none",
-                  }}
-                >
-                  Approved(L1)
-                </TableCell>
-                <TableCell
-                  sx={{
-                    ...bodyCellSx,
-                    borderBotton: "none",
-                  }}
-                >
-                  Completed
-                </TableCell>
-                <TableCell
-                  sx={{
-                    ...bodyCellSx,
-                    borderBotton: "none",
-                  }}
-                >
-                  -
-                </TableCell>
-              </TableRow>
-
-              <TableRow>
-                <TableCell
-                  sx={{
-                    ...bodyCellSx,
-                    fontWeight: 600,
-                    borderBotton: "none",
-                  }}
-                >
-                  Submitted
-                </TableCell>
-                <TableCell
-                  sx={{
-                    ...bodyCellSx,
-                    borderBotton: "none",
-                  }}
-                >
-                  No remarks
-                </TableCell>
-                <TableCell
-                  sx={{
-                    ...bodyCellSx,
-                    borderBotton: "none",
-                  }}
-                >
-                  -
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </TableContainer> */}
+                <TableRow>
+                  <TableCell
+                    sx={{
+                      ...bodyCellSx,
+                      borderBottom: "none",
+                      fontWeight: 600,
+                    }}
+                  >
+                    Approved(L2)
+                  </TableCell>
+                  <TableCell sx={{ ...bodyCellSx, borderBottom: "none" }}>
+                    27 April 2026,10:12AM*Benita
+                  </TableCell>
+                  <TableCell sx={{ ...bodyCellSx, borderBottom: "none" }}>
+                    -
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell
+                    sx={{
+                      ...bodyCellSx,
+                      borderBottom: "none",
+                      fontWeight: 600,
+                    }}
+                  >
+                    Approved(L1)
+                  </TableCell>
+                  <TableCell sx={{ ...bodyCellSx, borderBottom: "none" }}>
+                    27 April 2026,10:12AM*Benita
+                  </TableCell>
+                  <TableCell sx={{ ...bodyCellSx, borderBottom: "none" }}>
+                    -
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell
+                    sx={{
+                      ...bodyCellSx,
+                      borderBottom: "none",
+                      fontWeight: 600,
+                    }}
+                  >
+                    Resubmitted
+                  </TableCell>
+                  <TableCell sx={{ ...bodyCellSx, borderBottom: "none" }}>
+                    27 April 2026,10:12AM*Benita
+                  </TableCell>
+                  <TableCell sx={{ ...bodyCellSx, borderBottom: "none" }}>
+                    The mask item has been removed from the request.
+                  </TableCell>
+                  <TableCell sx={{ ...bodyCellSx, borderBottom: "none" }}>
+                    <Link>View More</Link>
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell
+                    sx={{
+                      ...bodyCellSx,
+                      borderBottom: "none",
+                      fontWeight: 600,
+                    }}
+                  >
+                    Rejected(L1)
+                  </TableCell>
+                  <TableCell sx={{ ...bodyCellSx, borderBottom: "none" }}>
+                    27 April 2026,10:12AM*Benita
+                  </TableCell>
+                  <TableCell sx={{ ...bodyCellSx, borderBottom: "none" }}>
+                    Regarding the mask request does not comply with procurement
+                    guidelines.
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell
+                    sx={{
+                      ...bodyCellSx,
+                      borderBottom: "none",
+                      fontWeight: 600,
+                    }}
+                  >
+                    Submitted
+                  </TableCell>
+                  <TableCell sx={{ ...bodyCellSx, borderBottom: "none" }}>
+                    27 April 2026,10:12AM*Benita
+                  </TableCell>
+                  <TableCell sx={{ ...bodyCellSx, borderBottom: "none" }}>
+                    -
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
       </Paper>
     </Box>
   );
