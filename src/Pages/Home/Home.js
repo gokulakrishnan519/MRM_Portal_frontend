@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import Navbar from "../../Navbars/Navbar";
-import right_icon from "../../Images/Home/Right_icon.png";
-import { Grid, Modal } from "@mui/material";
+import { useEffect } from "react";
 import {
   Box,
   Typography,
+  Button,
+  Chip,
   Table,
   TableBody,
   TableCell,
@@ -12,20 +12,24 @@ import {
   TableHead,
   TableRow,
   Paper,
-  Chip,
   IconButton,
-  Button,
-  InputAdornment,
-  TextField,
-  Menu,
-  MenuItem,
-  Checkbox,
-  ListItemText,
+  Tooltip,
+  Stack,
+  Divider,
+  Grid,
+  Modal,
 } from "@mui/material";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import AddIcon from "@mui/icons-material/Add";
 import SearchIcon from "@mui/icons-material/Search";
 import FilterListIcon from "@mui/icons-material/FilterList";
-import AddIcon from "@mui/icons-material/Add";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import WarningAmberIcon from "@mui/icons-material/WarningAmber";
+import ReplayIcon from "@mui/icons-material/Replay";
+import InsertDriveFileOutlinedIcon from "@mui/icons-material/InsertDriveFileOutlined";
+import CheckIcon from "@mui/icons-material/Check";
+import right_icon from "../../Images/Home/Right_icon.png";
+
+import ContentCopyOutlinedIcon from "@mui/icons-material/ContentCopyOutlined";
 
 import kpi_img1 from "../../Images/Home/MRM KPI 1.png";
 import kpi_img2 from "../../Images/Home/MRM KPI 2.png";
@@ -34,6 +38,10 @@ import kpi_img4 from "../../Images/Home/MRM KPI 4.png";
 import CreateMaterialRequest from "./Modal/CreateMaterialRequest";
 
 import CloseIcon from "@mui/icons-material/Close";
+import Navbar from "../../Navbars/Navbar";
+import ApproveMaterial from "./Modal/ApproveMaterial";
+import L1RejectFirstModal from "./Modal/L1RejectFirstModal";
+import L2RejectModal from "./Modal/L2RejectModal";
 
 const FONT = "Poppins, sans-serif";
 
@@ -136,90 +144,6 @@ const dummyData = [
   },
 ];
 
-const statusConfig = {
-  Pending: {
-    color: "#f59e0b",
-    bg: "#fffbeb",
-    border: "#fde68a",
-  },
-  "Final Review": {
-    color: "#6366f1",
-    bg: "#eef2ff",
-    border: "#c7d2fe",
-  },
-  Approved: {
-    color: "#10b981",
-    bg: "#ecfdf5",
-    border: "#a7f3d0",
-  },
-  Rejected: {
-    color: "#f43f5e",
-    bg: "#fff1f2",
-    border: "#fecdd3",
-  },
-};
-
-const levelConfig = {
-  L1: { color: "#6366f1", bg: "#eef2ff" },
-  L2: { color: "#8b5cf6", bg: "#f5f3ff" },
-};
-
-const ALL_STATUSES = ["Pending", "Final Review", "Approved", "Rejected"];
-
-function StatusChip({ status }) {
-  const cfg = statusConfig[status] || {
-    color: "#888",
-    bg: "#f5f5f5",
-    border: "#ddd",
-  };
-  return (
-    <Box
-      sx={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        px: 1.5,
-        py: 0.5,
-        borderRadius: "20px",
-        border: `1px solid ${cfg.border}`,
-        background: cfg.bg,
-        color: cfg.color,
-        fontWeight: 500,
-        fontSize: "0.8rem",
-        whiteSpace: "nowrap",
-        fontFamily: FONT,
-        minWidth: 80,
-      }}
-    >
-      {status}
-    </Box>
-  );
-}
-
-function LevelBadge({ level }) {
-  const cfg = levelConfig[level] || { color: "#555", bg: "#eee" };
-  return (
-    <Box
-      sx={{
-        display: "inline-flex",
-        alignItems: "center",
-        justifyContent: "center",
-        width: 28,
-        height: 28,
-        borderRadius: "50%",
-        background: cfg.bg,
-        color: cfg.color,
-        fontWeight: 600,
-        fontSize: "0.72rem",
-        ml: 1,
-        flexShrink: 0,
-      }}
-    >
-      {level}
-    </Box>
-  );
-}
-
 const style = {
   position: "absolute",
   top: "50%",
@@ -233,38 +157,285 @@ const style = {
   px: 3,
   py: 4,
   borderRadius: "10px",
+  border: "none", // Border remove
+  outline: "none", // Focus outline remove
 };
+
+const style2 = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: "80%",
+  maxHeight: "95vh", // fixed height
+  overflowY: "auto",
+  bgcolor: "background.paper",
+  boxShadow: 24,
+  px: 3,
+  py: 2,
+  borderRadius: "10px",
+  border: "none", // Border remove
+  outline: "none", // Focus outline remove
+};
+
+const rows = [
+  {
+    id: "MR-1023",
+    badges: ["new"],
+    requester: "Vishnu",
+    materials: 5,
+    requestedOn: "10 May 2026",
+    requiredDate: "24 April 2026",
+    handledBy: "Kannan",
+    level: "L1",
+    refNo: "-",
+    status: "L1 Review",
+  },
+  {
+    id: "MR-1028",
+    badges: ["critical", "resubmitted", "new"],
+    requester: "Vishnu",
+    materials: 5,
+    requestedOn: "10 May 2026",
+    requiredDate: "24 April 2026",
+    handledBy: "Kannan",
+    level: "L1",
+    refNo: "-",
+    status: "L1 Review",
+  },
+  {
+    id: "MR-1035",
+    badges: [],
+    requester: "Vishnu",
+    materials: 5,
+    requestedOn: "10 May 2026",
+    requiredDate: "24 April 2026",
+    handledBy: "Kannan",
+    level: "L1",
+    refNo: "-",
+    status: "L1 Rejected",
+  },
+  {
+    id: "MR-1019",
+    badges: ["critical"],
+    requester: "Vishnu",
+    materials: 4,
+    requestedOn: "10 May 2026",
+    requiredDate: "24 April 2026",
+    handledBy: "Senthil",
+    level: "L2",
+    refNo: "-",
+    status: "L2 Review",
+  },
+  {
+    id: "MR-1020",
+    badges: ["critical", "new"],
+    requester: "Vishnu",
+    materials: 3,
+    requestedOn: "10 May 2026",
+    requiredDate: "24 April 2026",
+    handledBy: "Kannan",
+    level: "L1",
+    refNo: "-",
+    status: "L1 Rejected",
+  },
+  {
+    id: "MR-1024",
+    badges: ["critical", "resubmitted"],
+    requester: "Vishnu",
+    materials: 3,
+    requestedOn: "10 May 2026",
+    requiredDate: "24 April 2026",
+    handledBy: "Senthil",
+    level: "L2",
+    refNo: "MJ-233",
+    status: "L2 Approved",
+  },
+  {
+    id: "MR-1022",
+    badges: ["critical", "new"],
+    requester: "Vishnu",
+    materials: 3,
+    requestedOn: "10 May 2026",
+    requiredDate: "24 April 2026",
+    handledBy: "Senthil",
+    level: "L2",
+    refNo: "PR-109, MJ-234",
+    status: "L2 Mixed",
+    approved: 2,
+    rejected: 2,
+  },
+];
+
+const statusConfig = {
+  "L1 Review": { bg: "#FEF3C7", color: "#D97706", border: "#FDE68A" },
+  "L1 Rejected": { bg: "#FEE2E2", color: "#DC2626", border: "#FECACA" },
+  "L2 Review": { bg: "#EDE9FE", color: "#7C3AED", border: "#DDD6FE" },
+  "L2 Approved": { bg: "#D1FAE5", color: "#059669", border: "#A7F3D0" },
+  "L2 Mixed": { bg: "#EDE9FE", color: "#7C3AED", border: "#DDD6FE" },
+};
+
+const levelConfig = {
+  L1: { bg: "#DBEAFE", color: "#2563EB" },
+  L2: { bg: "#E0E7FF", color: "#4F46E5" },
+};
+
+function BadgeIcon({ type }) {
+  if (type === "critical")
+    return (
+      <Tooltip title='Critical'>
+        <WarningAmberIcon sx={{ fontSize: 16, color: "#F59E0B" }} />
+      </Tooltip>
+    );
+  if (type === "resubmitted")
+    return (
+      <Tooltip title='Resubmitted'>
+        <ReplayIcon sx={{ fontSize: 16, color: "#60A5FA" }} />
+      </Tooltip>
+    );
+  if (type === "new")
+    return (
+      <Chip
+        label='New(A)'
+        size='small'
+        sx={{
+          height: 22,
+          fontSize: "0.7rem",
+          fontWeight: 700,
+          fontFamily: "Poppins, sans-serif",
+          bgcolor: "#DBEAFE",
+          color: "#2563EB",
+          borderRadius: "6px",
+          "& .MuiChip-label": { px: 1 },
+        }}
+      />
+    );
+  return null;
+}
+
+function StatusCell({ status, approved, rejected }) {
+  const cfg = statusConfig[status] || statusConfig["L1 Review"];
+
+  if (status === "L2 Mixed") {
+    return (
+      <Stack
+        direction='row'
+        spacing={0.5}
+        alignItems='center'
+        justifyContent='flex-end'
+      >
+        <Chip
+          label='L2'
+          size='small'
+          sx={{
+            height: 24,
+            fontSize: "0.7rem",
+            fontWeight: 700,
+            fontFamily: "Poppins, sans-serif",
+            bgcolor: cfg.bg,
+            color: cfg.color,
+            borderRadius: "6px",
+            "& .MuiChip-label": { px: 1 },
+          }}
+        />
+        <Chip
+          icon={
+            <CheckIcon
+              sx={{ fontSize: "11px !important", color: "#059669 !important" }}
+            />
+          }
+          label={approved}
+          size='small'
+          sx={{
+            height: 24,
+            fontSize: "0.7rem",
+            fontWeight: 700,
+            fontFamily: "Poppins, sans-serif",
+            bgcolor: "#D1FAE5",
+            color: "#059669",
+            borderRadius: "6px",
+            "& .MuiChip-label": { px: 0.5 },
+          }}
+        />
+        <Chip
+          icon={
+            <CloseIcon
+              sx={{ fontSize: "11px !important", color: "#DC2626 !important" }}
+            />
+          }
+          label={rejected}
+          size='small'
+          sx={{
+            height: 24,
+            fontSize: "0.7rem",
+            fontWeight: 700,
+            fontFamily: "Poppins, sans-serif",
+            bgcolor: "#FEE2E2",
+            color: "#DC2626",
+            borderRadius: "6px",
+            "& .MuiChip-label": { px: 0.5 },
+          }}
+        />
+      </Stack>
+    );
+  }
+
+  return (
+    <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+      <Chip
+        label={status}
+        size='small'
+        sx={{
+          height: 26,
+          fontSize: "0.75rem",
+          fontWeight: 600,
+          fontFamily: "Poppins, sans-serif",
+          bgcolor: cfg.bg,
+          color: cfg.color,
+          border: `1px solid ${cfg.border}`,
+          borderRadius: "8px",
+          "& .MuiChip-label": { px: 1.5 },
+        }}
+      />
+    </Box>
+  );
+}
+
+const tabs = [
+  {
+    label: "All Requests",
+    count: 7,
+    icon: <ContentCopyOutlinedIcon sx={{ fontSize: 14 }} />,
+  },
+  {
+    label: "Critical",
+    count: 5,
+    icon: <WarningAmberIcon sx={{ fontSize: 14 }} />,
+  },
+  {
+    label: "New",
+    count: 3,
+    icon: <InsertDriveFileOutlinedIcon sx={{ fontSize: 14 }} />,
+  },
+  {
+    label: "Resubmitted",
+    count: 2,
+    icon: <ReplayIcon sx={{ fontSize: 14 }} />,
+  },
+];
 
 export default function Home() {
   const [search, setSearch] = useState("");
   const [filterAnchor, setFilterAnchor] = useState(null);
   const [selectedStatuses, setSelectedStatuses] = useState([]);
+  const [activeTab, setActiveTab] = useState(0);
 
   const [open, setOpen] = React.useState(false);
-  const handleOpen = () => setOpen(true);
+
+  const [approveModal, setApproveModal] = useState(false);
+  const [modalName, setModalName] = useState("");
+
   const handleClose = () => setOpen(false);
-
-  const handleFilterOpen = (e) => setFilterAnchor(e.currentTarget);
-  const handleFilterClose = () => setFilterAnchor(null);
-
-  const toggleStatus = (status) => {
-    setSelectedStatuses((prev) =>
-      prev.includes(status)
-        ? prev.filter((s) => s !== status)
-        : [...prev, status],
-    );
-  };
-
-  const filtered = dummyData.filter((row) => {
-    const matchSearch =
-      search === "" ||
-      row.id.toLowerCase().includes(search.toLowerCase()) ||
-      row.handledBy.toLowerCase().includes(search.toLowerCase()) ||
-      row.status.toLowerCase().includes(search.toLowerCase());
-    const matchStatus =
-      selectedStatuses.length === 0 || selectedStatuses.includes(row.status);
-    return matchSearch && matchStatus;
-  });
 
   return (
     <div>
@@ -390,272 +561,351 @@ export default function Home() {
           </Grid>
         </Grid>
 
-        <Box
-          sx={{
-            py: { xs: 1, md: 3 },
-            // maxWidth: 1100,
-            mx: "auto",
-            fontFamily: FONT,
-            background: "#fff",
-            borderRadius: 3,
-            mt: 2,
-          }}
-        >
-          {/* Header */}
-          <Box
+        <Box>
+          <Grid
             sx={{
-              px: 2,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              mb: 3,
-              flexWrap: "wrap",
-              gap: 2,
-            }}
-          >
-            <Typography
-              variant='h5'
-              sx={{
-                fontWeight: 700,
-                color: "#1a1a2e",
-                fontSize: "1.4rem",
-                fontFamily: FONT,
-              }}
-            >
-              Track Your Requests
-            </Typography>
-
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-              {/* Search */}
-              <TextField
-                size='small'
-                placeholder='Search...'
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position='start'>
-                      <SearchIcon sx={{ fontSize: 18, color: "#9ca3af" }} />
-                    </InputAdornment>
-                  ),
-                }}
-                sx={{
-                  width: 200,
-                  "& .MuiOutlinedInput-root": {
-                    borderRadius: "8px",
-                    fontSize: "0.85rem",
-                    background: "#fff",
-                    fontFamily: FONT,
-                  },
-                  "& input": { fontFamily: FONT },
-                }}
-              />
-
-              {/* Filter */}
-              <Button
-                variant='outlined'
-                size='small'
-                onClick={handleFilterOpen}
-                endIcon={<KeyboardArrowDownIcon />}
-                startIcon={<FilterListIcon />}
-                sx={{
-                  borderRadius: "8px",
-                  textTransform: "none",
-                  fontSize: "0.85rem",
-                  color: "#374151",
-                  borderColor: "#d1d5db",
-                  fontFamily: FONT,
-                  "&:hover": {
-                    borderColor: "#9ca3af",
-                    background: "#f9fafb",
-                  },
-                }}
-              >
-                Filter
-              </Button>
-              <Menu
-                anchorEl={filterAnchor}
-                open={Boolean(filterAnchor)}
-                onClose={handleFilterClose}
-                PaperProps={{
-                  sx: {
-                    borderRadius: "10px",
-                    minWidth: 180,
-                    boxShadow: "0 4px 20px rgba(0,0,0,0.12)",
-                  },
-                }}
-              >
-                {ALL_STATUSES.map((s) => (
-                  <MenuItem key={s} onClick={() => toggleStatus(s)} dense>
-                    <Checkbox
-                      checked={selectedStatuses.includes(s)}
-                      size='small'
-                      sx={{ p: 0.5 }}
-                    />
-                    <ListItemText
-                      primary={s}
-                      primaryTypographyProps={{
-                        fontSize: "0.85rem",
-                        fontFamily: FONT,
-                      }}
-                    />
-                  </MenuItem>
-                ))}
-              </Menu>
-
-              {/* New Request */}
-              <Button
-                variant='contained'
-                startIcon={<AddIcon />}
-                sx={{
-                  borderRadius: "8px",
-                  textTransform: "none",
-                  fontSize: "0.85rem",
-                  fontWeight: 600,
-                  background: "#1e40af",
-                  fontFamily: FONT,
-                  "&:hover": { background: "#1d3a9a" },
-                  px: 2,
-                }}
-                onClick={handleOpen}
-              >
-                New Request
-              </Button>
-            </Box>
-          </Box>
-
-          {/* Table */}
-          <TableContainer
-            // component={Paper}
-            elevation={0}
-            sx={{
-              border: "1px solid #e5e7eb",
+              mt: 2,
+              background: "#fff",
+              // borderRadius: "16px",
+              // border: "1px solid #E2E8F0",
               overflow: "hidden",
             }}
           >
-            <Table>
-              <TableHead>
-                <TableRow sx={{ background: "#f9fafb" }}>
-                  {[
-                    "Material Request ID",
-                    "Number of Materials",
-                    "Required Date",
-                    "Requested On",
-                    "Handled by",
-                    "Status",
-                  ].map((col) => (
-                    <TableCell
-                      key={col}
+            {/* Header */}
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                px: 3,
+                py: 2.5,
+                gap: 2,
+                flexWrap: "wrap",
+              }}
+            >
+              <Typography
+                variant='h6'
+                fontWeight={700}
+                color='#0F172A'
+                sx={{ fontSize: "1.1rem", fontFamily: "Poppins, sans-serif" }}
+              >
+                Request Center
+              </Typography>
+
+              {/* Tabs */}
+              <Stack direction='row' spacing={1} flexWrap='wrap'>
+                {tabs.map((tab, i) => (
+                  <Box
+                    key={i}
+                    onClick={() => setActiveTab(i)}
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 0.75,
+                      px: 1.5,
+                      py: 0.75,
+                      borderRadius: "8px",
+                      cursor: "pointer",
+                      bgcolor: activeTab === i ? "#DBEAFE" : "transparent",
+                      border:
+                        activeTab === i
+                          ? "1px solid #BFDBFE"
+                          : "1px solid transparent",
+                      transition: "all 0.15s",
+                      "&:hover": { bgcolor: "#F0F9FF" },
+                    }}
+                  >
+                    <Box
+                      sx={{ color: activeTab === i ? "#2563EB" : "#94A3B8" }}
+                    >
+                      {tab.icon}
+                    </Box>
+                    <Typography
+                      variant='body2'
+                      fontWeight={activeTab === i ? 700 : 500}
+                      color={activeTab === i ? "#2563EB" : "#64748B"}
                       sx={{
-                        fontWeight: 600,
-                        fontSize: "0.82rem",
-                        color: "#6b7280",
-                        borderBottom: "1px solid #e5e7eb",
-                        py: 1.5,
-                        whiteSpace: "nowrap",
-                        fontFamily: FONT,
+                        fontSize: "0.8rem",
+                        fontFamily: "Poppins, sans-serif",
                       }}
                     >
-                      {col}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {filtered.length === 0 ? (
-                  <TableRow>
-                    <TableCell
-                      colSpan={6}
-                      align='center'
-                      sx={{ py: 4, color: "#9ca3af" }}
+                      {tab.label}
+                    </Typography>
+                    <Box
+                      sx={{
+                        bgcolor: activeTab === i ? "#2563EB" : "#E2E8F0",
+                        color: activeTab === i ? "#fff" : "#64748B",
+                        borderRadius: "4px",
+                        px: 0.6,
+                        py: 0.1,
+                        fontSize: "0.7rem",
+                        fontWeight: 700,
+                        fontFamily: "Poppins, sans-serif",
+                        minWidth: 20,
+                        textAlign: "center",
+                      }}
                     >
-                      No records found
+                      {tab.count}
+                    </Box>
+                  </Box>
+                ))}
+              </Stack>
+
+              {/* Actions */}
+              <Stack direction='row' spacing={1} alignItems='center'>
+                <IconButton
+                  size='small'
+                  sx={{
+                    border: "1px solid #E2E8F0",
+                    borderRadius: "8px",
+                    p: 0.75,
+                  }}
+                >
+                  <SearchIcon sx={{ fontSize: 18, color: "#64748B" }} />
+                </IconButton>
+                <IconButton
+                  size='small'
+                  sx={{
+                    border: "1px solid #E2E8F0",
+                    borderRadius: "8px",
+                    p: 0.75,
+                  }}
+                >
+                  <FilterListIcon sx={{ fontSize: 18, color: "#64748B" }} />
+                </IconButton>
+                <Button
+                  variant='contained'
+                  startIcon={<AddIcon />}
+                  size='small'
+                  sx={{
+                    bgcolor: "#2563EB",
+                    borderRadius: "8px",
+                    textTransform: "none",
+                    fontWeight: 600,
+                    fontSize: "0.8rem",
+                    fontFamily: "Poppins, sans-serif",
+                    px: 2,
+                    py: 0.875,
+                    boxShadow: "none",
+                    "&:hover": { bgcolor: "#1D4ED8", boxShadow: "none" },
+                  }}
+                  onClick={() => {
+                    setOpen(true);
+                  }}
+                >
+                  New Request
+                </Button>
+              </Stack>
+            </Box>
+
+            <Divider />
+
+            {/* Table */}
+            <TableContainer
+              sx={{
+                borderLeft: "1px solid #E2E8F0",
+                borderRight: "1px solid #E2E8F0",
+              }}
+            >
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell sx={{ fontFamily: "Poppins, sans-serif" }}>
+                      Material Request ID
+                    </TableCell>
+                    <TableCell sx={{ fontFamily: "Poppins, sans-serif" }}>
+                      Requester
+                      <Typography
+                        component='span'
+                        sx={{
+                          color: "#DC2626",
+                          fontWeight: 700,
+                          ml: 0.5,
+                          fontFamily: "Poppins, sans-serif",
+                        }}
+                      >
+                        (Approver)
+                      </Typography>
+                    </TableCell>
+                    <TableCell
+                      align='center'
+                      sx={{ fontFamily: "Poppins, sans-serif" }}
+                    >
+                      Number of Materials
+                    </TableCell>
+                    <TableCell sx={{ fontFamily: "Poppins, sans-serif" }}>
+                      Requested On
+                    </TableCell>
+                    <TableCell sx={{ fontFamily: "Poppins, sans-serif" }}>
+                      Required Date
+                    </TableCell>
+                    <TableCell sx={{ fontFamily: "Poppins, sans-serif" }}>
+                      Handled by
+                    </TableCell>
+                    <TableCell sx={{ fontFamily: "Poppins, sans-serif" }}>
+                      Reference No.
+                    </TableCell>
+                    <TableCell
+                      align='right'
+                      sx={{ fontFamily: "Poppins, sans-serif" }}
+                    >
+                      Status
                     </TableCell>
                   </TableRow>
-                ) : (
-                  filtered.map((row, idx) => (
+                </TableHead>
+                <TableBody>
+                  {rows.map((row) => (
                     <TableRow
-                      key={idx}
+                      key={row.id}
                       sx={{
-                        "&:last-child td": { border: 0 },
-                        "&:hover": { background: "#f8fafc" },
-                        transition: "background 0.15s",
+                        "&:hover": { bgcolor: "#F8FAFC" },
+                        transition: "background 0.1s",
+                      }}
+                      onClick={() => {
+                        setApproveModal(true);
+
+                        if (row.status == "L1 Review") {
+                          setModalName("ApproveModal");
+                        } else if (row.status == "L1 Rejected") {
+                          setModalName("L1RejectFirstModal");
+                        } else if (row.status == "L2 Mixed") {
+                          setModalName("L2RejectModal");
+                        } else {
+                          setModalName("");
+                        }
                       }}
                     >
-                      <TableCell
-                        sx={{
-                          fontSize: "0.875rem",
-                          fontWeight: 500,
-                          color: "#111827",
-                          borderBottom: "1px solid #f3f4f6",
+                      {/* ID + Badges */}
+                      <TableCell>
+                        <Stack direction='row' alignItems='center' spacing={1}>
+                          <Typography
+                            fontWeight={600}
+                            fontSize='0.875rem'
+                            color='#1E293B'
+                            sx={{ fontFamily: "Poppins, sans-serif" }}
+                          >
+                            {row.id}
+                          </Typography>
+                          {row.badges.map((b, i) => (
+                            <BadgeIcon key={i} type={b} />
+                          ))}
+                        </Stack>
+                      </TableCell>
 
-                          fontFamily: FONT,
-                          py: 0,
-                        }}
-                      >
-                        {row.id}
+                      {/* Requester */}
+                      <TableCell sx={{ fontFamily: "Poppins, sans-serif" }}>
+                        {row.requester}
                       </TableCell>
+
+                      {/* Materials */}
                       <TableCell
-                        sx={{
-                          fontSize: "0.875rem",
-                          color: "#374151",
-                          borderBottom: "1px solid #f3f4f6",
-                          textAlign: "right",
-                          pr: 6,
-                          fontFamily: FONT,
-                          py: 0,
-                        }}
+                        align='center'
+                        sx={{ fontFamily: "Poppins, sans-serif" }}
                       >
-                        {row.numMaterials}
+                        <Typography
+                          fontWeight={500}
+                          sx={{ fontFamily: "Poppins, sans-serif" }}
+                        >
+                          {row.materials}
+                        </Typography>
                       </TableCell>
-                      <TableCell
-                        sx={{
-                          fontSize: "0.875rem",
-                          color: "#374151",
-                          borderBottom: "1px solid #f3f4f6",
-                          fontFamily: FONT,
-                          py: 0,
-                        }}
-                      >
-                        {row.requiredDate}
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          fontSize: "0.875rem",
-                          color: "#374151",
-                          borderBottom: "1px solid #f3f4f6",
-                          fontFamily: FONT,
-                          py: 0,
-                        }}
-                      >
+
+                      {/* Requested On */}
+                      <TableCell sx={{ fontFamily: "Poppins, sans-serif" }}>
                         {row.requestedOn}
                       </TableCell>
-                      <TableCell
-                        sx={{
-                          fontSize: "0.875rem",
-                          color: "#374151",
-                          borderBottom: "1px solid #f3f4f6",
-                          fontFamily: FONT,
-                          py: 0,
-                        }}
-                      >
-                        <Box sx={{ display: "flex", alignItems: "center" }}>
-                          {row.handledBy}
-                          {row.level && <LevelBadge level={row.level} />}
-                        </Box>
+
+                      {/* Required Date */}
+                      <TableCell sx={{ fontFamily: "Poppins, sans-serif" }}>
+                        {row.requiredDate}
                       </TableCell>
-                      <TableCell
-                        sx={{ borderBottom: "1px solid #f3f4f6", py: 1 }}
-                      >
-                        <StatusChip status={row.status} />
+
+                      {/* Handled By + Level */}
+                      <TableCell sx={{ fontFamily: "Poppins, sans-serif" }}>
+                        <Stack direction='row' alignItems='center' spacing={1}>
+                          <Typography
+                            sx={{ fontFamily: "Poppins, sans-serif" }}
+                          >
+                            {row.handledBy}
+                          </Typography>
+                          <Chip
+                            label={row.level}
+                            size='small'
+                            sx={{
+                              height: 22,
+                              fontSize: "0.7rem",
+                              fontWeight: 700,
+                              fontFamily: "Poppins, sans-serif",
+                              bgcolor: levelConfig[row.level].bg,
+                              color: levelConfig[row.level].color,
+                              borderRadius: "6px",
+                              "& .MuiChip-label": { px: 1 },
+                            }}
+                          />
+                        </Stack>
+                      </TableCell>
+
+                      {/* Ref No */}
+                      <TableCell>
+                        <Typography
+                          color={row.refNo === "-" ? "#94A3B8" : "#1E293B"}
+                          sx={{ fontFamily: "Poppins, sans-serif" }}
+                        >
+                          {row.refNo}
+                        </Typography>
+                      </TableCell>
+
+                      {/* Status */}
+                      <TableCell align='right'>
+                        <StatusCell
+                          status={row.status}
+                          approved={row.approved}
+                          rejected={row.rejected}
+                        />
                       </TableCell>
                     </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Grid>
         </Box>
+
+        <div>
+          <Modal
+            open={approveModal}
+            onClose={handleClose}
+            aria-labelledby='modal-modal-title'
+            aria-describedby='modal-modal-description'
+          >
+            <Box sx={style}>
+              <Grid
+                sx={{
+                  position: "absolute",
+                  top: 10,
+                  right: 10,
+                  cursor: "pointer",
+                }}
+              >
+                <CloseIcon
+                  onClick={() => {
+                    setApproveModal(false);
+                  }}
+                />
+              </Grid>
+
+              {modalName == "ApproveModal" ? (
+                <ApproveMaterial />
+              ) : modalName == "L1RejectFirstModal" ? (
+                <L1RejectFirstModal />
+              ) : modalName == "L2RejectModal" ? (
+                <L2RejectModal />
+              ) : (
+                ""
+              )}
+            </Box>
+          </Modal>
+        </div>
 
         <div>
           <Modal
@@ -679,6 +929,7 @@ export default function Home() {
                   }}
                 />
               </Grid>
+
               <CreateMaterialRequest />
             </Box>
           </Modal>
