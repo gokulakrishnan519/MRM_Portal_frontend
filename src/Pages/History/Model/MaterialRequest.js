@@ -98,11 +98,42 @@ export default function MaterialRequest({ mrDetails }) {
   };
 
   const bodyCellSx = {
-    py: 0.7,
+    py: 1,
     px: 1,
     borderBottom: "1px solid #eaecf0",
     fontFamily: "Poppins, sans-serif",
     fontSize: "11px",
+  };
+  const statusStyles = {
+    Draft: {
+      background: "#f2f4f7",
+      color: "#667085",
+    },
+    Pending: {
+      background: "#fff4e5",
+      color: "#f79009",
+    },
+    "Final Review": {
+      background: "#e0f2fe",
+      color: "#0284c7",
+    },
+    "L2 Review": {
+      background: "#ede9fe",
+      color: "#7c3aed",
+    },
+    Approved: {
+      background: "#dcfce7",
+      color: "#16a34a",
+    },
+    Rejected: {
+      background: "#fee2e2",
+      color: "#dc2626",
+    },
+  };
+
+  const currentStyle = statusStyles[mrDetails.status] || {
+    background: "#f2f4f7",
+    color: "#667085",
   };
 
   return (
@@ -112,11 +143,11 @@ export default function MaterialRequest({ mrDetails }) {
           position: "absolute",
           top: 4,
           right: 0,
-          p: "2px",
-          background: "#c7c0f0",
-          color: "#725cf2",
+          p: "3px",
+          background: currentStyle.background,
+          color: currentStyle.color,
           fontFamily: "Poppins",
-          fontSize: "12px",
+          fontSize: "10px",
           borderRadius: "15px",
           width: "80px",
           textAlign: "center",

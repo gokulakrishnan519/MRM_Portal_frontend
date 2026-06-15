@@ -268,11 +268,11 @@ const rows = [
 ];
 
 const statusConfig = {
-  "L1 Review": { bg: "#FEF3C7", color: "#D97706", border: "#FDE68A" },
-  "L1 Rejected": { bg: "#FEE2E2", color: "#DC2626", border: "#FECACA" },
-  "L2 Review": { bg: "#EDE9FE", color: "#7C3AED", border: "#DDD6FE" },
-  "L2 Approved": { bg: "#D1FAE5", color: "#059669", border: "#A7F3D0" },
-  "L2 Mixed": { bg: "#EDE9FE", color: "#7C3AED", border: "#DDD6FE" },
+  "L1 Review": { bg: "#FEEFDA", color: "#F99709", border: "#FDE68A" },
+  "L1 Rejected": { bg: "#FBE3EA", color: "#E34472", border: "#FECACA" },
+  "L2 Review": { bg: "#EBE9FD", color: "#7C6CF2", border: "#DDD6FE" },
+  "L2 Approved": { bg: "#DCF7F7", color: "#16C8C7", border: "#A7F3D0" },
+  "L2 Mixed": { bg: "#E8EDFF", color: "#7C3AED", border: "#DDD6FE" },
 };
 
 const levelConfig = {
@@ -283,29 +283,29 @@ const levelConfig = {
 function BadgeIcon({ type }) {
   if (type === "critical")
     return (
-      <Tooltip title='Critical'>
+      <Tooltip title="Critical">
         <WarningAmberIcon sx={{ fontSize: 16, color: "#F59E0B" }} />
       </Tooltip>
     );
   if (type === "resubmitted")
     return (
-      <Tooltip title='Resubmitted'>
+      <Tooltip title="Resubmitted">
         <ReplayIcon sx={{ fontSize: 16, color: "#60A5FA" }} />
       </Tooltip>
     );
   if (type === "new")
     return (
       <Chip
-        label='New(A)'
-        size='small'
+        label="New(A)"
+        size="small"
         sx={{
           height: 22,
           fontSize: "0.7rem",
-          fontWeight: 700,
+          fontWeight: 500,
           fontFamily: "Poppins, sans-serif",
           bgcolor: "#DBEAFE",
           color: "#2563EB",
-          borderRadius: "6px",
+          borderRadius: "10px",
           "& .MuiChip-label": { px: 1 },
         }}
       />
@@ -319,22 +319,22 @@ function StatusCell({ status, approved, rejected }) {
   if (status === "L2 Mixed") {
     return (
       <Stack
-        direction='row'
+        direction="row"
         spacing={0.5}
-        alignItems='center'
-        justifyContent='flex-end'
+        alignItems="center"
+        justifyContaent="flex-end"
       >
         <Chip
-          label='L2'
-          size='small'
+          label="L2"
+          size="small"
           sx={{
             height: 24,
             fontSize: "0.7rem",
-            fontWeight: 700,
+            fontWeight: 500,
             fontFamily: "Poppins, sans-serif",
             bgcolor: cfg.bg,
             color: cfg.color,
-            borderRadius: "6px",
+            borderRadius: "15px",
             "& .MuiChip-label": { px: 1 },
           }}
         />
@@ -345,15 +345,15 @@ function StatusCell({ status, approved, rejected }) {
             />
           }
           label={approved}
-          size='small'
+          size="small"
           sx={{
             height: 24,
             fontSize: "0.7rem",
-            fontWeight: 700,
+            fontWeight: 500,
             fontFamily: "Poppins, sans-serif",
             bgcolor: "#D1FAE5",
             color: "#059669",
-            borderRadius: "6px",
+            borderRadius: "15px",
             "& .MuiChip-label": { px: 0.5 },
           }}
         />
@@ -364,15 +364,15 @@ function StatusCell({ status, approved, rejected }) {
             />
           }
           label={rejected}
-          size='small'
+          size="small"
           sx={{
             height: 24,
             fontSize: "0.7rem",
-            fontWeight: 700,
+            fontWeight: 500,
             fontFamily: "Poppins, sans-serif",
             bgcolor: "#FEE2E2",
             color: "#DC2626",
-            borderRadius: "6px",
+            borderRadius: "15px",
             "& .MuiChip-label": { px: 0.5 },
           }}
         />
@@ -384,16 +384,17 @@ function StatusCell({ status, approved, rejected }) {
     <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
       <Chip
         label={status}
-        size='small'
+        size="small"
         sx={{
           height: 26,
-          fontSize: "0.75rem",
-          fontWeight: 600,
+          fontSize: "0.70rem",
+          fontWeight: 500,
           fontFamily: "Poppins, sans-serif",
           bgcolor: cfg.bg,
           color: cfg.color,
-          border: `1px solid ${cfg.border}`,
-          borderRadius: "8px",
+          // border: `1px solid ${cfg.border}`,
+          borderRadius: "15px",
+          width: "100px",
           "& .MuiChip-label": { px: 1.5 },
         }}
       />
@@ -460,9 +461,9 @@ export default function Home() {
                     >
                       {/* Image */}
                       <Box
-                        component='img'
+                        component="img"
                         src={item.image}
-                        alt=''
+                        alt=""
                         sx={{
                           position: "absolute",
                           inset: 0,
@@ -552,7 +553,7 @@ export default function Home() {
           <Grid size={{ lg: 7, xs: 12, md: 12, sm: 12 }}>
             <img
               src={right_icon}
-              alt='icon'
+              alt="icon"
               style={{
                 width: "100%",
                 objectFit: "contain",
@@ -584,16 +585,16 @@ export default function Home() {
               }}
             >
               <Typography
-                variant='h6'
+                variant="h6"
                 fontWeight={700}
-                color='#0F172A'
+                color="#0F172A"
                 sx={{ fontSize: "1.1rem", fontFamily: "Poppins, sans-serif" }}
               >
                 Request Center
               </Typography>
 
               {/* Tabs */}
-              <Stack direction='row' spacing={1} flexWrap='wrap'>
+              <Stack direction="row" spacing={1} flexWrap="wrap">
                 {tabs.map((tab, i) => (
                   <Box
                     key={i}
@@ -621,11 +622,11 @@ export default function Home() {
                       {tab.icon}
                     </Box>
                     <Typography
-                      variant='body2'
+                      variant="body2"
                       fontWeight={activeTab === i ? 700 : 500}
                       color={activeTab === i ? "#2563EB" : "#64748B"}
                       sx={{
-                        fontSize: "0.8rem",
+                        fontSize: "0.70rem",
                         fontFamily: "Poppins, sans-serif",
                       }}
                     >
@@ -652,9 +653,9 @@ export default function Home() {
               </Stack>
 
               {/* Actions */}
-              <Stack direction='row' spacing={1} alignItems='center'>
+              <Stack direction="row" spacing={1} alignItems="center">
                 <IconButton
-                  size='small'
+                  size="small"
                   sx={{
                     border: "1px solid #E2E8F0",
                     borderRadius: "8px",
@@ -664,7 +665,7 @@ export default function Home() {
                   <SearchIcon sx={{ fontSize: 18, color: "#64748B" }} />
                 </IconButton>
                 <IconButton
-                  size='small'
+                  size="small"
                   sx={{
                     border: "1px solid #E2E8F0",
                     borderRadius: "8px",
@@ -674,15 +675,15 @@ export default function Home() {
                   <FilterListIcon sx={{ fontSize: 18, color: "#64748B" }} />
                 </IconButton>
                 <Button
-                  variant='contained'
+                  variant="contained"
                   startIcon={<AddIcon />}
-                  size='small'
+                  size="small"
                   sx={{
                     bgcolor: "#2563EB",
                     borderRadius: "8px",
                     textTransform: "none",
                     fontWeight: 600,
-                    fontSize: "0.8rem",
+                    fontSize: "0.70rem",
                     fontFamily: "Poppins, sans-serif",
                     px: 2,
                     py: 0.875,
@@ -710,44 +711,89 @@ export default function Home() {
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell sx={{ fontFamily: "Poppins, sans-serif" }}>
+                    <TableCell
+                      sx={{
+                        fontFamily: "Poppins, sans-serif",
+                        fontSize: "0.8rem",
+                      }}
+                    >
                       Material Request ID
                     </TableCell>
-                    <TableCell sx={{ fontFamily: "Poppins, sans-serif" }}>
+                    <TableCell
+                      sx={{
+                        fontFamily: "Poppins, sans-serif",
+                        fontSize: "0.8rem",
+                        textAlign: "center",
+                      }}
+                    >
                       Requester
                       <Typography
-                        component='span'
+                        component="span"
                         sx={{
                           color: "#DC2626",
-                          fontWeight: 700,
+                          fontWeight: 600,
                           ml: 0.5,
                           fontFamily: "Poppins, sans-serif",
+                          fontSize: "0.8rem",
+                          textAlign: "center",
                         }}
                       >
                         (Approver)
                       </Typography>
                     </TableCell>
                     <TableCell
-                      align='center'
-                      sx={{ fontFamily: "Poppins, sans-serif" }}
+                      align="center"
+                      sx={{
+                        fontFamily: "Poppins, sans-serif",
+                        fontSize: "0.8rem",
+                        textAlign: "center",
+                      }}
                     >
                       Number of Materials
                     </TableCell>
-                    <TableCell sx={{ fontFamily: "Poppins, sans-serif" }}>
+                    <TableCell
+                      sx={{
+                        fontFamily: "Poppins, sans-serif",
+                        fontSize: "0.8rem",
+                        textAlign: "center",
+                      }}
+                    >
                       Requested On
                     </TableCell>
-                    <TableCell sx={{ fontFamily: "Poppins, sans-serif" }}>
+                    <TableCell
+                      sx={{
+                        fontFamily: "Poppins, sans-serif",
+                        fontSize: "0.8rem",
+                        textAlign: "center",
+                      }}
+                    >
                       Required Date
                     </TableCell>
-                    <TableCell sx={{ fontFamily: "Poppins, sans-serif" }}>
+                    <TableCell
+                      sx={{
+                        fontFamily: "Poppins, sans-serif",
+                        fontSize: "0.8rem",
+                        textAlign: "center",
+                      }}
+                    >
                       Handled by
                     </TableCell>
-                    <TableCell sx={{ fontFamily: "Poppins, sans-serif" }}>
+                    <TableCell
+                      sx={{
+                        fontFamily: "Poppins, sans-serif",
+                        fontSize: "0.8rem",
+                        textAlign: "center",
+                      }}
+                    >
                       Reference No.
                     </TableCell>
                     <TableCell
-                      align='right'
-                      sx={{ fontFamily: "Poppins, sans-serif" }}
+                      // align="right"
+                      sx={{
+                        fontFamily: "Poppins, sans-serif",
+                        textAlign: "center",
+                        fontSize: "0.8rem",
+                      }}
                     >
                       Status
                     </TableCell>
@@ -777,11 +823,11 @@ export default function Home() {
                     >
                       {/* ID + Badges */}
                       <TableCell>
-                        <Stack direction='row' alignItems='center' spacing={1}>
+                        <Stack direction="row" alignItems="center" spacing={1}>
                           <Typography
                             fontWeight={600}
-                            fontSize='0.875rem'
-                            color='#1E293B'
+                            fontSize="0.70rem"
+                            color="#1E293B"
                             sx={{ fontFamily: "Poppins, sans-serif" }}
                           >
                             {row.id}
@@ -793,47 +839,71 @@ export default function Home() {
                       </TableCell>
 
                       {/* Requester */}
-                      <TableCell sx={{ fontFamily: "Poppins, sans-serif" }}>
+                      <TableCell
+                        sx={{
+                          fontFamily: "Poppins, sans-serif",
+                          fontSize: "0.70rem",
+                          textAlign: "center",
+                        }}
+                      >
                         {row.requester}
                       </TableCell>
 
                       {/* Materials */}
                       <TableCell
-                        align='center'
-                        sx={{ fontFamily: "Poppins, sans-serif" }}
+                        align="center"
+                        sx={{
+                          fontFamily: "Poppins, sans-serif",
+                        }}
                       >
                         <Typography
                           fontWeight={500}
-                          sx={{ fontFamily: "Poppins, sans-serif" }}
+                          sx={{
+                            fontFamily: "Poppins, sans-serif",
+                            fontSize: "0.76rem",
+                          }}
                         >
                           {row.materials}
                         </Typography>
                       </TableCell>
 
                       {/* Requested On */}
-                      <TableCell sx={{ fontFamily: "Poppins, sans-serif" }}>
+                      <TableCell
+                        sx={{
+                          fontFamily: "Poppins, sans-serif",
+                          fontSize: "0.76rem",
+                        }}
+                      >
                         {row.requestedOn}
                       </TableCell>
 
                       {/* Required Date */}
-                      <TableCell sx={{ fontFamily: "Poppins, sans-serif" }}>
+                      <TableCell
+                        sx={{
+                          fontFamily: "Poppins, sans-serif",
+                          fontSize: "0.76rem",
+                        }}
+                      >
                         {row.requiredDate}
                       </TableCell>
 
                       {/* Handled By + Level */}
                       <TableCell sx={{ fontFamily: "Poppins, sans-serif" }}>
-                        <Stack direction='row' alignItems='center' spacing={1}>
+                        <Stack direction="row" alignItems="center" spacing={1}>
                           <Typography
-                            sx={{ fontFamily: "Poppins, sans-serif" }}
+                            sx={{
+                              fontFamily: "Poppins, sans-serif",
+                              fontSize: "0.76rem",
+                            }}
                           >
                             {row.handledBy}
                           </Typography>
                           <Chip
                             label={row.level}
-                            size='small'
+                            size="small"
                             sx={{
                               height: 22,
-                              fontSize: "0.7rem",
+                              fontSize: "0.70rem",
                               fontWeight: 700,
                               fontFamily: "Poppins, sans-serif",
                               bgcolor: levelConfig[row.level].bg,
@@ -849,14 +919,18 @@ export default function Home() {
                       <TableCell>
                         <Typography
                           color={row.refNo === "-" ? "#94A3B8" : "#1E293B"}
-                          sx={{ fontFamily: "Poppins, sans-serif" }}
+                          sx={{
+                            fontFamily: "Poppins, sans-serif",
+                            fontSize: "0.76rem",
+                            textAlign: "center",
+                          }}
                         >
                           {row.refNo}
                         </Typography>
                       </TableCell>
 
                       {/* Status */}
-                      <TableCell align='right'>
+                      <TableCell sx={{ textAlign: "center" }}>
                         <StatusCell
                           status={row.status}
                           approved={row.approved}
@@ -875,8 +949,8 @@ export default function Home() {
           <Modal
             open={approveModal}
             onClose={handleClose}
-            aria-labelledby='modal-modal-title'
-            aria-describedby='modal-modal-description'
+            aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description"
           >
             <Box sx={style}>
               <Grid
@@ -911,8 +985,8 @@ export default function Home() {
           <Modal
             open={open}
             onClose={handleClose}
-            aria-labelledby='modal-modal-title'
-            aria-describedby='modal-modal-description'
+            aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description"
           >
             <Box sx={style}>
               <Grid

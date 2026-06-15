@@ -131,18 +131,19 @@ export default function CreateMaterialRequest() {
   return (
     <Box
       sx={{
-        backgroundColor: "#f5f6fa",
+        backgroundColor: "#F1F5F9",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         py: 3,
         px: 2,
         fontFamily: "Poppins, sans-serif",
+        borderRadius: "10px",
       }}
     >
       {/* Title */}
       <Typography
-        variant='h4'
+        variant="h4"
         sx={{
           fontWeight: 700,
           color: "#101828",
@@ -161,8 +162,8 @@ export default function CreateMaterialRequest() {
           width: "100%",
           maxWidth: 1100,
           borderRadius: "10px",
-          border: "1px solid #e4e7ec",
-          backgroundColor: "#eef0fb",
+          // border: "1px solid #e4e7ec",
+          backgroundColor: "white",
           p: 2,
           mb: 2,
           display: "flex",
@@ -205,7 +206,7 @@ export default function CreateMaterialRequest() {
             <DatePicker
               value={requiredDate}
               onChange={(newValue) => setRequiredDate(newValue)}
-              format='DD/MM/YYYY'
+              format="DD/MM/YYYY"
               slotProps={{
                 textField: {
                   variant: "standard",
@@ -260,9 +261,9 @@ export default function CreateMaterialRequest() {
           </Typography>
 
           <TextField
-            size='small'
+            size="small"
             fullWidth
-            placeholder='Enter the Purpose'
+            placeholder="Enter the Purpose"
             value={purpose}
             onChange={(e) => setPurpose(e.target.value)}
             sx={inputSx}
@@ -277,8 +278,8 @@ export default function CreateMaterialRequest() {
           width: "100%",
           maxWidth: 1100,
           borderRadius: "10px",
-          border: "1px solid #e4e7ec",
-          backgroundColor: "#eef0fb",
+          // border: "1px solid #e4e7ec",
+          backgroundColor: "white",
           p: 2,
           mb: 3,
         }}
@@ -304,7 +305,7 @@ export default function CreateMaterialRequest() {
             overflow: "hidden",
           }}
         >
-          <Table size='small'>
+          <Table size="small">
             <TableHead>
               <TableRow>
                 <TableCell sx={{ ...headerCellSx, width: "28%" }}>
@@ -349,9 +350,17 @@ export default function CreateMaterialRequest() {
               {rows.map((row) => (
                 <TableRow key={row.id} sx={{ backgroundColor: "#fff" }}>
                   {/* Material Name */}
-                  <TableCell sx={bodyCellSx}>
+                  <TableCell
+                    sx={{
+                      ...bodyCellSx,
+                      "& .MuiOutlinedInput-root": {
+                        height: 15,
+                        marginY: 1,
+                      },
+                    }}
+                  >
                     <Autocomplete
-                      size='small'
+                      size="small"
                       options={materialOptions}
                       value={row.materialName || null}
                       onChange={(_, val) =>
@@ -360,7 +369,7 @@ export default function CreateMaterialRequest() {
                       renderInput={(params) => (
                         <TextField
                           {...params}
-                          placeholder='Material Name'
+                          placeholder="Material Name"
                           sx={inputSx}
                         />
                       )}
@@ -386,7 +395,7 @@ export default function CreateMaterialRequest() {
                   {/* Material Category */}
                   <TableCell sx={bodyCellSx}>
                     <Select
-                      size='small'
+                      size="small"
                       fullWidth
                       displayEmpty
                       value={row.materialCategory}
@@ -442,55 +451,32 @@ export default function CreateMaterialRequest() {
 
                   {/* UOM */}
                   <TableCell sx={bodyCellSx}>
-                    <Select
-                      size='small'
+                    <TextField
+                      size="small"
                       fullWidth
-                      displayEmpty
+                      placeholder="UOM"
                       value={row.uom}
                       onChange={(e) =>
                         handleRowChange(row.id, "uom", e.target.value)
                       }
-                      renderValue={(v) =>
-                        v || (
-                          <span
-                            style={{
-                              color: "#9aa0ac",
-                              fontSize: 11,
-                              fontFamily: "Poppins, sans-serif",
-                            }}
-                          >
-                            UOM
-                          </span>
-                        )
-                      }
                       sx={{
-                        fontSize: "11px",
-                        fontFamily: "Poppins, sans-serif",
-                        backgroundColor: "#fff",
-                        borderRadius: "5px",
-                        minHeight: "34px",
+                        "& .MuiOutlinedInput-root": {
+                          minHeight: "34px",
+                          backgroundColor: "#fff",
+                          borderRadius: "5px",
+                          fontFamily: "Poppins, sans-serif",
+                          fontSize: "11px",
+                        },
+                        "& .MuiOutlinedInput-input": {
+                          padding: "6px 10px",
+                          fontSize: "11px",
+                          fontFamily: "Poppins, sans-serif",
+                        },
                         "& .MuiOutlinedInput-notchedOutline": {
                           borderColor: "#d0d5dd",
                         },
-                        "& .MuiSelect-select": {
-                          padding: "6px 10px",
-                          fontFamily: "Poppins, sans-serif",
-                        },
                       }}
-                    >
-                      {uomOptions.map((u) => (
-                        <MenuItem
-                          key={u}
-                          value={u}
-                          sx={{
-                            fontSize: "11px",
-                            fontFamily: "Poppins, sans-serif",
-                          }}
-                        >
-                          {u}
-                        </MenuItem>
-                      ))}
-                    </Select>
+                    />
                   </TableCell>
 
                   {/* Stock */}
@@ -507,10 +493,10 @@ export default function CreateMaterialRequest() {
                   {/* Quantity */}
                   <TableCell sx={bodyCellSx}>
                     <TextField
-                      size='small'
+                      size="small"
                       fullWidth
-                      placeholder='Quantity'
-                      type='number'
+                      placeholder="Quantity"
+                      type="number"
                       value={row.quantity}
                       onChange={(e) =>
                         handleRowChange(row.id, "quantity", e.target.value)
@@ -542,7 +528,7 @@ export default function CreateMaterialRequest() {
                       }}
                     >
                       <IconButton
-                        size='small'
+                        size="small"
                         onClick={() => handleRefreshRow(row.id)}
                         sx={{
                           color: "#b0b7c3",
@@ -556,7 +542,7 @@ export default function CreateMaterialRequest() {
                       </IconButton>
 
                       <IconButton
-                        size='small'
+                        size="small"
                         onClick={() => handleRemoveRow(row.id)}
                         disabled={rows.length === 1}
                         sx={{

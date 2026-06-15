@@ -192,7 +192,7 @@ function StatusChip({ status }) {
         px: 1.5,
         py: 0.5,
         borderRadius: "20px",
-        border: `1px solid ${cfg.border}`,
+        // border: `1px solid ${cfg.border}`,
         background: cfg.bg,
         color: cfg.color,
         fontWeight: 500,
@@ -243,7 +243,7 @@ const style = {
   boxShadow: 24,
   px: 3,
   py: 4,
-  borderRadius: "10px",
+  borderRadius: "15px",
 };
 
 export default function History() {
@@ -584,7 +584,8 @@ export default function History() {
                         borderBottom: "1px solid #e5e7eb",
                         py: 1.5,
                         whiteSpace: "nowrap",
-                        fontFamily: FONT,
+                        fontFamily: "Poppins",
+                        textAlign: "center",
                       }}
                     >
                       {col}
@@ -620,7 +621,7 @@ export default function History() {
                           fontWeight: 500,
                           color: "#111827",
                           borderBottom: "1px solid #f3f4f6",
-
+                          textAlign: "center",
                           fontFamily: FONT,
                           py: 0,
                         }}
@@ -687,7 +688,7 @@ export default function History() {
                           fontSize: "0.875rem",
                           color: "#374151",
                           borderBottom: "1px solid #f3f4f6",
-                          textAlign: "right",
+                          textAlign: "center",
                           pr: 6,
                           fontFamily: FONT,
                           py: 0,
@@ -700,7 +701,7 @@ export default function History() {
                           fontSize: "0.875rem",
                           color: "#374151",
                           borderBottom: "1px solid #f3f4f6",
-                          textAlign: "right",
+                          textAlign: "center",
                           pr: 6,
                           fontFamily: FONT,
                           py: 0,
@@ -714,6 +715,7 @@ export default function History() {
                           color: "#374151",
                           borderBottom: "1px solid #f3f4f6",
                           fontFamily: FONT,
+                          textAlign: "center",
                           py: 0,
                         }}
                       >
@@ -725,6 +727,7 @@ export default function History() {
                           color: "#374151",
                           borderBottom: "1px solid #f3f4f6",
                           fontFamily: FONT,
+                          textAlign: "center",
                           py: 0,
                         }}
                       >
@@ -736,10 +739,16 @@ export default function History() {
                           color: "#374151",
                           borderBottom: "1px solid #f3f4f6",
                           fontFamily: FONT,
+
                           py: 0,
                         }}
                       >
-                        <Box sx={{ display: "flex", alignItems: "center" }}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                          }}
+                        >
                           {row.handledBy}
                           {row.level && <LevelBadge level={row.level} />}
                         </Box>
@@ -764,7 +773,7 @@ export default function History() {
             aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-description"
           >
-            <Box sx={style}>
+            <Box sx={{ ...style, outline: "none" }}>
               <Grid
                 sx={{
                   position: "absolute",

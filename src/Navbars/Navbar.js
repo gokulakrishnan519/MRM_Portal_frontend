@@ -211,20 +211,20 @@ export default function Navbar({ children }) {
     <Box sx={{ display: "flex", height: "100vh" }}>
       <CssBaseline />
       <AppBar
-        position='fixed'
+        position="fixed"
         // open={open}
         sx={{
-          backgroundColor: "#fafafa",
+          backgroundColor: "#f8f8f8",
           boxShadow: "none",
           height: "8vh",
         }}
       >
         <Grid>
           <Box
-            display='flex'
-            alignItems='center'
-            justifyContent='space-between'
-            width='100%'
+            display="flex"
+            alignItems="center"
+            justifyContent="space-between"
+            width="100%"
             sx={{ mt: "2px" }}
           >
             <Grid sx={{ paddingLeft: 15 }}></Grid>
@@ -265,7 +265,7 @@ export default function Navbar({ children }) {
         </Grid>
       </AppBar>
       <Drawer
-        variant='permanent'
+        variant="permanent"
         open={open}
         sx={{
           // width: drawer == "miniopen" ? drawerWidth : 60, // 👈 IMPORTANT
@@ -288,7 +288,7 @@ export default function Navbar({ children }) {
         <Grid sx={{ display: "flex", justifyContent: "center", mt: 5 }}>
           <img
             src={main_logo}
-            alt='icon'
+            alt="icon"
             style={{
               height: 60,
               objectFit: "contain",
@@ -343,7 +343,7 @@ export default function Navbar({ children }) {
                       }}
                     >
                       <Box
-                        component='img'
+                        component="img"
                         src={item.activeicon}
                         sx={{
                           width: 20,
@@ -614,7 +614,7 @@ export default function Navbar({ children }) {
 
               {sessionStorage.getItem("role") == "Admin" ? (
                 <Button
-                  variant='outlined'
+                  variant="outlined"
                   sx={{
                     textTransform: "none",
                     mt: 1.5,
@@ -640,7 +640,7 @@ export default function Navbar({ children }) {
 
             <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
               <Button
-                variant='contained'
+                variant="contained"
                 sx={{
                   textTransform: "none",
                   borderRadius: 2,
