@@ -42,7 +42,8 @@ import Navbar from "../../Navbars/Navbar";
 import ApproveMaterial from "./Modal/ApproveMaterial";
 import L1RejectFirstModal from "./Modal/L1RejectFirstModal";
 import L2RejectModal from "./Modal/L2RejectModal";
-
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 const FONT = "Poppins, sans-serif";
 
 const cardData = [
@@ -432,12 +433,31 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState(0);
 
   const [open, setOpen] = React.useState(false);
+  // const [rows, setRows] = useState([]);
 
   const [approveModal, setApproveModal] = useState(false);
   const [modalName, setModalName] = useState("");
-
+  const navigate = useNavigate();
   const handleClose = () => setOpen(false);
+  useEffect(() => {
+    const success = sessionStorage.getItem("success");
 
+    if (!success) {
+      navigate("/");
+    }
+  }, [navigate]);
+
+  // const fetchTabledata = async () => {
+  //   await axios
+  //     .get("")
+  //     .then((res) => {
+  //       console.log(res.data);
+  //       setRows(res.data);
+  //     })
+  //     .catch((err) => {
+  //       console.log(err);
+  //     });
+  // };
   return (
     <div>
       <Navbar>

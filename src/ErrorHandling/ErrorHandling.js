@@ -21,22 +21,22 @@ export default function ErrorHandling() {
       <WifiOffIcon sx={{ fontSize: 120, color: "#9e9e9e", mb: 2 }} />
 
       <Typography
-        variant='h3'
-        fontWeight='bold'
+        variant="h3"
+        fontWeight="bold"
         sx={{ fontFamily: "Poppins, sans-serif", color: "#2e2e2e" }}
       >
-        {sessionStorage.getItem("errormessge")}
+        {sessionStorage.getItem("errormessage")}
       </Typography>
 
       <Typography
-        variant='h6'
+        variant="h6"
         sx={{ mb: 2, fontFamily: "Poppins, sans-serif", color: "#2e2e2e" }}
       >
         Please check your internet connection and try again.
       </Typography>
 
       <Button
-        variant='contained'
+        variant="contained"
         onClick={() => navigate("/Home")}
         sx={{ fontFamily: "Poppins, sans-serif" }}
       >

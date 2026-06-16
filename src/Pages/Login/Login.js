@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import {
   Box,
   Button,
@@ -18,16 +18,25 @@ import {
   PhoneOutlined,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-
+import axios from "axios";
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
+import UserContext from "../../UseContext/UserContext";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+} from "@mui/material";
 export default function Login() {
+  const { loadingpage, setLoadingpage } = useContext(UserContext);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
-
+  const [openDialog, setOpenDialog] = useState(false);
   const navigate = useNavigate();
-
+  const [apiError, setApiError] = useState("");
   const validate = () => {
     const newErrors = {};
     if (!username.trim()) newErrors.username = "Username is required";
@@ -38,17 +47,44 @@ export default function Login() {
     return newErrors;
   };
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     const validationErrors = validate();
+    setLoading(true);
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
+      setLoading(false);
       return;
     }
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      navigate("/Home");
-    }, 1500);
+    const payload = {
+      username: username,
+      password: password,
+    };
+    await axios
+      .post(" http://10.10.0.101:8000/mrmuser/login ", payload)
+      .then((res) => {
+        console.log(res.data);
+        if (res.data.success) {
+          sessionStorage.setItem("success", "true");
+          sessionStorage.setItem("user_id", res.data.user_id);
+          sessionStorage.setItem("user_name", res.data.user_name);
+          sessionStorage.setItem("role", res.data.role);
+          sessionStorage.setItem("approver_name", res.data.approver_name);
+
+          navigate("/Home");
+          // setTimeout(() => {
+          //   setLoading(false);
+          //   navigate("/Home");
+          // }, 1500);
+        } else {
+          setApiError(res.data.message);
+          setOpenDialog(true);
+          setLoading(false);
+        }
+      })
+      .catch((err) => {
+        setApiError(err.response?.data?.message || "Something went wrong");
+        navigate("/ErrorHandling");
+      });
   };
 
   const inputSx = {
@@ -298,18 +334,18 @@ export default function Login() {
             </Typography>
             <TextField
               fullWidth
-              placeholder='Enter your Username'
+              placeholder="Enter your Username"
               value={username}
               error={!!errors.username}
               onChange={(e) => {
-                setUsername(e.target.value.replace(/\D/, "").slice(0, 10));
+                setUsername(e.target.value);
                 setErrors((prev) => ({ ...prev, username: "" }));
               }}
               onKeyDown={(e) => e.key === "Enter" && handleLogin()}
               sx={inputSx}
               InputProps={{
                 startAdornment: (
-                  <InputAdornment position='start'>
+                  <InputAdornment position="start">
                     <PhoneOutlined sx={{ color: "#94A3B8", fontSize: 19 }} />
                   </InputAdornment>
                 ),
@@ -364,7 +400,7 @@ export default function Login() {
             <TextField
               fullWidth
               type={showPassword ? "text" : "password"}
-              placeholder='Enter your password'
+              placeholder="Enter your password"
               value={password}
               error={!!errors.password}
               onChange={(e) => {
@@ -375,22 +411,22 @@ export default function Login() {
               sx={inputSx}
               InputProps={{
                 startAdornment: (
-                  <InputAdornment position='start'>
+                  <InputAdornment position="start">
                     <LockOutlined sx={{ color: "#94A3B8", fontSize: 19 }} />
                   </InputAdornment>
                 ),
                 endAdornment: (
-                  <InputAdornment position='end'>
+                  <InputAdornment position="end">
                     <IconButton
                       onClick={() => setShowPassword(!showPassword)}
-                      edge='end'
-                      size='small'
+                      edge="end"
+                      size="small"
                       sx={{ color: "#94A3B8" }}
                     >
                       {showPassword ? (
-                        <Visibility fontSize='small' />
+                        <Visibility fontSize="small" />
                       ) : (
-                        <VisibilityOff fontSize='small' />
+                        <VisibilityOff fontSize="small" />
                       )}
                     </IconButton>
                   </InputAdornment>
@@ -414,7 +450,7 @@ export default function Login() {
           {/* Login Button */}
           <Button
             fullWidth
-            variant='contained'
+            variant="contained"
             onClick={handleLogin}
             disabled={loading}
             sx={{
@@ -478,6 +514,90 @@ export default function Login() {
           </Box>
         </Card>
       </Box>
+      <Dialog
+        open={openDialog}
+        onClose={() => setOpenDialog(false)}
+        PaperProps={{
+          sx: {
+            borderRadius: "12px",
+            padding: "8px",
+            minWidth: "360px",
+            boxShadow: "0 20px 60px rgba(0,0,0,0.15)",
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 1.5,
+            pb: 1,
+            pt: 2,
+            px: 3,
+          }}
+        >
+          <Box
+            sx={{
+              width: 36,
+              height: 36,
+              borderRadius: "50%",
+              backgroundColor: "#FEE2E2",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+            }}
+          >
+            <ErrorOutlineIcon sx={{ color: "#DC2626", fontSize: 20 }} />
+          </Box>
+          <Typography
+            variant="h6"
+            sx={{
+              fontWeight: 600,
+              fontSize: "1rem",
+              color: "#111827",
+              fontFamily: "Poppins",
+            }}
+          >
+            Login Failed
+          </Typography>
+        </DialogTitle>
+
+        <DialogContent sx={{ px: 3, pb: 1, pt: 0.5 }}>
+          <Typography
+            variant="body2"
+            sx={{
+              color: "#6B7280",
+              lineHeight: 1.6,
+              ml: "52px",
+              fontFamily: "Poppins",
+            }}
+          >
+            {apiError}
+          </Typography>
+        </DialogContent>
+
+        <DialogActions sx={{ px: 3, pb: 2.5, pt: 2 }}>
+          <Button
+            onClick={() => setOpenDialog(false)}
+            variant="contained"
+            disableElevation
+            sx={{
+              borderRadius: "8px",
+              textTransform: "none",
+              fontWeight: 600,
+              fontSize: "0.875rem",
+              fontFamily: "Poppins",
+              px: 3,
+              py: 1,
+              backgroundColor: "#DC2626",
+              "&:hover": { backgroundColor: "#B91C1C" },
+            }}
+          >
+            OK
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }
