@@ -44,6 +44,8 @@ import L1RejectFirstModal from "./Modal/L1RejectFirstModal";
 import L2RejectModal from "./Modal/L2RejectModal";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import warning from "../../Images/Home/warning_icon.png";
+import loop from "../../Images/History/loop_icon.png";
 const FONT = "Poppins, sans-serif";
 
 const cardData = [
@@ -179,94 +181,94 @@ const style2 = {
   outline: "none", // Focus outline remove
 };
 
-const rows = [
-  {
-    id: "MR-1023",
-    badges: ["new"],
-    requester: "Vishnu",
-    materials: 5,
-    requestedOn: "10 May 2026",
-    requiredDate: "24 April 2026",
-    handledBy: "Kannan",
-    level: "L1",
-    refNo: "-",
-    status: "L1 Review",
-  },
-  {
-    id: "MR-1028",
-    badges: ["critical", "resubmitted", "new"],
-    requester: "Vishnu",
-    materials: 5,
-    requestedOn: "10 May 2026",
-    requiredDate: "24 April 2026",
-    handledBy: "Kannan",
-    level: "L1",
-    refNo: "-",
-    status: "L1 Review",
-  },
-  {
-    id: "MR-1035",
-    badges: [],
-    requester: "Vishnu",
-    materials: 5,
-    requestedOn: "10 May 2026",
-    requiredDate: "24 April 2026",
-    handledBy: "Kannan",
-    level: "L1",
-    refNo: "-",
-    status: "L1 Rejected",
-  },
-  {
-    id: "MR-1019",
-    badges: ["critical"],
-    requester: "Vishnu",
-    materials: 4,
-    requestedOn: "10 May 2026",
-    requiredDate: "24 April 2026",
-    handledBy: "Senthil",
-    level: "L2",
-    refNo: "-",
-    status: "L2 Review",
-  },
-  {
-    id: "MR-1020",
-    badges: ["critical", "new"],
-    requester: "Vishnu",
-    materials: 3,
-    requestedOn: "10 May 2026",
-    requiredDate: "24 April 2026",
-    handledBy: "Kannan",
-    level: "L1",
-    refNo: "-",
-    status: "L1 Rejected",
-  },
-  {
-    id: "MR-1024",
-    badges: ["critical", "resubmitted"],
-    requester: "Vishnu",
-    materials: 3,
-    requestedOn: "10 May 2026",
-    requiredDate: "24 April 2026",
-    handledBy: "Senthil",
-    level: "L2",
-    refNo: "MJ-233",
-    status: "L2 Approved",
-  },
-  {
-    id: "MR-1022",
-    badges: ["critical", "new"],
-    requester: "Vishnu",
-    materials: 3,
-    requestedOn: "10 May 2026",
-    requiredDate: "24 April 2026",
-    handledBy: "Senthil",
-    level: "L2",
-    refNo: "PR-109, MJ-234",
-    status: "L2 Mixed",
-    approved: 2,
-    rejected: 2,
-  },
-];
+// const rows = [
+//   {
+//     id: "MR-1023",
+//     badges: ["new"],
+//     requester: "Vishnu",
+//     materials: 5,
+//     requestedOn: "10 May 2026",
+//     requiredDate: "24 April 2026",
+//     handledBy: "Kannan",
+//     level: "L1",
+//     refNo: "-",
+//     status: "L1 Review",
+//   },
+//   {
+//     id: "MR-1028",
+//     badges: ["critical", "resubmitted", "new"],
+//     requester: "Vishnu",
+//     materials: 5,
+//     requestedOn: "10 May 2026",
+//     requiredDate: "24 April 2026",
+//     handledBy: "Kannan",
+//     level: "L1",
+//     refNo: "-",
+//     status: "L1 Review",
+//   },
+//   {
+//     id: "MR-1035",
+//     badges: [],
+//     requester: "Vishnu",
+//     materials: 5,
+//     requestedOn: "10 May 2026",
+//     requiredDate: "24 April 2026",
+//     handledBy: "Kannan",
+//     level: "L1",
+//     refNo: "-",
+//     status: "L1 Rejected",
+//   },
+//   {
+//     id: "MR-1019",
+//     badges: ["critical"],
+//     requester: "Vishnu",
+//     materials: 4,
+//     requestedOn: "10 May 2026",
+//     requiredDate: "24 April 2026",
+//     handledBy: "Senthil",
+//     level: "L2",
+//     refNo: "-",
+//     status: "L2 Review",
+//   },
+//   {
+//     id: "MR-1020",
+//     badges: ["critical", "new"],
+//     requester: "Vishnu",
+//     materials: 3,
+//     requestedOn: "10 May 2026",
+//     requiredDate: "24 April 2026",
+//     handledBy: "Kannan",
+//     level: "L1",
+//     refNo: "-",
+//     status: "L1 Rejected",
+//   },
+//   {
+//     id: "MR-1024",
+//     badges: ["critical", "resubmitted"],
+//     requester: "Vishnu",
+//     materials: 3,
+//     requestedOn: "10 May 2026",
+//     requiredDate: "24 April 2026",
+//     handledBy: "Senthil",
+//     level: "L2",
+//     refNo: "MJ-233",
+//     status: "L2 Approved",
+//   },
+//   {
+//     id: "MR-1022",
+//     badges: ["critical", "new"],
+//     requester: "Vishnu",
+//     materials: 3,
+//     requestedOn: "10 May 2026",
+//     requiredDate: "24 April 2026",
+//     handledBy: "Senthil",
+//     level: "L2",
+//     refNo: "PR-109, MJ-234",
+//     status: "L2 Mixed",
+//     approved: 2,
+//     rejected: 2,
+//   },
+// ];
 
 const statusConfig = {
   "L1 Review": { bg: "#FEEFDA", color: "#F99709", border: "#FDE68A" },
@@ -282,26 +284,26 @@ const levelConfig = {
 };
 
 function BadgeIcon({ type }) {
-  if (type === "critical")
+  if (type === "Critical")
     return (
-      <Tooltip title="Critical">
-        <WarningAmberIcon sx={{ fontSize: 16, color: "#F59E0B" }} />
-      </Tooltip>
+      // <Tooltip title="Critical">
+      <img height={20} width={20} cursor="Pointer" src={warning} />
+      // </Tooltip>
     );
   if (type === "resubmitted")
     return (
       <Tooltip title="Resubmitted">
-        <ReplayIcon sx={{ fontSize: 16, color: "#60A5FA" }} />
+        <img height={20} width={20} cursor="Pointer" src={warning} />
       </Tooltip>
     );
-  if (type === "new")
+  if (type === "New")
     return (
       <Chip
         label="New(A)"
         size="small"
         sx={{
-          height: 22,
-          fontSize: "0.7rem",
+          height: 20,
+          fontSize: "0.6rem",
           fontWeight: 500,
           fontFamily: "Poppins, sans-serif",
           bgcolor: "#DBEAFE",
@@ -403,28 +405,28 @@ function StatusCell({ status, approved, rejected }) {
   );
 }
 
-const tabs = [
-  {
-    label: "All Requests",
-    count: 7,
-    icon: <ContentCopyOutlinedIcon sx={{ fontSize: 14 }} />,
-  },
-  {
-    label: "Critical",
-    count: 5,
-    icon: <WarningAmberIcon sx={{ fontSize: 14 }} />,
-  },
-  {
-    label: "New",
-    count: 3,
-    icon: <InsertDriveFileOutlinedIcon sx={{ fontSize: 14 }} />,
-  },
-  {
-    label: "Resubmitted",
-    count: 2,
-    icon: <ReplayIcon sx={{ fontSize: 14 }} />,
-  },
-];
+// const tabs = [
+//   {
+//     label: "All Requests",
+//     count: 7,
+//     icon: <ContentCopyOutlinedIcon sx={{ fontSize: 14 }} />,
+//   },
+//   {
+//     label: "Critical",
+//     count: 5,
+//     icon: <WarningAmberIcon sx={{ fontSize: 14 }} />,
+//   },
+//   {
+//     label: "New",
+//     count: 3,
+//     icon: <InsertDriveFileOutlinedIcon sx={{ fontSize: 14 }} />,
+//   },
+//   {
+//     label: "Resubmitted",
+//     count: 2,
+//     icon: <ReplayIcon sx={{ fontSize: 14 }} />,
+//   },
+// ];
 
 export default function Home() {
   const [search, setSearch] = useState("");
@@ -433,31 +435,60 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState(0);
 
   const [open, setOpen] = React.useState(false);
-  // const [rows, setRows] = useState([]);
-
+  const [rows, setRows] = useState([]);
+  const filteredRows = rows.filter((row) => {
+    switch (activeTab) {
+      case 1:
+        return row.CriticalStatus?.includes("Critical");
+      case 2:
+        return row.CriticalStatus?.includes("New");
+      case 3:
+        return row.CriticalStatus?.includes("Normal");
+      case 4:
+        return row.Resubmitted;
+      default:
+        return true;
+    }
+  });
+  const [tabs, setTabs] = useState([]);
   const [approveModal, setApproveModal] = useState(false);
   const [modalName, setModalName] = useState("");
   const navigate = useNavigate();
   const handleClose = () => setOpen(false);
   useEffect(() => {
     const success = sessionStorage.getItem("success");
-
+    const userid = sessionStorage.getItem("user_id");
+    const role = sessionStorage.getItem("role");
     if (!success) {
       navigate("/");
     }
   }, [navigate]);
 
-  // const fetchTabledata = async () => {
-  //   await axios
-  //     .get("")
-  //     .then((res) => {
-  //       console.log(res.data);
-  //       setRows(res.data);
-  //     })
-  //     .catch((err) => {
-  //       console.log(err);
-  //     });
-  // };
+  const fetchTabledata = async () => {
+    const payload = {
+      Id: sessionStorage.getItem("user_id"),
+      Role: sessionStorage.getItem("role"),
+    };
+    await axios
+      .post("http://10.10.0.101:8000/home", payload)
+      .then((res) => {
+        console.log(res.data);
+        setRows(res.data.data);
+        setTabs([
+          { label: "All", count: res.data.counts.total },
+          { label: "Critical", count: res.data.counts.critical },
+          { label: "New", count: res.data.counts.new },
+          { label: "Normal", count: res.data.counts.normal },
+          { label: "Resubmitted", count: res.data.counts.resubmitted },
+        ]);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+  useEffect(() => {
+    fetchTabledata();
+  }, []);
   return (
     <div>
       <Navbar>
@@ -820,7 +851,7 @@ export default function Home() {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {rows.map((row) => (
+                  {filteredRows.map((row) => (
                     <TableRow
                       key={row.id}
                       sx={{
@@ -850,11 +881,14 @@ export default function Home() {
                             color="#1E293B"
                             sx={{ fontFamily: "Poppins, sans-serif" }}
                           >
-                            {row.id}
+                            {row.MaterialRequestId}
                           </Typography>
-                          {row.badges.map((b, i) => (
+                          {row.CriticalStatus.map((b, i) => (
                             <BadgeIcon key={i} type={b} />
                           ))}
+                          {row.Resubmitted ? (
+                            <img src={loop} alt="Resubmitted" />
+                          ) : null}
                         </Stack>
                       </TableCell>
 
@@ -866,7 +900,7 @@ export default function Home() {
                           textAlign: "center",
                         }}
                       >
-                        {row.requester}
+                        {row.Requester}
                       </TableCell>
 
                       {/* Materials */}
@@ -883,7 +917,7 @@ export default function Home() {
                             fontSize: "0.76rem",
                           }}
                         >
-                          {row.materials}
+                          {row.NumberOfMaterials}
                         </Typography>
                       </TableCell>
 
@@ -894,7 +928,7 @@ export default function Home() {
                           fontSize: "0.76rem",
                         }}
                       >
-                        {row.requestedOn}
+                        {row.RequestedOn}
                       </TableCell>
 
                       {/* Required Date */}
@@ -904,7 +938,7 @@ export default function Home() {
                           fontSize: "0.76rem",
                         }}
                       >
-                        {row.requiredDate}
+                        {row.RequiredDate}
                       </TableCell>
 
                       {/* Handled By + Level */}
@@ -916,7 +950,7 @@ export default function Home() {
                               fontSize: "0.76rem",
                             }}
                           >
-                            {row.handledBy}
+                            {row.HandledBy}
                           </Typography>
                           <Chip
                             label={row.level}
@@ -926,8 +960,8 @@ export default function Home() {
                               fontSize: "0.70rem",
                               fontWeight: 700,
                               fontFamily: "Poppins, sans-serif",
-                              bgcolor: levelConfig[row.level].bg,
-                              color: levelConfig[row.level].color,
+                              // bgcolor: levelConfig[row.level].bg,
+                              // color: levelConfig[row.level].color,
                               borderRadius: "6px",
                               "& .MuiChip-label": { px: 1 },
                             }}
@@ -945,16 +979,16 @@ export default function Home() {
                             textAlign: "center",
                           }}
                         >
-                          {row.refNo}
+                          {row.ReferenceNo}
                         </Typography>
                       </TableCell>
 
                       {/* Status */}
                       <TableCell sx={{ textAlign: "center" }}>
                         <StatusCell
-                          status={row.status}
-                          approved={row.approved}
-                          rejected={row.rejected}
+                          status={row.Status}
+                          // approved={row.approved}
+                          // rejected={row.rejected}
                         />
                       </TableCell>
                     </TableRow>
