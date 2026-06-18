@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
   Typography,
@@ -19,6 +19,9 @@ import {
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import CloseIcon from "@mui/icons-material/Close";
 import EditIcon from "@mui/icons-material/Edit";
+import axios from "axios";
+import dayjs from "dayjs";
+import { useNavigate } from "react-router-dom";
 
 // ── Theme ────────────────────────────────────────────────────────────────────
 const theme = createTheme({
@@ -145,9 +148,34 @@ function SectionCard({ children, sx = {} }) {
 
 // ── Main Component ────────────────────────────────────────────────────────────
 
-export default function L1RejectFirstModal({ onClose }) {
+export default function L1RejectFirstModal({ onClose, rowData }) {
   const [resubmitReason, setResubmitReason] = useState("");
+  const [value, setValue] = useState({});
+  const navigate = useNavigate();
+  // console.log("rowdata", rowData);
+  const fetchData = async () => {
+    try {
+      const payload = {
+        materialRequestId: rowData.MaterialRequestId,
+        status: 2,
+      };
 
+      const res = await axios.post(
+        "http://10.10.0.101:8000/mrmuser/l1rejected/details",
+        payload,
+      );
+
+      console.log(res.data);
+      setValue(res.data.data);
+    } catch (err) {
+      navigate("/ErrorHandling");
+    }
+  };
+  useEffect(() => {
+    if (rowData?.MaterialRequestId) {
+      fetchData();
+    }
+  }, [rowData]);
   return (
     <ThemeProvider theme={theme}>
       <Box sx={{ padding: 3 }}>
@@ -165,7 +193,7 @@ export default function L1RejectFirstModal({ onClose }) {
             variant='h6'
             sx={{ fontWeight: 700, fontSize: 18, color: "#111827" }}
           >
-            Material Request MR-1020
+            Material Request {rowData.MaterialRequestId}
           </Typography>
           <Box
             sx={{
@@ -177,7 +205,7 @@ export default function L1RejectFirstModal({ onClose }) {
               gap: 1,
             }}
           >
-            <StatusBadge label='L1 Rejected' />
+            <StatusBadge label={rowData.Status} />
           </Box>
         </Box>
 
@@ -214,13 +242,13 @@ export default function L1RejectFirstModal({ onClose }) {
                   component='span'
                   sx={{ fontWeight: 600, color: "#111827" }}
                 >
-                  10 May 2026
+                  {dayjs(value.requiredDate).format("DD-MMM-YYYY")}
                 </Box>
               </Typography>
               <Typography sx={{ fontSize: 12, color: "#6B7280" }}>
                 Purpose&nbsp;
                 <Box component='span' sx={{ color: "#9CA3AF" }}>
-                  –
+                  {value.purpose}
                 </Box>
               </Typography>
             </Stack>
@@ -277,9 +305,9 @@ export default function L1RejectFirstModal({ onClose }) {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {materials.map((row) => (
+                  {value.materials?.map((row, index) => (
                     <TableRow
-                      key={row.id}
+                      key={index}
                       sx={{
                         "&:last-child td": { border: 0 },
                         "&:hover": { bgcolor: "#F9FAFB" },
@@ -298,20 +326,19 @@ export default function L1RejectFirstModal({ onClose }) {
                               color: "#111827",
                             }}
                           >
-                            {row.name}
+                            {row.materialName}
                           </Typography>
-                          {row.tag && (
+                          {row.itemtag && (
                             <Chip
-                              label={row.tag.label}
-                              color={row.tag.color}
+                              label={row.itemtag}
                               size='small'
                               sx={{
                                 bgcolor:
-                                  row.tag.color === "error"
+                                  row.itemtag === "Critical"
                                     ? "#FEE2E2"
                                     : "#DBEAFE",
                                 color:
-                                  row.tag.color === "error"
+                                  row.itemtag === "Critical"
                                     ? "#EF4444"
                                     : "#2563EB",
                               }}
@@ -324,7 +351,7 @@ export default function L1RejectFirstModal({ onClose }) {
                       </TableCell>
                       <TableCell sx={{ color: "#6B7280" }}>{row.uom}</TableCell>
                       <TableCell sx={{ color: "#6B7280" }}>
-                        {row.stock}
+                        {row.availableStock}
                       </TableCell>
                       <TableCell
                         align='right'
@@ -357,8 +384,7 @@ export default function L1RejectFirstModal({ onClose }) {
             }}
           >
             <Typography sx={{ fontSize: 13, color: "#374151" }}>
-              Regarding Mask request does not comply with procurement
-              guidelines.
+              {value.rejectionReason}
             </Typography>
             <Stack direction='row' spacing={1} alignItems='center'>
               <Typography sx={{ fontSize: 12, color: "#6B7280" }}>
@@ -367,7 +393,7 @@ export default function L1RejectFirstModal({ onClose }) {
               <Typography
                 sx={{ fontSize: 12, fontWeight: 700, color: "#111827" }}
               >
-                Kannan
+                {value.rejectedBy}
               </Typography>
               <Box
                 sx={{
@@ -384,7 +410,7 @@ export default function L1RejectFirstModal({ onClose }) {
                   fontFamily: "Poppins, sans-serif",
                 }}
               >
-                L1
+                {value.approvalLevel}
               </Box>
             </Stack>
           </Box>

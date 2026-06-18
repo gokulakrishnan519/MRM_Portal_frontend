@@ -47,7 +47,7 @@ const colors = {
 // ── Sub-components ────────────────────────────────────────────
 
 /** Top header bar */
-function DialogHeader({ data }) {
+function DialogHeader({ data, props }) {
   return (
     <Box
       sx={{
@@ -73,22 +73,24 @@ function DialogHeader({ data }) {
         Material Request {data?.materialRequestId}
       </Typography>
 
-      <Chip
-        icon={<ReplayIcon sx={{ fontSize: "0.75rem !important" }} />}
-        label='Resubmitted'
-        size='small'
-        sx={{
-          position: "absolute",
-          right: 44,
-          fontFamily: POPPINS,
-          fontSize: "0.68rem",
-          bgcolor: colors.resubmitBg,
-          color: colors.resubmitText,
-          fontWeight: 500,
-          height: 24,
-          "& .MuiChip-icon": { color: colors.resubmitText },
-        }}
-      />
+      {props?.rowData?.Resubmitted == true && (
+        <Chip
+          icon={<ReplayIcon sx={{ fontSize: "0.75rem !important" }} />}
+          label='Resubmitted'
+          size='small'
+          sx={{
+            position: "absolute",
+            right: 44,
+            fontFamily: POPPINS,
+            fontSize: "0.68rem",
+            bgcolor: colors.resubmitBg,
+            color: colors.resubmitText,
+            fontWeight: 500,
+            height: 24,
+            "& .MuiChip-icon": { color: colors.resubmitText },
+          }}
+        />
+      )}
     </Box>
   );
 }
@@ -438,13 +440,15 @@ function ReviewFooter() {
 }
 
 // ── Main Component ────────────────────────────────────────────
-export default function ApproveMaterial() {
+export default function ApproveMaterial(props) {
   const [data, setData] = useState(null);
   const navigate = useNavigate();
 
+  console.log(props);
+
   const DetailsAPi = () => {
     const payload = {
-      materialRequestId: "PO-DN-160000173",
+      materialRequestId: props?.rowData.MaterialRequestId,
       status: 0,
     };
 
@@ -472,7 +476,7 @@ export default function ApproveMaterial() {
   return (
     <Box>
       <Grid>
-        <DialogHeader data={data} />
+        <DialogHeader data={data} props={props} />
 
         <Box
           sx={{
@@ -489,15 +493,21 @@ export default function ApproveMaterial() {
             <RequestDetails data={data} />
             <MaterialDetails data={data} />
 
-            <ReviewComments />
-            <ResubmissionNote />
+            {props?.rowData?.Resubmitted == true && (
+              <>
+                <ReviewComments />
+                <ResubmissionNote />
+              </>
+            )}
           </Grid>
 
-          <Grid
-            sx={{ backgroundColor: "#F1F5F9", padding: 3, borderRadius: 2 }}
-          >
-            <ReviewFooter />
-          </Grid>
+          {props?.rowData?.Resubmitted == true && (
+            <Grid
+              sx={{ backgroundColor: "#F1F5F9", padding: 3, borderRadius: 2 }}
+            >
+              <ReviewFooter />
+            </Grid>
+          )}
 
           {/* Action buttons */}
           <Box

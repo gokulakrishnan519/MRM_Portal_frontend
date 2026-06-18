@@ -1084,7 +1084,7 @@ export default function Home() {
               {modalName == "ApproveModal" ? (
                 <ApproveMaterial rowData={passRowData} />
               ) : modalName == "L1RejectFirstModal" ? (
-                <L1RejectFirstModal />
+                <L1RejectFirstModal rowData={passRowData} />
               ) : modalName == "L2RejectModal" ? (
                 <L2RejectModal />
               ) : (

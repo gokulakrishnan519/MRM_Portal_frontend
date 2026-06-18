@@ -24,6 +24,14 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
 import axios from "axios";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import ErrorIcon from "@mui/icons-material/Error";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+} from "@mui/material";
 
 const materialOptions = [
   "Cement",
@@ -136,6 +144,14 @@ export default function CreateMaterialRequest() {
   const [rows, setRows] = useState([emptyRow()]);
   const [materialNameList, setMaterialNameList] = useState([]);
   const [materialCategoryList, setMaterialCategoryList] = useState([]);
+  const [loading, setLoading] = useState("");
+
+  const [modal, setModal] = useState({
+    open: false,
+    type: "",
+    title: "",
+    message: "",
+  });
 
   const handleAddMaterial = () => setRows((prev) => [...prev, emptyRow()]);
   const handleRemoveRow = (id) =>
@@ -146,43 +162,80 @@ export default function CreateMaterialRequest() {
     );
 
   const handleSubmit = async () => {
+    setLoading(true);
+
     const payload = {
       _request: {
         MaterialRequirementManagementHeader: {
-          HIQ_requester_id: "Hi-Q-000923",
-          HIQ_requester_name: "RM_SHIP",
+          HIQ_RequestNo: "",
+          HIQ_requester_id: "Hi-Q-000922",
+          HIQ_requester_Name: "USR_SHIP",
           HIQ_L1ApproverName: "",
           HIQ_L2ApproverName: "",
+
           HIQ_L2UserId: "",
-          HIQ_Required_date: dayjs(requiredDate).format("YYYY-MM-DD"),
+          HIQ_L1UserId: "",
+
+          HIQ_Required_date: dayjs(requiredDate).format(
+            "YYYY-MM-DD[T]00:00:00",
+          ),
           HIQ_purpose: purpose,
-          HIQ_Status: 0,
-          HIQ_movement_journal_id: "",
+          HIQ_Status: "0",
+          HIQ_movement_Journal_Id: "",
+          HIQ_purcharse_Req_Id: "",
+
+          HIQ_commentL1: "okay",
+
+          HIQ_commentL2: "",
           HIQ_resubmit_count: 0,
+
+          HIQ_submitted_at: dayjs().format("YYYY-MM-DD[T]HH:mm:ss"),
+
+          HIQ_ApproveDateL1: "",
+
+          HIQ_synced_at: "",
+
+          HIQ_resubmit_count: 0,
+          HIQ_sync_error: "",
+
+          HIQ_SyncStatus: "0",
+
+          HIQ_ManagerAction: "2",
         },
 
         MaterialRequirementManagementLine: rows.map((item, i) => ({
+          HeaderRequestId: "",
           LineNum: i + 1,
           ItemId: item.materialName?.Itemid,
           MaterialName: item.materialName?.name,
           UOM: item.uom,
           AvailableStock: item.availableStock ?? "",
-          Quantity: item.quantity,
+          Quantity: Number(item.quantity),
           ItemTag:
             item.objectitem === "New"
-              ? 1
+              ? "1"
               : item.materialName?.Itemid === 0
-                ? 2
+                ? "2"
                 : item.materialName?.Itemid === 1
-                  ? 0
+                  ? "0"
                   : "",
+
+          CategoryId:
+            item.materialCategory == null ? "" : item.materialCategory,
+          MovementJournalIdLine: "",
+
+          PurchaseReqIdLine: "",
+
+          SyncStatusLine: "0",
+
+          SyncErrorLine: "",
+
+          resubmissionReason: "",
         })),
       },
     };
 
     try {
-      console.log(payload);
-
       const response = await axios.post(
         "http://10.10.0.101:8000/mrmuser/create",
         payload,
@@ -193,11 +246,28 @@ export default function CreateMaterialRequest() {
         },
       );
 
-      console.log("Success:", response.data);
-      alert("Request Submitted!");
+      // setModal({
+      //   open: true,
+      //   type: "success",
+      //   title: "Request Submitted",
+      //   message:
+      //     "Your material requirement request has been submitted successfully.",
+      // });
     } catch (error) {
-      console.error("Error:", error);
-      alert("Request Failed!");
+      console.log(error);
+
+      const errorMessage =
+        error.response?.data?.detail ||
+        "Something went wrong. Please try again later.";
+
+      setModal({
+        open: true,
+        type: "error",
+        title: "Submission Failed",
+        message: errorMessage,
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -384,7 +454,7 @@ export default function CreateMaterialRequest() {
               <DatePicker
                 value={requiredDate}
                 onChange={(newValue) => setRequiredDate(newValue)}
-                format="DD/MM/YYYY"
+                format='DD/MM/YYYY'
                 slotProps={{
                   textField: {
                     variant: "standard",
@@ -438,9 +508,9 @@ export default function CreateMaterialRequest() {
               <span style={{ color: tokens.colors.danger }}>*</span>
             </Typography>
             <TextField
-              size="small"
+              size='small'
               fullWidth
-              placeholder="Describe the purpose of this request"
+              placeholder='Describe the purpose of this request'
               value={purpose}
               onChange={(e) => setPurpose(e.target.value)}
               sx={inputSx}
@@ -513,7 +583,7 @@ export default function CreateMaterialRequest() {
             overflow: "hidden",
           }}
         >
-          <Table size="small">
+          <Table size='small'>
             <TableHead>
               <TableRow>
                 <TableCell sx={{ ...headerCellSx, width: "28%" }}>
@@ -571,7 +641,7 @@ export default function CreateMaterialRequest() {
                           <Autocomplete
                             disableClearable
                             freeSolo
-                            size="small"
+                            size='small'
                             options={materialNameList}
                             value={row.materialName ?? null}
                             getOptionLabel={(option) =>
@@ -627,8 +697,8 @@ export default function CreateMaterialRequest() {
                                 </span>
                                 {Number(option.tag) === 1 && (
                                   <Chip
-                                    label="Critical"
-                                    size="small"
+                                    label='Critical'
+                                    size='small'
                                     sx={{
                                       fontSize: "10px",
                                       height: 18,
@@ -643,7 +713,7 @@ export default function CreateMaterialRequest() {
                             renderInput={(params) => (
                               <TextField
                                 {...params}
-                                placeholder="Search material…"
+                                placeholder='Search material…'
                                 sx={{ ...inputSx, width: 200 }}
                               />
                             )}
@@ -654,8 +724,8 @@ export default function CreateMaterialRequest() {
                       {/* New / Cancel button */}
                       {row.objectitem === "New" ? (
                         <Button
-                          variant="outlined"
-                          size="small"
+                          variant='outlined'
+                          size='small'
                           onClick={() =>
                             setRows((prevRows) =>
                               prevRows.map((item, i) =>
@@ -694,8 +764,8 @@ export default function CreateMaterialRequest() {
                         </Button>
                       ) : row.newmaterialName?.trim() ? (
                         <Button
-                          variant="contained"
-                          size="small"
+                          variant='contained'
+                          size='small'
                           onClick={() =>
                             setRows((prevRows) =>
                               prevRows.map((item, i) =>
@@ -732,7 +802,7 @@ export default function CreateMaterialRequest() {
                   <TableCell sx={bodyCellSx}>
                     {row.objectitem === "New" ? (
                       <Select
-                        size="small"
+                        size='small'
                         fullWidth
                         displayEmpty
                         value={row.materialCategory}
@@ -812,9 +882,9 @@ export default function CreateMaterialRequest() {
                   <TableCell sx={bodyCellSx}>
                     {row.objectitem === "New" ? (
                       <TextField
-                        size="small"
+                        size='small'
                         fullWidth
-                        placeholder="UOM"
+                        placeholder='UOM'
                         value={row.uom}
                         onChange={(e) =>
                           setRows((prevRows) =>
@@ -884,10 +954,10 @@ export default function CreateMaterialRequest() {
                   {/* Quantity */}
                   <TableCell sx={bodyCellSx}>
                     <TextField
-                      size="small"
+                      size='small'
                       fullWidth
-                      placeholder="0"
-                      type="number"
+                      placeholder='0'
+                      type='number'
                       value={row.quantity}
                       onChange={(e) =>
                         setRows((prevRows) =>
@@ -921,9 +991,9 @@ export default function CreateMaterialRequest() {
                       }}
                     >
                       <IconButton
-                        size="small"
+                        size='small'
                         onClick={() => handleRefreshRow(row.id)}
-                        title="Reset row"
+                        title='Reset row'
                         sx={{
                           color: tokens.colors.text.muted,
                           p: 0.6,
@@ -938,10 +1008,10 @@ export default function CreateMaterialRequest() {
                         <Refresh sx={{ fontSize: 15 }} />
                       </IconButton>
                       <IconButton
-                        size="small"
+                        size='small'
                         onClick={() => handleRemoveRow(row.id)}
                         disabled={rows.length === 1}
-                        title="Remove row"
+                        title='Remove row'
                         sx={{
                           color: tokens.colors.text.muted,
                           p: 0.6,
@@ -1085,6 +1155,59 @@ export default function CreateMaterialRequest() {
           )}
         </>
       </Box>
+
+      <Dialog
+        open={modal.open}
+        onClose={() => setModal({ ...modal, open: false })}
+        fullWidth
+        maxWidth='xs'
+        PaperProps={{
+          sx: {
+            overflow: "hidden",
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+            fontWeight: 600,
+            fontFamily: "'Inter', 'Poppins', sans-serif",
+          }}
+        >
+          {modal.type === "success" ? (
+            <CheckCircleIcon color='success' />
+          ) : (
+            <ErrorIcon color='error' />
+          )}
+
+          {modal.title}
+        </DialogTitle>
+
+        {/* ✅ MUST USE DialogContent */}
+        <DialogContent
+          sx={{
+            fontFamily: "'Inter', 'Poppins', sans-serif",
+            overflow: "hidden",
+            wordBreak: "break-word",
+          }}
+        >
+          <Typography variant='body2' color='text.secondary'>
+            {modal.message}
+          </Typography>
+        </DialogContent>
+
+        <DialogActions sx={{ p: 2 }}>
+          <Button
+            variant='contained'
+            onClick={() => setModal({ ...modal, open: false })}
+            sx={{ fontFamily: "'Inter', 'Poppins', sans-serif" }}
+          >
+            OK
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }
