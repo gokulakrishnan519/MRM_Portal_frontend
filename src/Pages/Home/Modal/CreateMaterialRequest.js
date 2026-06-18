@@ -32,26 +32,7 @@ import {
   DialogContent,
   DialogActions,
 } from "@mui/material";
-
-const materialOptions = [
-  "Cement",
-  "Steel Bars",
-  "Sand",
-  "Bricks",
-  "Timber",
-  "Paint",
-  "Plumbing Pipes",
-];
-
-const categoryOptions = [
-  "Construction",
-  "Electrical",
-  "Plumbing",
-  "Finishing",
-  "Hardware",
-];
-
-const uomOptions = ["Kg", "Ton", "Litre", "Bag", "Piece", "Meter"];
+import CircularProgress from "@mui/material/CircularProgress";
 
 const emptyRow = () => ({
   id: Date.now(),
@@ -214,9 +195,9 @@ export default function CreateMaterialRequest() {
           ItemTag:
             item.objectitem === "New"
               ? "1"
-              : item.materialName?.Itemid === 0
+              : item.materialName?.tag == 0
                 ? "2"
-                : item.materialName?.Itemid === 1
+                : item.materialName?.tag === 1
                   ? "0"
                   : "",
 
@@ -358,856 +339,905 @@ export default function CreateMaterialRequest() {
     });
 
   return (
-    <Box
-      sx={{
-        backgroundColor: tokens.colors.pageBg,
-        minHeight: "100vh",
-        py: 4,
-        px: { xs: 2, md: 4 },
-        fontFamily: tokens.fontFamily,
-      }}
-    >
-      {/* Page Header */}
-      <Box sx={{ maxWidth: 1140, mx: "auto", mb: 3 }}>
-        <Typography
+    <div>
+      {loading ? (
+        <Grid
           sx={{
-            fontWeight: 700,
-            color: tokens.colors.text.primary,
-            fontSize: "20px",
-            fontFamily: tokens.fontFamily,
-            letterSpacing: "-0.3px",
+            minHeight: "50vh",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
           }}
         >
-          Material Request
-        </Typography>
-        <Typography
-          sx={{
-            fontSize: "13px",
-            color: tokens.colors.text.muted,
-            fontFamily: tokens.fontFamily,
-            mt: 0.4,
-          }}
-        >
-          Fill in the details below to raise a new material request.
-        </Typography>
-      </Box>
-
-      {/* Requirement Details Card */}
-      <Paper
-        elevation={0}
-        sx={{
-          width: "100%",
-          maxWidth: 1140,
-          mx: "auto",
-          borderRadius: tokens.radius.lg,
-          border: `1px solid ${tokens.colors.border}`,
-          backgroundColor: tokens.colors.cardBg,
-          p: 3,
-          mb: 2.5,
-        }}
-      >
-        {/* Section Label */}
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2.5 }}>
-          <Box
-            sx={{
-              width: 3,
-              height: 18,
-              borderRadius: "2px",
-              backgroundColor: tokens.colors.accent.indigo,
-            }}
-          />
-          <Typography
-            sx={{
-              fontWeight: 600,
-              fontSize: "13px",
-              color: tokens.colors.text.primary,
-              fontFamily: tokens.fontFamily,
-              letterSpacing: "-0.1px",
-            }}
-          >
-            Requirement Details
-          </Typography>
-        </Box>
-
+          <CircularProgress aria-label='Loading…' />
+        </Grid>
+      ) : (
         <Box
           sx={{
-            display: "flex",
-            alignItems: "center",
-            gap: 3,
-            flexWrap: "wrap",
+            backgroundColor: tokens.colors.pageBg,
+            minHeight: "100vh",
+            py: 4,
+            px: { xs: 2, md: 4 },
+            fontFamily: tokens.fontFamily,
           }}
         >
-          {/* Required Date */}
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 0.6 }}>
-            <Typography
-              sx={{
-                fontWeight: 500,
-                fontSize: "12px",
-                color: tokens.colors.text.secondary,
-                fontFamily: tokens.fontFamily,
-              }}
-            >
-              Required Date{" "}
-              <span style={{ color: tokens.colors.danger }}>*</span>
-            </Typography>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DatePicker
-                value={requiredDate}
-                onChange={(newValue) => setRequiredDate(newValue)}
-                format='DD/MM/YYYY'
-                slotProps={{
-                  textField: {
-                    variant: "standard",
-                    inputProps: { readOnly: true },
-                    sx: {
-                      border: `1px solid ${tokens.colors.border}`,
-                      backgroundColor: "#fff",
-                      borderRadius: tokens.radius.sm,
-                      width: 148,
-                      "&:hover": { borderColor: "#9DA5B4" },
-                    },
-                    InputProps: {
-                      disableUnderline: true,
-                      sx: {
-                        px: "10px",
-                        fontSize: "12px",
-                        height: 36,
-                        fontFamily: tokens.fontFamily,
-                        color: tokens.colors.text.primary,
-                        "& .MuiSvgIcon-root": {
-                          fontSize: "1rem",
-                          color: tokens.colors.text.muted,
-                        },
-                      },
-                    },
-                  },
+          <Grid>
+            {/* Page Header */}
+            <Box sx={{ maxWidth: 1140, mx: "auto", mb: 3 }}>
+              <Typography
+                sx={{
+                  fontWeight: 700,
+                  color: tokens.colors.text.primary,
+                  fontSize: "20px",
+                  fontFamily: tokens.fontFamily,
+                  letterSpacing: "-0.3px",
                 }}
-              />
-            </LocalizationProvider>
-          </Box>
+              >
+                Material Request
+              </Typography>
+              <Typography
+                sx={{
+                  fontSize: "13px",
+                  color: tokens.colors.text.muted,
+                  fontFamily: tokens.fontFamily,
+                  mt: 0.4,
+                }}
+              >
+                Fill in the details below to raise a new material request.
+              </Typography>
+            </Box>
 
-          {/* Purpose */}
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 0.6,
-              flex: 1,
-              minWidth: 260,
-            }}
-          >
-            <Typography
+            {/* Requirement Details Card */}
+            <Paper
+              elevation={0}
               sx={{
-                fontWeight: 500,
-                fontSize: "12px",
-                color: tokens.colors.text.secondary,
-                fontFamily: tokens.fontFamily,
+                width: "100%",
+                maxWidth: 1140,
+                mx: "auto",
+                borderRadius: tokens.radius.lg,
+                border: `1px solid ${tokens.colors.border}`,
+                backgroundColor: tokens.colors.cardBg,
+                p: 3,
+                mb: 2.5,
               }}
             >
-              Purpose
-              <span style={{ color: tokens.colors.danger }}>*</span>
-            </Typography>
-            <TextField
-              size='small'
-              fullWidth
-              placeholder='Describe the purpose of this request'
-              value={purpose}
-              onChange={(e) => setPurpose(e.target.value)}
-              sx={inputSx}
-            />
-          </Box>
-        </Box>
-      </Paper>
-
-      {/* Material Details Card */}
-      <Paper
-        elevation={0}
-        sx={{
-          width: "100%",
-          maxWidth: 1140,
-          mx: "auto",
-          borderRadius: tokens.radius.lg,
-          border: `1px solid ${tokens.colors.border}`,
-          backgroundColor: tokens.colors.cardBg,
-          p: 3,
-          mb: 3,
-        }}
-      >
-        {/* Section Label */}
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            mb: 2,
-          }}
-        >
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <Box
-              sx={{
-                width: 3,
-                height: 18,
-                borderRadius: "2px",
-                backgroundColor: tokens.colors.accent.indigo,
-              }}
-            />
-            <Typography
-              sx={{
-                fontWeight: 600,
-                fontSize: "13px",
-                color: tokens.colors.text.primary,
-                fontFamily: tokens.fontFamily,
-                letterSpacing: "-0.1px",
-              }}
-            >
-              Material Details
-            </Typography>
-          </Box>
-          <Typography
-            sx={{
-              fontSize: "12px",
-              color: tokens.colors.text.muted,
-              fontFamily: tokens.fontFamily,
-            }}
-          >
-            {rows.length} {rows.length === 1 ? "item" : "items"}
-          </Typography>
-        </Box>
-
-        <TableContainer
-          component={Paper}
-          elevation={0}
-          sx={{
-            border: `1px solid ${tokens.colors.border}`,
-            borderRadius: tokens.radius.md,
-            overflow: "hidden",
-          }}
-        >
-          <Table size='small'>
-            <TableHead>
-              <TableRow>
-                <TableCell sx={{ ...headerCellSx, width: "28%" }}>
-                  Material Name
-                </TableCell>
-                <TableCell sx={{ ...headerCellSx, width: "20%" }}>
-                  Category
-                </TableCell>
-                <TableCell sx={{ ...headerCellSx, width: "11%" }}>
-                  UOM
-                </TableCell>
-                <TableCell sx={{ ...headerCellSx, width: "13%" }}>
-                  Stock
-                </TableCell>
-                <TableCell
-                  sx={{ ...headerCellSx, width: "16%", textAlign: "right" }}
-                >
-                  Quantity
-                </TableCell>
-                <TableCell
-                  sx={{ ...headerCellSx, width: "10%", textAlign: "center" }}
-                >
-                  Actions
-                </TableCell>
-              </TableRow>
-            </TableHead>
-
-            <TableBody>
-              {rows.map((row, index) => (
-                <TableRow
-                  key={row.id}
+              {/* Section Label */}
+              <Box
+                sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2.5 }}
+              >
+                <Box
                   sx={{
-                    backgroundColor: "#fff",
-                    "&:hover": { backgroundColor: "#FAFAFA" },
-                    "&:last-child td": { borderBottom: "none" },
-                    transition: "background 0.1s",
+                    width: 3,
+                    height: 18,
+                    borderRadius: "2px",
+                    backgroundColor: tokens.colors.accent.indigo,
+                  }}
+                />
+                <Typography
+                  sx={{
+                    fontWeight: 600,
+                    fontSize: "13px",
+                    color: tokens.colors.text.primary,
+                    fontFamily: tokens.fontFamily,
+                    letterSpacing: "-0.1px",
                   }}
                 >
-                  {/* Material Name */}
-                  <TableCell sx={{ ...bodyCellSx }}>
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                      <Box sx={{ flex: 1, minWidth: 0 }}>
-                        {row.objectitem === "New" ? (
-                          <Typography
-                            sx={{
+                  Requirement Details
+                </Typography>
+              </Box>
+
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 3,
+                  flexWrap: "wrap",
+                }}
+              >
+                {/* Required Date */}
+                <Box
+                  sx={{ display: "flex", flexDirection: "column", gap: 0.6 }}
+                >
+                  <Typography
+                    sx={{
+                      fontWeight: 500,
+                      fontSize: "12px",
+                      color: tokens.colors.text.secondary,
+                      fontFamily: tokens.fontFamily,
+                    }}
+                  >
+                    Required Date{" "}
+                    <span style={{ color: tokens.colors.danger }}>*</span>
+                  </Typography>
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <DatePicker
+                      value={requiredDate}
+                      onChange={(newValue) => setRequiredDate(newValue)}
+                      format='DD/MM/YYYY'
+                      slotProps={{
+                        textField: {
+                          variant: "standard",
+                          inputProps: { readOnly: true },
+                          sx: {
+                            border: `1px solid ${tokens.colors.border}`,
+                            backgroundColor: "#fff",
+                            borderRadius: tokens.radius.sm,
+                            width: 148,
+                            "&:hover": { borderColor: "#9DA5B4" },
+                          },
+                          InputProps: {
+                            disableUnderline: true,
+                            sx: {
+                              px: "10px",
                               fontSize: "12px",
+                              height: 36,
+                              fontFamily: tokens.fontFamily,
                               color: tokens.colors.text.primary,
-                              fontFamily: tokens.fontFamily,
-                              fontWeight: 500,
-                            }}
-                          >
-                            {row.newmaterialName}
-                          </Typography>
-                        ) : (
-                          <Autocomplete
-                            disableClearable
-                            freeSolo
-                            size='small'
-                            options={materialNameList}
-                            value={row.materialName ?? null}
-                            getOptionLabel={(option) =>
-                              typeof option === "string"
-                                ? option
-                                : option
-                                  ? `${option.name} - ${option.Itemid}`
-                                  : ""
-                            }
-                            isOptionEqualToValue={(option, value) =>
-                              option.Itemid === value.Itemid
-                            }
-                            onInputChange={(_, newInputValue, reason) => {
-                              if (reason === "input")
-                                handleRowChange(
-                                  index,
-                                  "newmaterialName",
-                                  newInputValue,
-                                );
-                            }}
-                            onChange={(_, val) => {
-                              handleRowChange(index, "materialName", val);
-                              handleRowChange(index, "newmaterialName", "");
-                            }}
-                            PaperComponent={({ children }) => (
-                              <Paper
-                                sx={{
-                                  fontFamily: tokens.fontFamily,
-                                  fontSize: "12px",
-                                  borderRadius: tokens.radius.md,
-                                  border: `1px solid ${tokens.colors.border}`,
-                                  boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
-                                }}
-                              >
-                                {children}
-                              </Paper>
-                            )}
-                            renderOption={(props, option) => (
-                              <li
-                                {...props}
-                                key={option.Itemid}
-                                style={{
-                                  fontSize: "12px",
-                                  fontFamily: tokens.fontFamily,
-                                  padding: "8px 12px",
-                                  display: "flex",
-                                  alignItems: "center",
-                                  gap: 8,
-                                }}
-                              >
-                                <span>
-                                  {option.name} — {option.Itemid}
-                                </span>
-                                {Number(option.tag) === 1 && (
-                                  <Chip
-                                    label='Critical'
-                                    size='small'
-                                    sx={{
-                                      fontSize: "10px",
-                                      height: 18,
-                                      backgroundColor: "#FEF2F2",
-                                      color: "#DC2626",
-                                      fontFamily: tokens.fontFamily,
-                                    }}
-                                  />
-                                )}
-                              </li>
-                            )}
-                            renderInput={(params) => (
-                              <TextField
-                                {...params}
-                                placeholder='Search material…'
-                                sx={{ ...inputSx, width: 200 }}
-                              />
-                            )}
-                          />
-                        )}
-                      </Box>
-
-                      {/* New / Cancel button */}
-                      {row.objectitem === "New" ? (
-                        <Button
-                          variant='outlined'
-                          size='small'
-                          onClick={() =>
-                            setRows((prevRows) =>
-                              prevRows.map((item, i) =>
-                                i === index
-                                  ? {
-                                      ...item,
-                                      objectitem: "Old",
-                                      materialName: "",
-                                      materialCategory: "",
-                                      uom: "",
-                                      availableStock: "",
-                                      quantity: "",
-                                    }
-                                  : item,
-                              ),
-                            )
-                          }
-                          sx={{
-                            minWidth: "52px",
-                            height: "28px",
-                            fontSize: "10px",
-                            fontWeight: 600,
-                            fontFamily: tokens.fontFamily,
-                            borderRadius: tokens.radius.sm,
-                            borderColor: tokens.colors.danger,
-                            color: tokens.colors.danger,
-                            textTransform: "none",
-                            whiteSpace: "nowrap",
-                            "&:hover": {
-                              backgroundColor: tokens.colors.dangerLight,
-                              borderColor: tokens.colors.danger,
+                              "& .MuiSvgIcon-root": {
+                                fontSize: "1rem",
+                                color: tokens.colors.text.muted,
+                              },
                             },
-                          }}
-                        >
-                          Cancel
-                        </Button>
-                      ) : row.newmaterialName?.trim() ? (
-                        <Button
-                          variant='contained'
-                          size='small'
-                          onClick={() =>
-                            setRows((prevRows) =>
-                              prevRows.map((item, i) =>
-                                i === index
-                                  ? { ...item, objectitem: "New" }
-                                  : item,
-                              ),
-                            )
-                          }
-                          sx={{
-                            minWidth: "44px",
-                            height: "28px",
-                            fontSize: "10px",
-                            fontWeight: 600,
-                            fontFamily: tokens.fontFamily,
-                            borderRadius: tokens.radius.sm,
-                            backgroundColor: tokens.colors.accent.indigo,
-                            textTransform: "none",
-                            whiteSpace: "nowrap",
-                            boxShadow: "none",
-                            "&:hover": {
-                              backgroundColor: tokens.colors.accent.indigoDark,
-                              boxShadow: "none",
-                            },
-                          }}
-                        >
-                          + New
-                        </Button>
-                      ) : null}
-                    </Box>
-                  </TableCell>
-
-                  {/* Material Category */}
-                  <TableCell sx={bodyCellSx}>
-                    {row.objectitem === "New" ? (
-                      <Select
-                        size='small'
-                        fullWidth
-                        displayEmpty
-                        value={row.materialCategory}
-                        onChange={(e) =>
-                          setRows((prevRows) =>
-                            prevRows.map((item, i) =>
-                              i === index
-                                ? { ...item, materialCategory: e.target.value }
-                                : item,
-                            ),
-                          )
-                        }
-                        renderValue={(v) =>
-                          v || (
-                            <span
-                              style={{
-                                color: tokens.colors.text.placeholder,
-                                fontSize: 12,
-                                fontFamily: tokens.fontFamily,
-                              }}
-                            >
-                              Select category
-                            </span>
-                          )
-                        }
-                        sx={{
-                          fontSize: "12px",
-                          fontFamily: tokens.fontFamily,
-                          backgroundColor: "#fff",
-                          borderRadius: tokens.radius.sm,
-                          minHeight: "36px",
-                          "& .MuiOutlinedInput-notchedOutline": {
-                            borderColor: tokens.colors.border,
                           },
-                          "&:hover .MuiOutlinedInput-notchedOutline": {
-                            borderColor: "#9DA5B4",
-                          },
-                          "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                            borderColor: tokens.colors.accent.indigo,
-                          },
-                          "& .MuiSelect-select": {
-                            padding: "7px 10px",
-                            fontFamily: tokens.fontFamily,
-                            fontSize: "12px",
-                          },
-                        }}
-                      >
-                        {materialCategoryList.map((c) => (
-                          <MenuItem
-                            key={c}
-                            value={c}
-                            sx={{
-                              fontSize: "12px",
-                              fontFamily: tokens.fontFamily,
-                            }}
-                          >
-                            {c}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    ) : (
-                      <Typography
-                        sx={{
-                          fontSize: "12px",
-                          color: row.materialCategory
-                            ? tokens.colors.text.primary
-                            : tokens.colors.text.muted,
-                          fontFamily: tokens.fontFamily,
-                        }}
-                      >
-                        {row.materialCategory || "—"}
-                      </Typography>
-                    )}
-                  </TableCell>
-
-                  {/* UOM */}
-                  <TableCell sx={bodyCellSx}>
-                    {row.objectitem === "New" ? (
-                      <TextField
-                        size='small'
-                        fullWidth
-                        placeholder='UOM'
-                        value={row.uom}
-                        onChange={(e) =>
-                          setRows((prevRows) =>
-                            prevRows.map((item, i) =>
-                              i === index
-                                ? { ...item, uom: e.target.value }
-                                : item,
-                            ),
-                          )
-                        }
-                        sx={inputSx}
-                        style={{ width: 50 }}
-                      />
-                    ) : (
-                      <Typography
-                        sx={{
-                          fontSize: "12px",
-                          color: row.uom
-                            ? tokens.colors.text.primary
-                            : tokens.colors.text.muted,
-                          fontFamily: tokens.fontFamily,
-                        }}
-                      >
-                        {row.uom || "—"}
-                      </Typography>
-                    )}
-                  </TableCell>
-
-                  {/* Stock */}
-                  <TableCell sx={bodyCellSx}>
-                    <Box sx={{ display: "inline-flex" }}>
-                      {row.availableStock && row.availableStock !== "-" ? (
-                        <Box
-                          sx={{
-                            px: 1.2,
-                            py: 0.3,
-                            borderRadius: "20px",
-                            backgroundColor: "#ECFDF5",
-                            border: "1px solid #A7F3D0",
-                          }}
-                        >
-                          <Typography
-                            sx={{
-                              fontSize: "11px",
-                              color: "#065F46",
-                              fontFamily: tokens.fontFamily,
-                              fontWeight: 600,
-                            }}
-                          >
-                            {row.availableStock}
-                          </Typography>
-                        </Box>
-                      ) : (
-                        <Typography
-                          sx={{
-                            fontSize: "12px",
-                            color: tokens.colors.text.muted,
-                            fontFamily: tokens.fontFamily,
-                          }}
-                        >
-                          —
-                        </Typography>
-                      )}
-                    </Box>
-                  </TableCell>
-
-                  {/* Quantity */}
-                  <TableCell sx={bodyCellSx}>
-                    <TextField
-                      size='small'
-                      fullWidth
-                      placeholder='0'
-                      type='number'
-                      value={row.quantity}
-                      onChange={(e) =>
-                        setRows((prevRows) =>
-                          prevRows.map((item, i) =>
-                            i === index
-                              ? { ...item, quantity: e.target.value }
-                              : item,
-                          ),
-                        )
-                      }
-                      sx={{
-                        ...inputSx,
-                        "& .MuiInputBase-input": {
-                          padding: "7px 10px",
-                          textAlign: "right",
-                          fontFamily: tokens.fontFamily,
-                          fontSize: "12px",
-                          fontWeight: 500,
                         },
                       }}
                     />
-                  </TableCell>
+                  </LocalizationProvider>
+                </Box>
 
-                  {/* Actions */}
-                  <TableCell sx={{ ...bodyCellSx, textAlign: "center" }}>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "center",
-                        gap: 0.5,
-                      }}
-                    >
-                      <IconButton
-                        size='small'
-                        onClick={() => handleRefreshRow(row.id)}
-                        title='Reset row'
+                {/* Purpose */}
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 0.6,
+                    flex: 1,
+                    minWidth: 260,
+                  }}
+                >
+                  <Typography
+                    sx={{
+                      fontWeight: 500,
+                      fontSize: "12px",
+                      color: tokens.colors.text.secondary,
+                      fontFamily: tokens.fontFamily,
+                    }}
+                  >
+                    Purpose
+                    <span style={{ color: tokens.colors.danger }}>*</span>
+                  </Typography>
+                  <TextField
+                    size='small'
+                    fullWidth
+                    placeholder='Describe the purpose of this request'
+                    value={purpose}
+                    onChange={(e) => setPurpose(e.target.value)}
+                    sx={inputSx}
+                  />
+                </Box>
+              </Box>
+            </Paper>
+
+            {/* Material Details Card */}
+            <Paper
+              elevation={0}
+              sx={{
+                width: "100%",
+                maxWidth: 1140,
+                mx: "auto",
+                borderRadius: tokens.radius.lg,
+                border: `1px solid ${tokens.colors.border}`,
+                backgroundColor: tokens.colors.cardBg,
+                p: 3,
+                mb: 3,
+              }}
+            >
+              {/* Section Label */}
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  mb: 2,
+                }}
+              >
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  <Box
+                    sx={{
+                      width: 3,
+                      height: 18,
+                      borderRadius: "2px",
+                      backgroundColor: tokens.colors.accent.indigo,
+                    }}
+                  />
+                  <Typography
+                    sx={{
+                      fontWeight: 600,
+                      fontSize: "13px",
+                      color: tokens.colors.text.primary,
+                      fontFamily: tokens.fontFamily,
+                      letterSpacing: "-0.1px",
+                    }}
+                  >
+                    Material Details
+                  </Typography>
+                </Box>
+                <Typography
+                  sx={{
+                    fontSize: "12px",
+                    color: tokens.colors.text.muted,
+                    fontFamily: tokens.fontFamily,
+                  }}
+                >
+                  {rows.length} {rows.length === 1 ? "item" : "items"}
+                </Typography>
+              </Box>
+
+              <TableContainer
+                component={Paper}
+                elevation={0}
+                sx={{
+                  border: `1px solid ${tokens.colors.border}`,
+                  borderRadius: tokens.radius.md,
+                  overflow: "hidden",
+                }}
+              >
+                <Table size='small'>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell sx={{ ...headerCellSx, width: "28%" }}>
+                        Material Name
+                      </TableCell>
+                      <TableCell sx={{ ...headerCellSx, width: "20%" }}>
+                        Category
+                      </TableCell>
+                      <TableCell sx={{ ...headerCellSx, width: "11%" }}>
+                        UOM
+                      </TableCell>
+                      <TableCell sx={{ ...headerCellSx, width: "13%" }}>
+                        Stock
+                      </TableCell>
+                      <TableCell
                         sx={{
-                          color: tokens.colors.text.muted,
-                          p: 0.6,
-                          borderRadius: tokens.radius.sm,
-                          "&:hover": {
-                            color: tokens.colors.accent.indigo,
-                            backgroundColor: tokens.colors.accent.indigoLight,
-                          },
-                          transition: "all 0.15s",
+                          ...headerCellSx,
+                          width: "16%",
+                          textAlign: "right",
                         }}
                       >
-                        <Refresh sx={{ fontSize: 15 }} />
-                      </IconButton>
-                      <IconButton
-                        size='small'
-                        onClick={() => handleRemoveRow(row.id)}
-                        disabled={rows.length === 1}
-                        title='Remove row'
+                        Quantity
+                      </TableCell>
+                      <TableCell
                         sx={{
-                          color: tokens.colors.text.muted,
-                          p: 0.6,
-                          borderRadius: tokens.radius.sm,
-                          "&:hover": {
-                            color: tokens.colors.danger,
-                            backgroundColor: tokens.colors.dangerLight,
-                          },
-                          "&.Mui-disabled": {
-                            color: tokens.colors.borderLight,
-                          },
-                          transition: "all 0.15s",
+                          ...headerCellSx,
+                          width: "10%",
+                          textAlign: "center",
                         }}
                       >
-                        <Close sx={{ fontSize: 15 }} />
-                      </IconButton>
-                    </Box>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+                        Actions
+                      </TableCell>
+                    </TableRow>
+                  </TableHead>
 
-        {/* Add Material */}
-        <Box sx={{ mt: 1.5, px: 0.5 }}>
-          <Box
-            onClick={handleAddMaterial}
-            sx={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 0.7,
-              cursor: "pointer",
-              color: tokens.colors.accent.indigo,
-              py: 0.6,
-              px: 1,
-              borderRadius: tokens.radius.sm,
-              "&:hover": { backgroundColor: tokens.colors.accent.indigoLight },
-              transition: "background 0.15s",
-              userSelect: "none",
+                  <TableBody>
+                    {rows.map((row, index) => (
+                      <TableRow
+                        key={row.id}
+                        sx={{
+                          backgroundColor: "#fff",
+                          "&:hover": { backgroundColor: "#FAFAFA" },
+                          "&:last-child td": { borderBottom: "none" },
+                          transition: "background 0.1s",
+                        }}
+                      >
+                        {/* Material Name */}
+                        <TableCell sx={{ ...bodyCellSx }}>
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 1,
+                            }}
+                          >
+                            <Box sx={{ flex: 1, minWidth: 0 }}>
+                              {row.objectitem === "New" ? (
+                                <Typography
+                                  sx={{
+                                    fontSize: "12px",
+                                    color: tokens.colors.text.primary,
+                                    fontFamily: tokens.fontFamily,
+                                    fontWeight: 500,
+                                  }}
+                                >
+                                  {row.newmaterialName}
+                                </Typography>
+                              ) : (
+                                <Autocomplete
+                                  disableClearable
+                                  freeSolo
+                                  size='small'
+                                  options={materialNameList}
+                                  value={row.materialName ?? null}
+                                  getOptionLabel={(option) =>
+                                    typeof option === "string"
+                                      ? option
+                                      : option
+                                        ? `${option.name} - ${option.Itemid}`
+                                        : ""
+                                  }
+                                  isOptionEqualToValue={(option, value) =>
+                                    option.Itemid === value.Itemid
+                                  }
+                                  onInputChange={(_, newInputValue, reason) => {
+                                    if (reason === "input")
+                                      handleRowChange(
+                                        index,
+                                        "newmaterialName",
+                                        newInputValue,
+                                      );
+                                  }}
+                                  onChange={(_, val) => {
+                                    handleRowChange(index, "materialName", val);
+                                    handleRowChange(
+                                      index,
+                                      "newmaterialName",
+                                      "",
+                                    );
+                                  }}
+                                  PaperComponent={({ children }) => (
+                                    <Paper
+                                      sx={{
+                                        fontFamily: tokens.fontFamily,
+                                        fontSize: "12px",
+                                        borderRadius: tokens.radius.md,
+                                        border: `1px solid ${tokens.colors.border}`,
+                                        boxShadow:
+                                          "0 4px 16px rgba(0,0,0,0.08)",
+                                      }}
+                                    >
+                                      {children}
+                                    </Paper>
+                                  )}
+                                  renderOption={(props, option) => (
+                                    <li
+                                      {...props}
+                                      key={option.Itemid}
+                                      style={{
+                                        fontSize: "12px",
+                                        fontFamily: tokens.fontFamily,
+                                        padding: "8px 12px",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: 8,
+                                      }}
+                                    >
+                                      <span>
+                                        {option.name} — {option.Itemid}
+                                      </span>
+                                      {Number(option.tag) === 1 && (
+                                        <Chip
+                                          label='Critical'
+                                          size='small'
+                                          sx={{
+                                            fontSize: "10px",
+                                            height: 18,
+                                            backgroundColor: "#FEF2F2",
+                                            color: "#DC2626",
+                                            fontFamily: tokens.fontFamily,
+                                          }}
+                                        />
+                                      )}
+                                    </li>
+                                  )}
+                                  renderInput={(params) => (
+                                    <TextField
+                                      {...params}
+                                      placeholder='Search material…'
+                                      sx={{ ...inputSx, width: 200 }}
+                                    />
+                                  )}
+                                />
+                              )}
+                            </Box>
+
+                            {/* New / Cancel button */}
+                            {row.objectitem === "New" ? (
+                              <Button
+                                variant='outlined'
+                                size='small'
+                                onClick={() =>
+                                  setRows((prevRows) =>
+                                    prevRows.map((item, i) =>
+                                      i === index
+                                        ? {
+                                            ...item,
+                                            objectitem: "Old",
+                                            materialName: "",
+                                            materialCategory: "",
+                                            uom: "",
+                                            availableStock: "",
+                                            quantity: "",
+                                          }
+                                        : item,
+                                    ),
+                                  )
+                                }
+                                sx={{
+                                  minWidth: "52px",
+                                  height: "28px",
+                                  fontSize: "10px",
+                                  fontWeight: 600,
+                                  fontFamily: tokens.fontFamily,
+                                  borderRadius: tokens.radius.sm,
+                                  borderColor: tokens.colors.danger,
+                                  color: tokens.colors.danger,
+                                  textTransform: "none",
+                                  whiteSpace: "nowrap",
+                                  "&:hover": {
+                                    backgroundColor: tokens.colors.dangerLight,
+                                    borderColor: tokens.colors.danger,
+                                  },
+                                }}
+                              >
+                                Cancel
+                              </Button>
+                            ) : row.newmaterialName?.trim() ? (
+                              <Button
+                                variant='contained'
+                                size='small'
+                                onClick={() =>
+                                  setRows((prevRows) =>
+                                    prevRows.map((item, i) =>
+                                      i === index
+                                        ? { ...item, objectitem: "New" }
+                                        : item,
+                                    ),
+                                  )
+                                }
+                                sx={{
+                                  minWidth: "44px",
+                                  height: "28px",
+                                  fontSize: "10px",
+                                  fontWeight: 600,
+                                  fontFamily: tokens.fontFamily,
+                                  borderRadius: tokens.radius.sm,
+                                  backgroundColor: tokens.colors.accent.indigo,
+                                  textTransform: "none",
+                                  whiteSpace: "nowrap",
+                                  boxShadow: "none",
+                                  "&:hover": {
+                                    backgroundColor:
+                                      tokens.colors.accent.indigoDark,
+                                    boxShadow: "none",
+                                  },
+                                }}
+                              >
+                                + New
+                              </Button>
+                            ) : null}
+                          </Box>
+                        </TableCell>
+
+                        {/* Material Category */}
+                        <TableCell sx={bodyCellSx}>
+                          {row.objectitem === "New" ? (
+                            <Select
+                              size='small'
+                              fullWidth
+                              displayEmpty
+                              value={row.materialCategory}
+                              onChange={(e) =>
+                                setRows((prevRows) =>
+                                  prevRows.map((item, i) =>
+                                    i === index
+                                      ? {
+                                          ...item,
+                                          materialCategory: e.target.value,
+                                        }
+                                      : item,
+                                  ),
+                                )
+                              }
+                              renderValue={(v) =>
+                                v || (
+                                  <span
+                                    style={{
+                                      color: tokens.colors.text.placeholder,
+                                      fontSize: 12,
+                                      fontFamily: tokens.fontFamily,
+                                    }}
+                                  >
+                                    Select category
+                                  </span>
+                                )
+                              }
+                              sx={{
+                                fontSize: "12px",
+                                fontFamily: tokens.fontFamily,
+                                backgroundColor: "#fff",
+                                borderRadius: tokens.radius.sm,
+                                minHeight: "36px",
+                                "& .MuiOutlinedInput-notchedOutline": {
+                                  borderColor: tokens.colors.border,
+                                },
+                                "&:hover .MuiOutlinedInput-notchedOutline": {
+                                  borderColor: "#9DA5B4",
+                                },
+                                "&.Mui-focused .MuiOutlinedInput-notchedOutline":
+                                  {
+                                    borderColor: tokens.colors.accent.indigo,
+                                  },
+                                "& .MuiSelect-select": {
+                                  padding: "7px 10px",
+                                  fontFamily: tokens.fontFamily,
+                                  fontSize: "12px",
+                                },
+                              }}
+                            >
+                              {materialCategoryList.map((c) => (
+                                <MenuItem
+                                  key={c}
+                                  value={c}
+                                  sx={{
+                                    fontSize: "12px",
+                                    fontFamily: tokens.fontFamily,
+                                  }}
+                                >
+                                  {c}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          ) : (
+                            <Typography
+                              sx={{
+                                fontSize: "12px",
+                                color: row.materialCategory
+                                  ? tokens.colors.text.primary
+                                  : tokens.colors.text.muted,
+                                fontFamily: tokens.fontFamily,
+                              }}
+                            >
+                              {row.materialCategory || "—"}
+                            </Typography>
+                          )}
+                        </TableCell>
+
+                        {/* UOM */}
+                        <TableCell sx={bodyCellSx}>
+                          {row.objectitem === "New" ? (
+                            <TextField
+                              size='small'
+                              fullWidth
+                              placeholder='UOM'
+                              value={row.uom}
+                              onChange={(e) =>
+                                setRows((prevRows) =>
+                                  prevRows.map((item, i) =>
+                                    i === index
+                                      ? { ...item, uom: e.target.value }
+                                      : item,
+                                  ),
+                                )
+                              }
+                              sx={inputSx}
+                              style={{ width: 50 }}
+                            />
+                          ) : (
+                            <Typography
+                              sx={{
+                                fontSize: "12px",
+                                color: row.uom
+                                  ? tokens.colors.text.primary
+                                  : tokens.colors.text.muted,
+                                fontFamily: tokens.fontFamily,
+                              }}
+                            >
+                              {row.uom || "—"}
+                            </Typography>
+                          )}
+                        </TableCell>
+
+                        {/* Stock */}
+                        <TableCell sx={bodyCellSx}>
+                          <Box sx={{ display: "inline-flex" }}>
+                            {row.availableStock &&
+                            row.availableStock !== "-" ? (
+                              <Box
+                                sx={{
+                                  px: 1.2,
+                                  py: 0.3,
+                                  borderRadius: "20px",
+                                  backgroundColor: "#ECFDF5",
+                                  border: "1px solid #A7F3D0",
+                                }}
+                              >
+                                <Typography
+                                  sx={{
+                                    fontSize: "11px",
+                                    color: "#065F46",
+                                    fontFamily: tokens.fontFamily,
+                                    fontWeight: 600,
+                                  }}
+                                >
+                                  {row.availableStock}
+                                </Typography>
+                              </Box>
+                            ) : (
+                              <Typography
+                                sx={{
+                                  fontSize: "12px",
+                                  color: tokens.colors.text.muted,
+                                  fontFamily: tokens.fontFamily,
+                                }}
+                              >
+                                —
+                              </Typography>
+                            )}
+                          </Box>
+                        </TableCell>
+
+                        {/* Quantity */}
+                        <TableCell sx={bodyCellSx}>
+                          <TextField
+                            size='small'
+                            fullWidth
+                            placeholder='0'
+                            type='number'
+                            value={row.quantity}
+                            onChange={(e) =>
+                              setRows((prevRows) =>
+                                prevRows.map((item, i) =>
+                                  i === index
+                                    ? { ...item, quantity: e.target.value }
+                                    : item,
+                                ),
+                              )
+                            }
+                            sx={{
+                              ...inputSx,
+                              "& .MuiInputBase-input": {
+                                padding: "7px 10px",
+                                textAlign: "right",
+                                fontFamily: tokens.fontFamily,
+                                fontSize: "12px",
+                                fontWeight: 500,
+                              },
+                            }}
+                          />
+                        </TableCell>
+
+                        {/* Actions */}
+                        <TableCell sx={{ ...bodyCellSx, textAlign: "center" }}>
+                          <Box
+                            sx={{
+                              display: "flex",
+                              justifyContent: "center",
+                              gap: 0.5,
+                            }}
+                          >
+                            <IconButton
+                              size='small'
+                              onClick={() => handleRefreshRow(row.id)}
+                              title='Reset row'
+                              sx={{
+                                color: tokens.colors.text.muted,
+                                p: 0.6,
+                                borderRadius: tokens.radius.sm,
+                                "&:hover": {
+                                  color: tokens.colors.accent.indigo,
+                                  backgroundColor:
+                                    tokens.colors.accent.indigoLight,
+                                },
+                                transition: "all 0.15s",
+                              }}
+                            >
+                              <Refresh sx={{ fontSize: 15 }} />
+                            </IconButton>
+                            <IconButton
+                              size='small'
+                              onClick={() => handleRemoveRow(row.id)}
+                              disabled={rows.length === 1}
+                              title='Remove row'
+                              sx={{
+                                color: tokens.colors.text.muted,
+                                p: 0.6,
+                                borderRadius: tokens.radius.sm,
+                                "&:hover": {
+                                  color: tokens.colors.danger,
+                                  backgroundColor: tokens.colors.dangerLight,
+                                },
+                                "&.Mui-disabled": {
+                                  color: tokens.colors.borderLight,
+                                },
+                                transition: "all 0.15s",
+                              }}
+                            >
+                              <Close sx={{ fontSize: 15 }} />
+                            </IconButton>
+                          </Box>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+
+              {/* Add Material */}
+              <Box sx={{ mt: 1.5, px: 0.5 }}>
+                <Box
+                  onClick={handleAddMaterial}
+                  sx={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 0.7,
+                    cursor: "pointer",
+                    color: tokens.colors.accent.indigo,
+                    py: 0.6,
+                    px: 1,
+                    borderRadius: tokens.radius.sm,
+                    "&:hover": {
+                      backgroundColor: tokens.colors.accent.indigoLight,
+                    },
+                    transition: "background 0.15s",
+                    userSelect: "none",
+                  }}
+                >
+                  <AddCircleOutline sx={{ fontSize: 15 }} />
+                  <Typography
+                    sx={{
+                      fontWeight: 600,
+                      fontSize: "12px",
+                      fontFamily: tokens.fontFamily,
+                      color: "inherit",
+                    }}
+                  >
+                    Add Material
+                  </Typography>
+                </Box>
+              </Box>
+            </Paper>
+
+            {/* Action Buttons */}
+            <Box
+              sx={{
+                maxWidth: 1140,
+                mx: "auto",
+                display: "flex",
+                gap: 1.5,
+                justifyContent: "flex-end",
+              }}
+            >
+              <Button
+                onClick={handleCancel}
+                sx={{
+                  border: `1.5px solid ${tokens.colors.border}`,
+                  color: tokens.colors.text.secondary,
+                  fontWeight: 600,
+                  fontSize: "12px",
+                  fontFamily: tokens.fontFamily,
+                  px: 3,
+                  py: 0.9,
+                  borderRadius: tokens.radius.sm,
+                  textTransform: "none",
+                  minHeight: "36px",
+                  backgroundColor: "#fff",
+                  "&:hover": {
+                    backgroundColor: tokens.colors.pageBg,
+                    borderColor: "#9DA5B4",
+                  },
+                  transition: "all 0.15s",
+                }}
+              >
+                Cancel
+              </Button>
+              <>
+                <Button
+                  onClick={handleSubmit}
+                  disabled={!isFormValid}
+                  sx={{
+                    backgroundColor: tokens.colors.accent.indigo,
+                    color: "#fff",
+                    fontWeight: 600,
+                    fontSize: "12px",
+                    fontFamily: tokens.fontFamily,
+                    px: 3.5,
+                    py: 0.9,
+                    borderRadius: tokens.radius.sm,
+                    textTransform: "none",
+                    minHeight: "36px",
+                    boxShadow: "none",
+                    transition: "background 0.15s",
+
+                    "&:hover": {
+                      backgroundColor: tokens.colors.accent.indigoDark,
+                      boxShadow: "none",
+                    },
+
+                    "&.Mui-disabled": {
+                      backgroundColor: "#e0e0e0",
+                      color: "red",
+                      cursor: "not-allowed",
+                      opacity: 1,
+                    },
+                  }}
+                >
+                  Submit Request
+                </Button>
+
+                {!isFormValid && (
+                  <Typography
+                    sx={{
+                      color: "red",
+                      fontSize: "12px",
+                      mt: 1,
+                      fontWeight: 500,
+                      fontFamily: tokens.fontFamily,
+                    }}
+                  >
+                    * Please fill all required fields.
+                    <br />
+                    • For New Material: Material Category, UOM and Quantity are
+                    required.
+                    <br />• For Old Material: Quantity is required.
+                  </Typography>
+                )}
+              </>
+            </Box>
+          </Grid>
+
+          <Dialog
+            open={modal.open}
+            onClose={() => setModal({ ...modal, open: false })}
+            fullWidth
+            maxWidth='xs'
+            PaperProps={{
+              sx: {
+                overflow: "hidden",
+              },
             }}
           >
-            <AddCircleOutline sx={{ fontSize: 15 }} />
-            <Typography
+            <DialogTitle
               sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
                 fontWeight: 600,
-                fontSize: "12px",
-                fontFamily: tokens.fontFamily,
-                color: "inherit",
+                fontFamily: "'Inter', 'Poppins', sans-serif",
               }}
             >
-              Add Material
-            </Typography>
-          </Box>
-        </Box>
-      </Paper>
+              {modal.type === "success" ? (
+                <CheckCircleIcon color='success' />
+              ) : (
+                <ErrorIcon color='error' />
+              )}
 
-      {/* Action Buttons */}
-      <Box
-        sx={{
-          maxWidth: 1140,
-          mx: "auto",
-          display: "flex",
-          gap: 1.5,
-          justifyContent: "flex-end",
-        }}
-      >
-        <Button
-          onClick={handleCancel}
-          sx={{
-            border: `1.5px solid ${tokens.colors.border}`,
-            color: tokens.colors.text.secondary,
-            fontWeight: 600,
-            fontSize: "12px",
-            fontFamily: tokens.fontFamily,
-            px: 3,
-            py: 0.9,
-            borderRadius: tokens.radius.sm,
-            textTransform: "none",
-            minHeight: "36px",
-            backgroundColor: "#fff",
-            "&:hover": {
-              backgroundColor: tokens.colors.pageBg,
-              borderColor: "#9DA5B4",
-            },
-            transition: "all 0.15s",
-          }}
-        >
-          Cancel
-        </Button>
-        <>
-          <Button
-            onClick={handleSubmit}
-            disabled={!isFormValid}
-            sx={{
-              backgroundColor: tokens.colors.accent.indigo,
-              color: "#fff",
-              fontWeight: 600,
-              fontSize: "12px",
-              fontFamily: tokens.fontFamily,
-              px: 3.5,
-              py: 0.9,
-              borderRadius: tokens.radius.sm,
-              textTransform: "none",
-              minHeight: "36px",
-              boxShadow: "none",
-              transition: "background 0.15s",
+              {modal.title}
+            </DialogTitle>
 
-              "&:hover": {
-                backgroundColor: tokens.colors.accent.indigoDark,
-                boxShadow: "none",
-              },
-
-              "&.Mui-disabled": {
-                backgroundColor: "#e0e0e0",
-                color: "red",
-                cursor: "not-allowed",
-                opacity: 1,
-              },
-            }}
-          >
-            Submit Request
-          </Button>
-
-          {!isFormValid && (
-            <Typography
+            {/* ✅ MUST USE DialogContent */}
+            <DialogContent
               sx={{
-                color: "red",
-                fontSize: "12px",
-                mt: 1,
-                fontWeight: 500,
-                fontFamily: tokens.fontFamily,
+                fontFamily: "'Inter', 'Poppins', sans-serif",
+                overflow: "hidden",
+                wordBreak: "break-word",
               }}
             >
-              * Please fill all required fields.
-              <br />
-              • For New Material: Material Category, UOM and Quantity are
-              required.
-              <br />• For Old Material: Quantity is required.
-            </Typography>
-          )}
-        </>
-      </Box>
+              <Typography variant='body2' color='text.secondary'>
+                {modal.message}
+              </Typography>
+            </DialogContent>
 
-      <Dialog
-        open={modal.open}
-        onClose={() => setModal({ ...modal, open: false })}
-        fullWidth
-        maxWidth='xs'
-        PaperProps={{
-          sx: {
-            overflow: "hidden",
-          },
-        }}
-      >
-        <DialogTitle
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            gap: 1,
-            fontWeight: 600,
-            fontFamily: "'Inter', 'Poppins', sans-serif",
-          }}
-        >
-          {modal.type === "success" ? (
-            <CheckCircleIcon color='success' />
-          ) : (
-            <ErrorIcon color='error' />
-          )}
-
-          {modal.title}
-        </DialogTitle>
-
-        {/* ✅ MUST USE DialogContent */}
-        <DialogContent
-          sx={{
-            fontFamily: "'Inter', 'Poppins', sans-serif",
-            overflow: "hidden",
-            wordBreak: "break-word",
-          }}
-        >
-          <Typography variant='body2' color='text.secondary'>
-            {modal.message}
-          </Typography>
-        </DialogContent>
-
-        <DialogActions sx={{ p: 2 }}>
-          <Button
-            variant='contained'
-            onClick={() => setModal({ ...modal, open: false })}
-            sx={{ fontFamily: "'Inter', 'Poppins', sans-serif" }}
-          >
-            OK
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </Box>
+            <DialogActions sx={{ p: 2 }}>
+              <Button
+                variant='contained'
+                onClick={() => setModal({ ...modal, open: false })}
+                sx={{ fontFamily: "'Inter', 'Poppins', sans-serif" }}
+              >
+                OK
+              </Button>
+            </DialogActions>
+          </Dialog>
+        </Box>
+      )}
+    </div>
   );
 }

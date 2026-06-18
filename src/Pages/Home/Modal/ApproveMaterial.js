@@ -23,6 +23,8 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 
+import CircularProgress from "@mui/material/CircularProgress";
+
 // ── Token system ──────────────────────────────────────────────
 const POPPINS = "'Poppins', 'Poppins Fallback', sans-serif";
 
@@ -442,6 +444,14 @@ function ReviewFooter() {
 // ── Main Component ────────────────────────────────────────────
 export default function ApproveMaterial(props) {
   const [data, setData] = useState(null);
+  const [modal, setModal] = useState({
+    open: false,
+    type: "",
+    title: "",
+    message: "",
+  });
+  const [loading, setLoading] = useState("");
+
   const navigate = useNavigate();
 
   console.log(props);
@@ -469,102 +479,266 @@ export default function ApproveMaterial(props) {
       });
   };
 
+  console.log(data);
+
+  const handleApprove = async () => {
+    const payload = {
+      _request: {
+        MaterialRequirementManagementHeader: {
+          HIQ_RequestNo: data?.materialRequestId,
+
+          HIQ_requester_id: "Hi-Q-000922",
+
+          HIQ_requester_Name: "USR_SHIP",
+
+          HIQ_L1ApproverName: "",
+
+          HIQ_L2ApproverName: "",
+
+          HIQ_L1UserId: "",
+
+          HIQ_L2UserId: "",
+
+          HIQ_Required_date: "2026-06-20T00:00:00",
+
+          HIQ_purpose: "Material requirement for production",
+
+          HIQ_Status: "1",
+
+          HIQ_movement_Journal_Id: "",
+
+          HIQ_purcharse_Req_Id: "",
+
+          HIQ_commentL1: "",
+
+          HIQ_commentL2: "",
+
+          HIQ_submitted_at: "2026-06-17T14:45:00",
+
+          HIQ_ApproveDateL1: "2026-06-17T14:45:00",
+
+          HIQ_synced_at: "",
+
+          HIQ_resubmit_count: 0,
+
+          HIQ_sync_error: "",
+
+          HIQ_SyncStatus: "0",
+
+          HIQ_ManagerAction: "0",
+
+          resubmissionReason: "",
+        },
+
+        MaterialRequirementManagementLine: [
+          {
+            HeaderRequestId: "PO-DN-160000131",
+
+            ItemId: "DK-SMDIA1.60MMFK10.5",
+
+            MaterialName:
+              "Multilayer Drill bits Kemmer SM Series 3.175mm shank and flute length 10.5 mm diameter 1.60 mm",
+
+            LineNum: 1,
+
+            CategoryId: "",
+
+            UOM: "NOS",
+
+            AvailableStock: 0,
+
+            Quantity: 10,
+
+            ItemTag: "0",
+
+            MovementJournalIdLine: "",
+
+            PurchaseReqIdLine: "",
+
+            SyncStatusLine: "0",
+
+            SyncErrorLine: "",
+          },
+
+          {
+            HeaderRequestId: "PO-DN-160000131",
+
+            ItemId: "DFFX250CS17.75ix500f-AW",
+
+            MaterialName: "Photopolymer Dry Film RISTON FX250 17.75 x 500 AW",
+
+            LineNum: 2,
+
+            CategoryId: "",
+
+            UOM: "ROLL",
+
+            AvailableStock: 4,
+
+            Quantity: 2,
+
+            ItemTag: "0",
+
+            MovementJournalIdLine: "",
+
+            PurchaseReqIdLine: "",
+
+            SyncStatusLine: "0",
+
+            SyncErrorLine: "",
+          },
+        ],
+      },
+    };
+
+    try {
+      const response = await axios.post(
+        "http://10.10.0.101:8000/mrmuser/create",
+        payload,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+
+      // setModal({
+      //   open: true,
+      //   type: "success",
+      //   title: "Request Submitted",
+      //   message:
+      //     "Your material requirement request has been submitted successfully.",
+      // });
+    } catch (error) {
+      console.log(error);
+
+      const errorMessage =
+        error.response?.data?.detail ||
+        "Something went wrong. Please try again later.";
+
+      setModal({
+        open: true,
+        type: "error",
+        title: "Submission Failed",
+        message: errorMessage,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     DetailsAPi();
   }, []);
 
   return (
     <Box>
-      <Grid>
-        <DialogHeader data={data} props={props} />
-
-        <Box
+      {loading ? (
+        <Grid
           sx={{
-            p: 2.5,
+            minHeight: "50vh",
             display: "flex",
-            flexDirection: "column",
-            gap: 1.5,
-            // maxHeight: "80vh",
+            justifyContent: "center",
+            alignItems: "center",
           }}
         >
-          <Grid
-            sx={{ backgroundColor: "#F1F5F9", padding: 3, borderRadius: 2 }}
+          <CircularProgress aria-label='Loading…' />
+        </Grid>
+      ) : (
+        <Grid>
+          <DialogHeader data={data} props={props} />
+
+          <Box
+            sx={{
+              p: 2.5,
+              display: "flex",
+              flexDirection: "column",
+              gap: 1.5,
+              // maxHeight: "80vh",
+            }}
           >
-            <RequestDetails data={data} />
-            <MaterialDetails data={data} />
-
-            {props?.rowData?.Resubmitted == true && (
-              <>
-                <ReviewComments />
-                <ResubmissionNote />
-              </>
-            )}
-          </Grid>
-
-          {props?.rowData?.Resubmitted == true && (
             <Grid
               sx={{ backgroundColor: "#F1F5F9", padding: 3, borderRadius: 2 }}
             >
-              <ReviewFooter />
-            </Grid>
-          )}
+              <RequestDetails data={data} />
+              <MaterialDetails data={data} />
 
-          {/* Action buttons */}
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              gap: 1.5,
-              alignItems: "center",
-            }}
-          >
-            <Button
-              variant='contained'
+              {props?.rowData?.Resubmitted == true && (
+                <>
+                  <ReviewComments />
+                  <ResubmissionNote />
+                </>
+              )}
+            </Grid>
+
+            {props?.rowData?.Resubmitted == true && (
+              <Grid
+                sx={{ backgroundColor: "#F1F5F9", padding: 3, borderRadius: 2 }}
+              >
+                <ReviewFooter />
+              </Grid>
+            )}
+
+            {/* Action buttons */}
+            <Box
               sx={{
-                fontFamily: POPPINS,
-                fontWeight: 600,
-                fontSize: "0.78rem",
-                bgcolor: colors.approveBtn,
-                textTransform: "none",
-                borderRadius: 1.5,
-                px: 3.5,
-                boxShadow: "none",
-                "&:hover": { bgcolor: "#DC2626", boxShadow: "none" },
+                display: "flex",
+                justifyContent: "center",
+                gap: 1.5,
+                alignItems: "center",
               }}
             >
-              Approve
-            </Button>
-            <Button
-              variant='outlined'
-              sx={{
-                fontFamily: POPPINS,
-                fontWeight: 600,
-                fontSize: "0.78rem",
-                color: colors.rejectText,
-                borderColor: colors.rejectBorder,
-                textTransform: "none",
-                borderRadius: 1.5,
-                px: 3.5,
-                "&:hover": {
-                  bgcolor: "#FEF2F2",
+              <Button
+                variant='contained'
+                sx={{
+                  fontFamily: POPPINS,
+                  fontWeight: 600,
+                  fontSize: "0.78rem",
+                  bgcolor: colors.approveBtn,
+                  textTransform: "none",
+                  borderRadius: 1.5,
+                  px: 3.5,
+                  boxShadow: "none",
+                  "&:hover": { bgcolor: "#DC2626", boxShadow: "none" },
+                }}
+                onClick={() => {
+                  handleApprove();
+                }}
+              >
+                Approve
+              </Button>
+              <Button
+                variant='outlined'
+                sx={{
+                  fontFamily: POPPINS,
+                  fontWeight: 600,
+                  fontSize: "0.78rem",
+                  color: colors.rejectText,
                   borderColor: colors.rejectBorder,
-                },
-              }}
-            >
-              Reject
-            </Button>
-            <Typography
-              sx={{
-                fontFamily: POPPINS,
-                fontSize: "0.72rem",
-                color: colors.labelGray,
-              }}
-            >
-              (A)
-            </Typography>
+                  textTransform: "none",
+                  borderRadius: 1.5,
+                  px: 3.5,
+                  "&:hover": {
+                    bgcolor: "#FEF2F2",
+                    borderColor: colors.rejectBorder,
+                  },
+                }}
+              >
+                Reject
+              </Button>
+              <Typography
+                sx={{
+                  fontFamily: POPPINS,
+                  fontSize: "0.72rem",
+                  color: colors.labelGray,
+                }}
+              >
+                (A)
+              </Typography>
+            </Box>
           </Box>
-        </Box>
-      </Grid>
+        </Grid>
+      )}
     </Box>
   );
 }

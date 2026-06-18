@@ -310,6 +310,7 @@ export default function Home() {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [showSearch, setShowSearch] = useState(false);
   const [passRowData, setPassRowData] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -398,6 +399,15 @@ export default function Home() {
   useEffect(() => {
     fetchTabledata();
   }, []);
+
+  const loadingTrue = () => {
+    setLoading(true);
+  };
+
+  const loadingFalse = () => {
+    setLoading(false);
+  };
+
   return (
     <div>
       <Navbar>
@@ -1117,7 +1127,10 @@ export default function Home() {
                 />
               </Grid>
 
-              <CreateMaterialRequest />
+              <CreateMaterialRequest
+                loadingTrue={loadingTrue}
+                loadingFalse={loadingFalse}
+              />
             </Box>
           </Modal>
         </div>
