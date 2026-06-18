@@ -37,7 +37,7 @@ import kpi_img2 from "../../Images/Home/MRM KPI 2.png";
 import kpi_img3 from "../../Images/Home/MRM KPI 3.png";
 import kpi_img4 from "../../Images/Home/MRM KPI 4.png";
 import CreateMaterialRequest from "./Modal/CreateMaterialRequest";
-
+import { TextField, Menu, MenuItem } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import Navbar from "../../Navbars/Navbar";
 import ApproveMaterial from "./Modal/ApproveMaterial";
@@ -47,6 +47,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import warning from "../../Images/Home/warning_icon.png";
 import loop from "../../Images/History/loop_icon.png";
+import dayjs from "dayjs";
 const FONT = "Poppins, sans-serif";
 
 const cardData = [
@@ -302,9 +303,13 @@ export default function Home() {
   const [tabs, setTabs] = useState([]);
   const [approveModal, setApproveModal] = useState(false);
   const [modalName, setModalName] = useState("");
-
+  const [searchText, setSearchText] = useState("");
+  const [statusFilter, setStatusFilter] = useState("All");
+  const [anchorEl, setAnchorEl] = useState(null);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [showSearch, setShowSearch] = useState(false);
+  const [passRowData, setPassRowData] = useState(null);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -358,20 +363,38 @@ export default function Home() {
   };
 
   const filteredRows = rows.filter((row) => {
+    // Existing tab filtering
+    let tabMatch = true;
+
     switch (activeTab) {
       case 1:
-        return row.CriticalStatus?.includes("Critical");
+        tabMatch = row.CriticalStatus?.includes("Critical");
+        break;
       case 2:
-        return row.CriticalStatus?.includes("New");
+        tabMatch = row.CriticalStatus?.includes("New");
+        break;
       case 3:
-        return row.CriticalStatus?.includes("Normal");
+        tabMatch = row.CriticalStatus?.includes("Normal");
+        break;
       case 4:
-        return row.Resubmitted;
+        tabMatch = row.Resubmitted;
+        break;
       default:
-        return true;
+        tabMatch = true;
     }
-  });
 
+    // Search filter
+    const searchMatch =
+      !searchText ||
+      row.MaterialRequestId?.toLowerCase().includes(searchText.toLowerCase()) ||
+      row.Requester?.toLowerCase().includes(searchText.toLowerCase()) ||
+      row.HandledBy?.toLowerCase().includes(searchText.toLowerCase());
+
+    // Status filter
+    const statusMatch = statusFilter === "All" || row.Status === statusFilter;
+
+    return tabMatch && searchMatch && statusMatch;
+  });
   useEffect(() => {
     fetchTabledata();
   }, []);
@@ -591,8 +614,30 @@ export default function Home() {
 
               {/* Actions */}
               <Stack direction='row' spacing={1} alignItems='center'>
+                {showSearch && (
+                  <Box sx={{ p: 1 }}>
+                    <TextField
+                      size='small'
+                      placeholder='Search...'
+                      value={searchText}
+                      onChange={(e) => setSearchText(e.target.value)}
+                      sx={{
+                        width: "140px",
+                        "& .MuiOutlinedInput-root": {
+                          height: "28px",
+                          borderRadius: "6px",
+                          fontSize: "0.7rem",
+                        },
+                        "& .MuiOutlinedInput-input": {
+                          padding: "4px 8px",
+                        },
+                      }}
+                    />
+                  </Box>
+                )}
                 <IconButton
                   size='small'
+                  onClick={() => setShowSearch(!showSearch)}
                   sx={{
                     border: "1px solid #E2E8F0",
                     borderRadius: "8px",
@@ -603,6 +648,7 @@ export default function Home() {
                 </IconButton>
                 <IconButton
                   size='small'
+                  onClick={(e) => setAnchorEl(e.currentTarget)}
                   sx={{
                     border: "1px solid #E2E8F0",
                     borderRadius: "8px",
@@ -635,7 +681,79 @@ export default function Home() {
                 </Button>
               </Stack>
             </Box>
+            <Menu
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={() => setAnchorEl(null)}
+              PaperProps={{
+                sx: {
+                  minWidth: 140,
+                  borderRadius: "8px",
+                  boxShadow: "0px 4px 12px rgba(0,0,0,0.08)",
+                  "& .MuiMenuItem-root": {
+                    minHeight: "30px",
+                    fontSize: "0.75rem",
+                    fontFamily: "Poppins, sans-serif",
+                    py: 0.5,
+                    px: 1.5,
+                  },
+                },
+              }}
+            >
+              <MenuItem
+                onClick={() => {
+                  setStatusFilter("All");
+                  setAnchorEl(null);
+                }}
+              >
+                All Statuses
+              </MenuItem>
 
+              <MenuItem
+                onClick={() => {
+                  setStatusFilter("L1 Review");
+                  setAnchorEl(null);
+                }}
+              >
+                L1 Review
+              </MenuItem>
+
+              <MenuItem
+                onClick={() => {
+                  setStatusFilter("L2 Review");
+                  setAnchorEl(null);
+                }}
+              >
+                L2 Review
+              </MenuItem>
+
+              <MenuItem
+                onClick={() => {
+                  setStatusFilter("L1 Rejected");
+                  setAnchorEl(null);
+                }}
+              >
+                L1 Rejected
+              </MenuItem>
+
+              <MenuItem
+                onClick={() => {
+                  setStatusFilter("L2 Approved");
+                  setAnchorEl(null);
+                }}
+              >
+                L2 Approved
+              </MenuItem>
+
+              <MenuItem
+                onClick={() => {
+                  setStatusFilter("L2 Mixed");
+                  setAnchorEl(null);
+                }}
+              >
+                L2 Mixed
+              </MenuItem>
+            </Menu>
             <Divider />
 
             {/* Table */}
@@ -645,13 +763,21 @@ export default function Home() {
                 borderRight: "1px solid #E2E8F0",
               }}
             >
-              <Table>
+              <Table
+                sx={{
+                  "& .MuiTableCell-root": {
+                    py: 1, // vertical padding
+                    px: 1.5,
+                  },
+                }}
+              >
                 <TableHead>
                   <TableRow>
                     <TableCell
                       sx={{
                         fontFamily: "Poppins, sans-serif",
                         fontSize: "0.8rem",
+                        whiteSpace: "nowrap",
                       }}
                     >
                       Material Request ID
@@ -684,6 +810,7 @@ export default function Home() {
                         fontFamily: "Poppins, sans-serif",
                         fontSize: "0.8rem",
                         textAlign: "center",
+                        whiteSpace: "nowrap",
                       }}
                     >
                       Number of Materials
@@ -693,6 +820,7 @@ export default function Home() {
                         fontFamily: "Poppins, sans-serif",
                         fontSize: "0.8rem",
                         textAlign: "center",
+                        whiteSpace: "nowrap",
                       }}
                     >
                       Requested On
@@ -702,6 +830,7 @@ export default function Home() {
                         fontFamily: "Poppins, sans-serif",
                         fontSize: "0.8rem",
                         textAlign: "center",
+                        whiteSpace: "nowrap",
                       }}
                     >
                       Required Date
@@ -720,9 +849,10 @@ export default function Home() {
                         fontFamily: "Poppins, sans-serif",
                         fontSize: "0.8rem",
                         textAlign: "center",
+                        whiteSpace: "nowrap",
                       }}
                     >
-                      Reference No.
+                      Reference No
                     </TableCell>
                     <TableCell
                       // align="right"
@@ -749,11 +879,12 @@ export default function Home() {
                         onClick={() => {
                           setApproveModal(true);
 
-                          if (row.status == "L1 Review") {
+                          if (row.Status == "L1 Review") {
                             setModalName("ApproveModal");
-                          } else if (row.status == "L1 Rejected") {
+                            setPassRowData(row);
+                          } else if (row.Status == "L1 Rejected") {
                             setModalName("L1RejectFirstModal");
-                          } else if (row.status == "L2 Mixed") {
+                          } else if (row.Status == "L2 Mixed") {
                             setModalName("L2RejectModal");
                           } else {
                             setModalName("");
@@ -768,10 +899,13 @@ export default function Home() {
                             spacing={1}
                           >
                             <Typography
-                              fontWeight={600}
+                              fontWeight={500}
                               fontSize='0.70rem'
                               color='#1E293B'
-                              sx={{ fontFamily: "Poppins, sans-serif" }}
+                              sx={{
+                                fontFamily: "Poppins, sans-serif",
+                                whiteSpace: "nowrap",
+                              }}
                             >
                               {row.MaterialRequestId}
                             </Typography>
@@ -789,7 +923,7 @@ export default function Home() {
                           sx={{
                             fontFamily: "Poppins, sans-serif",
                             fontSize: "0.70rem",
-                            textAlign: "center",
+                            textAlign: "left",
                           }}
                         >
                           {row.Requester}
@@ -797,7 +931,7 @@ export default function Home() {
 
                         {/* Materials */}
                         <TableCell
-                          align='center'
+                          align='right'
                           sx={{
                             fontFamily: "Poppins, sans-serif",
                           }}
@@ -820,7 +954,7 @@ export default function Home() {
                             fontSize: "0.76rem",
                           }}
                         >
-                          {row.RequestedOn}
+                          {dayjs(row.RequestedOn).format("DD-MMM-YYYY")}
                         </TableCell>
 
                         {/* Required Date */}
@@ -830,7 +964,7 @@ export default function Home() {
                             fontSize: "0.76rem",
                           }}
                         >
-                          {row.RequiredDate}
+                          {dayjs(row.RequiredDate).format("DD-MMM-YYYY")}
                         </TableCell>
 
                         {/* Handled By + Level */}
@@ -868,14 +1002,16 @@ export default function Home() {
                         {/* Ref No */}
                         <TableCell>
                           <Typography
-                            color={row.refNo === "-" ? "#94A3B8" : "#1E293B"}
+                            // color={
+                            //   row.ReferenceNo === "-" ? "#94A3B8" : "#1E293B"
+                            // }
                             sx={{
                               fontFamily: "Poppins, sans-serif",
                               fontSize: "0.76rem",
                               textAlign: "center",
                             }}
                           >
-                            {row.ReferenceNo}
+                            {row.ReferenceNo == "" ? "-" : row.ReferenceNo}
                           </Typography>
                         </TableCell>
 
@@ -946,7 +1082,7 @@ export default function Home() {
               </Grid>
 
               {modalName == "ApproveModal" ? (
-                <ApproveMaterial />
+                <ApproveMaterial rowData={passRowData} />
               ) : modalName == "L1RejectFirstModal" ? (
                 <L1RejectFirstModal />
               ) : modalName == "L2RejectModal" ? (

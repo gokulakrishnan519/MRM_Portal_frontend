@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
   Typography,
@@ -19,6 +19,9 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import ReplayIcon from "@mui/icons-material/Replay";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import dayjs from "dayjs";
 
 // ── Token system ──────────────────────────────────────────────
 const POPPINS = "'Poppins', 'Poppins Fallback', sans-serif";
@@ -44,7 +47,7 @@ const colors = {
 // ── Sub-components ────────────────────────────────────────────
 
 /** Top header bar */
-function DialogHeader({ onClose }) {
+function DialogHeader({ data }) {
   return (
     <Box
       sx={{
@@ -67,7 +70,7 @@ function DialogHeader({ onClose }) {
           fontSize: "1rem",
         }}
       >
-        Material Request MR-1028
+        Material Request {data?.materialRequestId}
       </Typography>
 
       <Chip
@@ -149,18 +152,21 @@ function InfoPair({ label, value }) {
 }
 
 // ── Request Details Section ───────────────────────────────────
-function RequestDetails() {
+function RequestDetails({ data }) {
   return (
     <SectionCard title='Request Details'>
       <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2.5, mb: 1 }}>
-        <InfoPair label='Required Date' value='10 May 2026' />
-        <InfoPair label='Requested By' value='Vishnu' />
-        <InfoPair label='Requested On' value='12 April 2026' />
+        <InfoPair
+          label='Required Date'
+          value={dayjs(data?.requiredDate).format("DD MMM YYYY")}
+        />
+        <InfoPair label='Requested By' value={data?.requestedBy} />
+        <InfoPair
+          label='Requested On'
+          value={dayjs(data?.requestedOn).format("DD MMM YYYY")}
+        />
       </Box>
-      <InfoPair
-        label='Purpose'
-        value='General maintenance and sanitation requirements'
-      />
+      <InfoPair label='Purpose' value={data?.purpose} />
     </SectionCard>
   );
 }
@@ -185,7 +191,7 @@ const materialRows = [
   },
 ];
 
-function MaterialDetails() {
+function MaterialDetails({ data }) {
   return (
     <SectionCard title='Material Details' sx={{ mt: 2 }}>
       <TableContainer
@@ -218,16 +224,16 @@ function MaterialDetails() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {materialRows.map((row, i) => (
+            {data?.materials.map((row, i) => (
               <TableRow key={i} sx={{ "&:last-child td": { borderBottom: 0 } }}>
                 <TableCell
                   sx={{ fontFamily: POPPINS, fontSize: "0.72rem", py: 1.2 }}
                 >
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                    {row.name}
-                    {row.critical && (
+                    {row.materialName}
+                    {row.itemtag && (
                       <Chip
-                        label='Critical'
+                        label={row.itemtag}
                         size='small'
                         sx={{
                           fontFamily: POPPINS,
@@ -248,7 +254,7 @@ function MaterialDetails() {
                     color: colors.labelGray,
                   }}
                 >
-                  {row.category}
+                  {row.categoryId}
                 </TableCell>
                 <TableCell sx={{ fontFamily: POPPINS, fontSize: "0.72rem" }}>
                   {row.uom}
@@ -433,26 +439,40 @@ function ReviewFooter() {
 
 // ── Main Component ────────────────────────────────────────────
 export default function ApproveMaterial() {
-  const [open, setOpen] = useState(true);
+  const [data, setData] = useState(null);
+  const navigate = useNavigate();
 
-  if (!open) {
-    return (
-      <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
-        <Button
-          variant='contained'
-          onClick={() => setOpen(true)}
-          sx={{ fontFamily: POPPINS, textTransform: "none" }}
-        >
-          Open Dialog
-        </Button>
-      </Box>
-    );
-  }
+  const DetailsAPi = () => {
+    const payload = {
+      materialRequestId: "PO-DN-160000173",
+      status: 0,
+    };
+
+    axios
+      .post(`http://10.10.0.101:8000/mrmuser/l1review/details`, payload)
+      .then((res) => {
+        console.log(console.log(res));
+        setData(res.data.data);
+      })
+      .catch((err) => {
+        const errorMessage =
+          err.response?.data?.message || err.message || "Login failed";
+
+        //console.log(err);
+        navigate("/ErrorHandling");
+        sessionStorage.setItem("errormessge", errorMessage);
+        // setLoading(false);
+      });
+  };
+
+  useEffect(() => {
+    DetailsAPi();
+  }, []);
 
   return (
     <Box>
       <Grid>
-        <DialogHeader onClose={() => setOpen(false)} />
+        <DialogHeader data={data} />
 
         <Box
           sx={{
@@ -466,8 +486,8 @@ export default function ApproveMaterial() {
           <Grid
             sx={{ backgroundColor: "#F1F5F9", padding: 3, borderRadius: 2 }}
           >
-            <RequestDetails />
-            <MaterialDetails />
+            <RequestDetails data={data} />
+            <MaterialDetails data={data} />
 
             <ReviewComments />
             <ResubmissionNote />
