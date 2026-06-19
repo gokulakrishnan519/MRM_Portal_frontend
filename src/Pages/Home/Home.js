@@ -412,6 +412,7 @@ export default function Home() {
 
   const loadingFalse = () => {
     setLoading(false);
+    setApproveModal(false);
   };
 
   return (
@@ -898,6 +899,9 @@ export default function Home() {
                           if (row.Status == "L1 Review") {
                             setModalName("ApproveModal");
                             setPassRowData(row);
+                          } else if (row.Status == "L2 Review") {
+                            setModalName("ApproveModal");
+                            setPassRowData(row);
                           } else if (row.Status == "L1 Rejected") {
                             setModalName("L1RejectFirstModal");
                             setPassRowData(row);
@@ -1099,7 +1103,11 @@ export default function Home() {
               </Grid>
 
               {modalName == "ApproveModal" ? (
-                <ApproveMaterial rowData={passRowData} />
+                <ApproveMaterial
+                  rowData={passRowData}
+                  loadingTrue={loadingTrue}
+                  loadingFalse={loadingFalse}
+                />
               ) : modalName == "L1RejectFirstModal" ? (
                 <L1RejectFirstModal rowData={passRowData} />
               ) : modalName == "L2RejectModal" ? (

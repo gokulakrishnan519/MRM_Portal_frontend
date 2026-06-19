@@ -184,24 +184,6 @@ function RequestDetails({ data }) {
 }
 
 // ── Material Details Section ──────────────────────────────────
-const materialRows = [
-  {
-    name: "General Purpose Solvent",
-    critical: true,
-    category: "Solvent",
-    uom: "L",
-    availableStock: "50 L",
-    quantity: "5 L",
-  },
-  {
-    name: "Mild Detergent",
-    critical: false,
-    category: "Sanitation Supplies",
-    uom: "Kg",
-    availableStock: "45 Kg",
-    quantity: "10 L",
-  },
-];
 
 function MaterialDetails({ data }) {
   return (
@@ -471,7 +453,12 @@ export default function ApproveMaterial(props) {
     };
 
     axios
-      .post(`http://10.10.0.101:8000/mrmuser/l1review/details`, payload)
+      .post(
+        props?.rowData?.Status === "L2 Review"
+          ? "http://10.10.0.101:8000/mrmuser/L2Review"
+          : "http://10.10.0.101:8000/mrmuser/l1review/details",
+        payload,
+      )
       .then((res) => {
         console.log(console.log(res));
         setData(res.data.data);
@@ -490,6 +477,7 @@ export default function ApproveMaterial(props) {
   console.log(data);
 
   const handleApprove = async () => {
+    setLoading(true);
     const payload = {
       _request: {
         MaterialRequirementManagementHeader: {
@@ -556,7 +544,8 @@ export default function ApproveMaterial(props) {
 
           UOM: item.uom,
 
-          AvailableStock: item.availableStock,
+          AvailableStock:
+            item.availableStock == 0.0 ? "0" : String(item.availableStock),
 
           Quantity: item.quantity,
 
@@ -584,11 +573,136 @@ export default function ApproveMaterial(props) {
         },
       );
 
+      setLoading(false);
+
       setModal({
         open: true,
         type: "success",
         title: "Request Approved",
         message: "The request has been approved successfully.",
+      });
+    } catch (error) {
+      console.log(error);
+
+      const errorMessage =
+        error.response?.data?.detail ||
+        "Something went wrong. Please try again later.";
+
+      setModal({
+        open: true,
+        type: "error",
+        title: "Submission Failed",
+        message: errorMessage,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleReject = async () => {
+    setLoading(true);
+    const payload = {
+      _request: {
+        MaterialRequirementManagementHeader: {
+          HIQ_RequestNo: data?.materialRequestId,
+
+          HIQ_requester_id: "Hi-Q-000922",
+
+          HIQ_requester_Name: "USR_SHIP",
+
+          HIQ_L1ApproverName: "",
+
+          HIQ_L2ApproverName: "",
+
+          HIQ_L1UserId: "",
+
+          HIQ_L2UserId: "",
+
+          HIQ_Required_date: data?.requiredDate,
+
+          HIQ_purpose: data?.purpose,
+
+          HIQStatus: "2",
+
+          HIQ_movement_Journal_Id: "",
+
+          HIQ_purcharse_Req_Id: "",
+
+          HIQ_commentL1: "",
+
+          HIQ_commentL2: "",
+
+          HIQ_submitted_at: dayjs().format("YYYY-MM-DD[T]HH:mm:ss"),
+
+          HIQ_ApproveDateL1: dayjs().format("YYYY-MM-DD[T]HH:mm:ss"),
+
+          HIQ_synced_at: "",
+
+          HIQ_resubmit_count:
+            props.rowData?.Resubmitted == false
+              ? 0
+              : props.rowData?.Resubmitted == true
+                ? 1
+                : "",
+
+          HIQ_sync_error: "",
+
+          HIQ_SyncStatus: "0",
+
+          HIQ_ManagerAction: "0",
+
+          resubmissionReason: "",
+        },
+
+        MaterialRequirementManagementLine: data?.materials.map((item, i) => ({
+          HeaderRequestId: data?.materialRequestId,
+
+          ItemId: item.itemId,
+
+          MaterialName: item.materialName,
+
+          LineNum: i + 1,
+
+          CategoryId: item.categoryId,
+
+          UOM: item.uom,
+
+          AvailableStock:
+            item.availableStock == "0" ? "0" : String(item.availableStock),
+
+          Quantity: item.quantity,
+
+          ItemTag: item.itemtag,
+
+          MovementJournalIdLine: "",
+
+          PurchaseReqIdLine: "",
+
+          SyncStatusLine: "0",
+
+          SyncErrorLine: "",
+        })),
+      },
+    };
+
+    try {
+      const response = await axios.post(
+        "http://10.10.0.101:8000/mrmuser/create",
+        payload,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+
+      setLoading(false);
+
+      setModal({
+        open: true,
+        type: "success",
+        title: "Request Rejected",
+        message: "The request has been rejected successfully.",
       });
     } catch (error) {
       console.log(error);
@@ -665,63 +779,70 @@ export default function ApproveMaterial(props) {
                 </Grid>
               )}
 
-              {/* Action buttons */}
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  gap: 1.5,
-                  alignItems: "center",
-                }}
-              >
-                <Button
-                  variant='contained'
-                  sx={{
-                    fontFamily: POPPINS,
-                    fontWeight: 600,
-                    fontSize: "0.78rem",
-                    bgcolor: colors.approveBtn,
-                    textTransform: "none",
-                    borderRadius: 1.5,
-                    px: 3.5,
-                    boxShadow: "none",
-                    "&:hover": { bgcolor: "#DC2626", boxShadow: "none" },
-                  }}
-                  onClick={() => {
-                    handleApprove();
-                  }}
-                >
-                  Approve
-                </Button>
-                <Button
-                  variant='outlined'
-                  sx={{
-                    fontFamily: POPPINS,
-                    fontWeight: 600,
-                    fontSize: "0.78rem",
-                    color: colors.rejectText,
-                    borderColor: colors.rejectBorder,
-                    textTransform: "none",
-                    borderRadius: 1.5,
-                    px: 3.5,
-                    "&:hover": {
-                      bgcolor: "#FEF2F2",
-                      borderColor: colors.rejectBorder,
-                    },
-                  }}
-                >
-                  Reject
-                </Button>
-                <Typography
-                  sx={{
-                    fontFamily: POPPINS,
-                    fontSize: "0.72rem",
-                    color: colors.labelGray,
-                  }}
-                >
-                  (A)
-                </Typography>
-              </Box>
+              {props?.rowData?.Status === "L1 Review" && (
+                <>
+                  {/* Action buttons */}
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "center",
+                      gap: 1.5,
+                      alignItems: "center",
+                    }}
+                  >
+                    <Button
+                      variant='contained'
+                      sx={{
+                        fontFamily: POPPINS,
+                        fontWeight: 600,
+                        fontSize: "0.78rem",
+                        bgcolor: colors.approveBtn,
+                        textTransform: "none",
+                        borderRadius: 1.5,
+                        px: 3.5,
+                        boxShadow: "none",
+                        "&:hover": { bgcolor: "#DC2626", boxShadow: "none" },
+                      }}
+                      onClick={() => {
+                        handleApprove();
+                      }}
+                    >
+                      Approve
+                    </Button>
+                    <Button
+                      variant='outlined'
+                      sx={{
+                        fontFamily: POPPINS,
+                        fontWeight: 600,
+                        fontSize: "0.78rem",
+                        color: colors.rejectText,
+                        borderColor: colors.rejectBorder,
+                        textTransform: "none",
+                        borderRadius: 1.5,
+                        px: 3.5,
+                        "&:hover": {
+                          bgcolor: "#FEF2F2",
+                          borderColor: colors.rejectBorder,
+                        },
+                      }}
+                      onClick={() => {
+                        handleReject();
+                      }}
+                    >
+                      Reject
+                    </Button>
+                    <Typography
+                      sx={{
+                        fontFamily: POPPINS,
+                        fontSize: "0.72rem",
+                        color: colors.labelGray,
+                      }}
+                    >
+                      (A)
+                    </Typography>
+                  </Box>
+                </>
+              )}
             </Box>
           </Grid>
 
@@ -762,7 +883,11 @@ export default function ApproveMaterial(props) {
                 wordBreak: "break-word",
               }}
             >
-              <Typography variant='body2' color='text.secondary'>
+              <Typography
+                variant='body2'
+                color='text.secondary'
+                sx={{ fontFamily: "'Inter', 'Poppins', sans-serif" }}
+              >
                 {modal.message}
               </Typography>
             </DialogContent>
@@ -770,7 +895,10 @@ export default function ApproveMaterial(props) {
             <DialogActions sx={{ p: 2 }}>
               <Button
                 variant='contained'
-                onClick={() => setModal({ ...modal, open: false })}
+                onClick={() => {
+                  setModal({ ...modal, open: false });
+                  window.location.reload();
+                }}
                 sx={{ fontFamily: "'Inter', 'Poppins', sans-serif" }}
               >
                 OK

@@ -40,7 +40,7 @@ const emptyRow = () => ({
   materialName: "",
   materialCategory: "",
   uom: "",
-  availableStock: "-",
+  availableStock: "",
   quantity: "",
 });
 
@@ -184,8 +184,8 @@ export default function CreateMaterialRequest() {
               ? item.newmaterialName
               : item.materialName?.name,
           UOM: item.uom,
-          AvailableStock: item.availableStock ?? "",
-          Quantity: Number(item.quantity),
+          AvailableStock: item.availableStock == "" ? "0" : item.availableStock,
+          Quantity: item.quantity == "" ? "0" : Number(item.quantity),
           ItemTag:
             item.objectitem === "New"
               ? "1"
