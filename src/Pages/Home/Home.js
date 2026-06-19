@@ -336,17 +336,23 @@ export default function Home() {
         const updatedRows = res.data.data.map((item) => ({
           ...item,
           Status:
-            item.Status === "pending_l1"
+            item.Status == "0"
               ? "L1 Review"
-              : item.Status === "pending_l2"
+              : item.Status == "1"
                 ? "L2 Review"
-                : item.Status === "approved"
-                  ? "L2 Approved"
-                  : item.Status === "l1_rejected"
-                    ? "L1 Rejected"
-                    : item.Status === "l2_rejected"
-                      ? "L2 Rejected"
-                      : item.Status,
+                : item.Status == "2"
+                  ? "L1 Rejected"
+                  : item.Status == "3"
+                    ? "L2 Rejected"
+                    : item.Status == "4"
+                      ? "L2 Approved"
+                      : item.Status == "5"
+                        ? "Processing"
+                        : item.Status == "6"
+                          ? "Fulfilled"
+                          : item.Cancelled == "7"
+                            ? "Cancelled"
+                            : item.Status,
         }));
 
         setRows(updatedRows);
@@ -894,6 +900,7 @@ export default function Home() {
                             setPassRowData(row);
                           } else if (row.Status == "L1 Rejected") {
                             setModalName("L1RejectFirstModal");
+                            setPassRowData(row);
                           } else if (row.Status == "L2 Mixed") {
                             setModalName("L2RejectModal");
                           } else {

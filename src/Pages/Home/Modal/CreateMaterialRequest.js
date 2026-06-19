@@ -178,8 +178,11 @@ export default function CreateMaterialRequest() {
         MaterialRequirementManagementLine: rows.map((item, i) => ({
           HeaderRequestId: "",
           LineNum: i + 1,
-          ItemId: item.materialName?.Itemid,
-          MaterialName: item.materialName?.name,
+          ItemId: item.objectitem === "New" ? "" : item.materialName?.Itemid,
+          MaterialName:
+            item.objectitem === "New"
+              ? item.newmaterialName
+              : item.materialName?.name,
           UOM: item.uom,
           AvailableStock: item.availableStock ?? "",
           Quantity: Number(item.quantity),
@@ -214,8 +217,6 @@ export default function CreateMaterialRequest() {
         },
       );
 
-      alert("hii");
-
       if (response.data?.data?.$id === "1") {
         setModal({
           open: true,
@@ -234,13 +235,13 @@ export default function CreateMaterialRequest() {
         });
       }
     } catch (err) {
+      alert("hii");
       const errorMessage =
-        err.response?.data?.detail?.map((item) => item.msg).join("\n") ||
-        err.message ||
-        "Something went wrong";
+        err.response?.data?.detail || err.detail || "Something went wrong";
+
+      sessionStorage.setItem("errormessge", errorMessage);
 
       navigate("/ErrorHandling");
-      sessionStorage.setItem("errormessge", errorMessage);
       setLoading(false);
     } finally {
       setLoading(false);
@@ -254,6 +255,7 @@ export default function CreateMaterialRequest() {
   };
 
   const getLabels = async () => {
+    setLoading(true);
     try {
       const response = await axios.post(
         "http://10.10.0.101:8000/mrmuser/label",
@@ -262,8 +264,15 @@ export default function CreateMaterialRequest() {
         ...item,
       }));
       setMaterialNameList(updatedData);
-    } catch (error) {
-      console.log(error);
+      setLoading(false);
+    } catch (err) {
+      const errorMessage =
+        err.response?.data?.detail || err.detail || "Something went wrong";
+
+      sessionStorage.setItem("errormessge", errorMessage);
+
+      navigate("/ErrorHandling");
+      setLoading(false);
     }
   };
 
