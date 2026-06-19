@@ -33,6 +33,7 @@ import {
   DialogActions,
 } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
+import { useNavigate } from "react-router-dom";
 
 const emptyRow = () => ({
   id: Date.now(),
@@ -134,6 +135,8 @@ export default function CreateMaterialRequest() {
     message: "",
   });
 
+  const navigate = useNavigate();
+
   const handleAddMaterial = () => setRows((prev) => [...prev, emptyRow()]);
   const handleRemoveRow = (id) =>
     setRows((prev) => prev.filter((r) => r.id !== id));
@@ -144,7 +147,6 @@ export default function CreateMaterialRequest() {
 
   const handleSubmit = async () => {
     setLoading(true);
-
     const payload = {
       _request: {
         MaterialRequirementManagementHeader: {
@@ -153,10 +155,8 @@ export default function CreateMaterialRequest() {
           HIQ_requester_Name: "USR_SHIP",
           HIQ_L1ApproverName: "",
           HIQ_L2ApproverName: "",
-
           HIQ_L2UserId: "",
           HIQ_L1UserId: "",
-
           HIQ_Required_date: dayjs(requiredDate).format(
             "YYYY-MM-DD[T]00:00:00",
           ),
@@ -164,26 +164,17 @@ export default function CreateMaterialRequest() {
           HIQ_Status: "0",
           HIQ_movement_Journal_Id: "",
           HIQ_purcharse_Req_Id: "",
-
           HIQ_commentL1: "okay",
-
           HIQ_commentL2: "",
           HIQ_resubmit_count: 0,
-
           HIQ_submitted_at: dayjs().format("YYYY-MM-DD[T]HH:mm:ss"),
-
           HIQ_ApproveDateL1: "",
-
           HIQ_synced_at: "",
-
           HIQ_resubmit_count: 0,
           HIQ_sync_error: "",
-
           HIQ_SyncStatus: "0",
-
           HIQ_ManagerAction: "2",
         },
-
         MaterialRequirementManagementLine: rows.map((item, i) => ({
           HeaderRequestId: "",
           LineNum: i + 1,
@@ -200,22 +191,18 @@ export default function CreateMaterialRequest() {
                 : item.materialName?.tag === 1
                   ? "0"
                   : "",
-
           CategoryId:
             item.materialCategory == null ? "" : item.materialCategory,
           MovementJournalIdLine: "",
-
           PurchaseReqIdLine: "",
-
           SyncStatusLine: "0",
-
           SyncErrorLine: "",
-
           resubmissionReason: "",
         })),
       },
     };
 
+    console.log(payload);
     try {
       const response = await axios.post(
         "http://10.10.0.101:8000/mrmuser/create",
@@ -227,26 +214,34 @@ export default function CreateMaterialRequest() {
         },
       );
 
-      // setModal({
-      //   open: true,
-      //   type: "success",
-      //   title: "Request Submitted",
-      //   message:
-      //     "Your material requirement request has been submitted successfully.",
-      // });
-    } catch (error) {
-      console.log(error);
+      alert("hii");
 
+      if (response.data?.data?.$id === "1") {
+        setModal({
+          open: true,
+          type: "success",
+          title: "Request Submitted",
+          message: response.data.data.DebugMessage,
+        });
+      } else {
+        setModal({
+          open: true,
+          type: "error",
+          title: "Submission Failed",
+          message:
+            response.data?.data?.DebugMessage ||
+            "Something went wrong. Please try again later.",
+        });
+      }
+    } catch (err) {
       const errorMessage =
-        error.response?.data?.detail ||
-        "Something went wrong. Please try again later.";
+        err.response?.data?.detail?.map((item) => item.msg).join("\n") ||
+        err.message ||
+        "Something went wrong";
 
-      setModal({
-        open: true,
-        type: "error",
-        title: "Submission Failed",
-        message: errorMessage,
-      });
+      navigate("/ErrorHandling");
+      sessionStorage.setItem("errormessge", errorMessage);
+      setLoading(false);
     } finally {
       setLoading(false);
     }
@@ -1186,7 +1181,6 @@ export default function CreateMaterialRequest() {
 
           <Dialog
             open={modal.open}
-            onClose={() => setModal({ ...modal, open: false })}
             fullWidth
             maxWidth='xs'
             PaperProps={{
@@ -1221,7 +1215,11 @@ export default function CreateMaterialRequest() {
                 wordBreak: "break-word",
               }}
             >
-              <Typography variant='body2' color='text.secondary'>
+              <Typography
+                variant='body2'
+                color='text.secondary'
+                sx={{ fontFamily: "'Inter', 'Poppins', sans-serif" }}
+              >
                 {modal.message}
               </Typography>
             </DialogContent>
@@ -1229,7 +1227,11 @@ export default function CreateMaterialRequest() {
             <DialogActions sx={{ p: 2 }}>
               <Button
                 variant='contained'
-                onClick={() => setModal({ ...modal, open: false })}
+                onClick={() => {
+                  setModal({ ...modal, open: false });
+                  setRows([emptyRow()]);
+                  setPurpose("");
+                }}
                 sx={{ fontFamily: "'Inter', 'Poppins', sans-serif" }}
               >
                 OK

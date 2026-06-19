@@ -22,8 +22,16 @@ import ReplayIcon from "@mui/icons-material/Replay";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import ErrorIcon from "@mui/icons-material/Error";
 
 import CircularProgress from "@mui/material/CircularProgress";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+} from "@mui/material";
 
 // ── Token system ──────────────────────────────────────────────
 const POPPINS = "'Poppins', 'Poppins Fallback', sans-serif";
@@ -499,9 +507,9 @@ export default function ApproveMaterial(props) {
 
           HIQ_L2UserId: "",
 
-          HIQ_Required_date: "2026-06-20T00:00:00",
+          HIQ_Required_date: data?.requiredDate,
 
-          HIQ_purpose: "Material requirement for production",
+          HIQ_purpose: data?.purpose,
 
           HIQ_Status: "1",
 
@@ -513,13 +521,18 @@ export default function ApproveMaterial(props) {
 
           HIQ_commentL2: "",
 
-          HIQ_submitted_at: "2026-06-17T14:45:00",
+          HIQ_submitted_at: dayjs().format("YYYY-MM-DD[T]HH:mm:ss"),
 
-          HIQ_ApproveDateL1: "2026-06-17T14:45:00",
+          HIQ_ApproveDateL1: dayjs().format("YYYY-MM-DD[T]HH:mm:ss"),
 
           HIQ_synced_at: "",
 
-          HIQ_resubmit_count: 0,
+          HIQ_resubmit_count:
+            props.rowData?.Resubmitted == false
+              ? 0
+              : props.rowData?.Resubmitted == true
+                ? 1
+                : "",
 
           HIQ_sync_error: "",
 
@@ -530,64 +543,33 @@ export default function ApproveMaterial(props) {
           resubmissionReason: "",
         },
 
-        MaterialRequirementManagementLine: [
-          {
-            HeaderRequestId: "PO-DN-160000131",
+        MaterialRequirementManagementLine: data?.materials.map((item, i) => ({
+          HeaderRequestId: data?.materialRequestId,
 
-            ItemId: "DK-SMDIA1.60MMFK10.5",
+          ItemId: item.itemId,
 
-            MaterialName:
-              "Multilayer Drill bits Kemmer SM Series 3.175mm shank and flute length 10.5 mm diameter 1.60 mm",
+          MaterialName: item.materialName,
 
-            LineNum: 1,
+          LineNum: i + 1,
 
-            CategoryId: "",
+          CategoryId: item.categoryId,
 
-            UOM: "NOS",
+          UOM: item.uom,
 
-            AvailableStock: 0,
+          AvailableStock: item.availableStock,
 
-            Quantity: 10,
+          Quantity: item.quantity,
 
-            ItemTag: "0",
+          ItemTag: item.itemtag,
 
-            MovementJournalIdLine: "",
+          MovementJournalIdLine: "",
 
-            PurchaseReqIdLine: "",
+          PurchaseReqIdLine: "",
 
-            SyncStatusLine: "0",
+          SyncStatusLine: "0",
 
-            SyncErrorLine: "",
-          },
-
-          {
-            HeaderRequestId: "PO-DN-160000131",
-
-            ItemId: "DFFX250CS17.75ix500f-AW",
-
-            MaterialName: "Photopolymer Dry Film RISTON FX250 17.75 x 500 AW",
-
-            LineNum: 2,
-
-            CategoryId: "",
-
-            UOM: "ROLL",
-
-            AvailableStock: 4,
-
-            Quantity: 2,
-
-            ItemTag: "0",
-
-            MovementJournalIdLine: "",
-
-            PurchaseReqIdLine: "",
-
-            SyncStatusLine: "0",
-
-            SyncErrorLine: "",
-          },
-        ],
+          SyncErrorLine: "",
+        })),
       },
     };
 
@@ -602,13 +584,12 @@ export default function ApproveMaterial(props) {
         },
       );
 
-      // setModal({
-      //   open: true,
-      //   type: "success",
-      //   title: "Request Submitted",
-      //   message:
-      //     "Your material requirement request has been submitted successfully.",
-      // });
+      setModal({
+        open: true,
+        type: "success",
+        title: "Request Approved",
+        message: "The request has been approved successfully.",
+      });
     } catch (error) {
       console.log(error);
 
@@ -645,99 +626,158 @@ export default function ApproveMaterial(props) {
           <CircularProgress aria-label='Loading…' />
         </Grid>
       ) : (
-        <Grid>
-          <DialogHeader data={data} props={props} />
+        <>
+          <Grid>
+            <DialogHeader data={data} props={props} />
 
-          <Box
-            sx={{
-              p: 2.5,
-              display: "flex",
-              flexDirection: "column",
-              gap: 1.5,
-              // maxHeight: "80vh",
-            }}
-          >
-            <Grid
-              sx={{ backgroundColor: "#F1F5F9", padding: 3, borderRadius: 2 }}
+            <Box
+              sx={{
+                p: 2.5,
+                display: "flex",
+                flexDirection: "column",
+                gap: 1.5,
+                // maxHeight: "80vh",
+              }}
             >
-              <RequestDetails data={data} />
-              <MaterialDetails data={data} />
-
-              {props?.rowData?.Resubmitted == true && (
-                <>
-                  <ReviewComments />
-                  <ResubmissionNote />
-                </>
-              )}
-            </Grid>
-
-            {props?.rowData?.Resubmitted == true && (
               <Grid
                 sx={{ backgroundColor: "#F1F5F9", padding: 3, borderRadius: 2 }}
               >
-                <ReviewFooter />
-              </Grid>
-            )}
+                <RequestDetails data={data} />
+                <MaterialDetails data={data} />
 
-            {/* Action buttons */}
-            <Box
+                {props?.rowData?.Resubmitted == true && (
+                  <>
+                    <ReviewComments />
+                    <ResubmissionNote />
+                  </>
+                )}
+              </Grid>
+
+              {props?.rowData?.Resubmitted == true && (
+                <Grid
+                  sx={{
+                    backgroundColor: "#F1F5F9",
+                    padding: 3,
+                    borderRadius: 2,
+                  }}
+                >
+                  <ReviewFooter />
+                </Grid>
+              )}
+
+              {/* Action buttons */}
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  gap: 1.5,
+                  alignItems: "center",
+                }}
+              >
+                <Button
+                  variant='contained'
+                  sx={{
+                    fontFamily: POPPINS,
+                    fontWeight: 600,
+                    fontSize: "0.78rem",
+                    bgcolor: colors.approveBtn,
+                    textTransform: "none",
+                    borderRadius: 1.5,
+                    px: 3.5,
+                    boxShadow: "none",
+                    "&:hover": { bgcolor: "#DC2626", boxShadow: "none" },
+                  }}
+                  onClick={() => {
+                    handleApprove();
+                  }}
+                >
+                  Approve
+                </Button>
+                <Button
+                  variant='outlined'
+                  sx={{
+                    fontFamily: POPPINS,
+                    fontWeight: 600,
+                    fontSize: "0.78rem",
+                    color: colors.rejectText,
+                    borderColor: colors.rejectBorder,
+                    textTransform: "none",
+                    borderRadius: 1.5,
+                    px: 3.5,
+                    "&:hover": {
+                      bgcolor: "#FEF2F2",
+                      borderColor: colors.rejectBorder,
+                    },
+                  }}
+                >
+                  Reject
+                </Button>
+                <Typography
+                  sx={{
+                    fontFamily: POPPINS,
+                    fontSize: "0.72rem",
+                    color: colors.labelGray,
+                  }}
+                >
+                  (A)
+                </Typography>
+              </Box>
+            </Box>
+          </Grid>
+
+          <Dialog
+            open={modal.open}
+            onClose={() => setModal({ ...modal, open: false })}
+            fullWidth
+            maxWidth='xs'
+            PaperProps={{
+              sx: {
+                overflow: "hidden",
+              },
+            }}
+          >
+            <DialogTitle
               sx={{
                 display: "flex",
-                justifyContent: "center",
-                gap: 1.5,
                 alignItems: "center",
+                gap: 1,
+                fontWeight: 600,
+                fontFamily: "'Inter', 'Poppins', sans-serif",
               }}
             >
+              {modal.type === "success" ? (
+                <CheckCircleIcon color='success' />
+              ) : (
+                <ErrorIcon color='error' />
+              )}
+
+              {modal.title}
+            </DialogTitle>
+
+            {/* ✅ MUST USE DialogContent */}
+            <DialogContent
+              sx={{
+                fontFamily: "'Inter', 'Poppins', sans-serif",
+                overflow: "hidden",
+                wordBreak: "break-word",
+              }}
+            >
+              <Typography variant='body2' color='text.secondary'>
+                {modal.message}
+              </Typography>
+            </DialogContent>
+
+            <DialogActions sx={{ p: 2 }}>
               <Button
                 variant='contained'
-                sx={{
-                  fontFamily: POPPINS,
-                  fontWeight: 600,
-                  fontSize: "0.78rem",
-                  bgcolor: colors.approveBtn,
-                  textTransform: "none",
-                  borderRadius: 1.5,
-                  px: 3.5,
-                  boxShadow: "none",
-                  "&:hover": { bgcolor: "#DC2626", boxShadow: "none" },
-                }}
-                onClick={() => {
-                  handleApprove();
-                }}
+                onClick={() => setModal({ ...modal, open: false })}
+                sx={{ fontFamily: "'Inter', 'Poppins', sans-serif" }}
               >
-                Approve
+                OK
               </Button>
-              <Button
-                variant='outlined'
-                sx={{
-                  fontFamily: POPPINS,
-                  fontWeight: 600,
-                  fontSize: "0.78rem",
-                  color: colors.rejectText,
-                  borderColor: colors.rejectBorder,
-                  textTransform: "none",
-                  borderRadius: 1.5,
-                  px: 3.5,
-                  "&:hover": {
-                    bgcolor: "#FEF2F2",
-                    borderColor: colors.rejectBorder,
-                  },
-                }}
-              >
-                Reject
-              </Button>
-              <Typography
-                sx={{
-                  fontFamily: POPPINS,
-                  fontSize: "0.72rem",
-                  color: colors.labelGray,
-                }}
-              >
-                (A)
-              </Typography>
-            </Box>
-          </Box>
-        </Grid>
+            </DialogActions>
+          </Dialog>
+        </>
       )}
     </Box>
   );
