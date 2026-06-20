@@ -225,9 +225,17 @@ function MaterialDetails({ data }) {
                 >
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                     {row.materialName}
-                    {row.itemtag && (
+                    {row.itemtag == 0 ? (
+                      ""
+                    ) : (
                       <Chip
-                        label={row.itemtag}
+                        label={
+                          row.itemtag == 1
+                            ? "Crtical"
+                            : row.itemtag == 2
+                              ? "New"
+                              : row.itemtag
+                        }
                         size='small'
                         sx={{
                           fontFamily: POPPINS,
@@ -449,12 +457,12 @@ export default function ApproveMaterial(props) {
   const DetailsAPi = () => {
     const payload = {
       materialRequestId: props?.rowData.MaterialRequestId,
-      status: 0,
+      status: props.rowData?.Status,
     };
 
     axios
       .post(
-        props?.rowData?.Status === "L2 Review"
+        props?.rowData?.Status_text === "L2 Review"
           ? "http://10.10.0.101:8000/mrmuser/L2Review"
           : "http://10.10.0.101:8000/mrmuser/l1review/details",
         payload,
@@ -549,7 +557,7 @@ export default function ApproveMaterial(props) {
 
           Quantity: item.quantity,
 
-          ItemTag: item.itemtag,
+          ItemTag: String(item.itemtag),
 
           MovementJournalIdLine: "",
 
@@ -573,13 +581,52 @@ export default function ApproveMaterial(props) {
         },
       );
 
+      ApproveApi2();
+    } catch (error) {
+      console.log(error);
+
+      const errorMessage =
+        error.response?.data?.detail ||
+        "Something went wrong. Please try again later.";
+
+      setModal({
+        open: true,
+        type: "error",
+        title: "Submission Failed",
+        message: errorMessage,
+      });
+    }
+  };
+
+  const ApproveApi2 = async () => {
+    setLoading(true);
+
+    const payload = {
+      _request: {
+        MaterialRequirementManagementTransaction: {
+          RequestID: data?.materialRequestId,
+        },
+      },
+    };
+
+    try {
+      const response = await axios.post(
+        "http://10.10.0.101:8000/mrmuser/transaction",
+        payload,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+
       setLoading(false);
 
       setModal({
         open: true,
         type: "success",
-        title: "Request Approved",
-        message: "The request has been approved successfully.",
+        title: "Request Rejected",
+        message: "The request has been rejected successfully.",
       });
     } catch (error) {
       console.log(error);
@@ -672,7 +719,7 @@ export default function ApproveMaterial(props) {
 
           Quantity: item.quantity,
 
-          ItemTag: item.itemtag,
+          ItemTag: String(item.itemtag),
 
           MovementJournalIdLine: "",
 
@@ -725,6 +772,8 @@ export default function ApproveMaterial(props) {
   useEffect(() => {
     DetailsAPi();
   }, []);
+
+  console.log(props.rowData);
 
   return (
     <Box>
@@ -779,7 +828,7 @@ export default function ApproveMaterial(props) {
                 </Grid>
               )}
 
-              {props?.rowData?.Status === "L1 Review" && (
+              {props.rowData?.Status_text === "L1 Review" && (
                 <>
                   {/* Action buttons */}
                   <Box

@@ -148,7 +148,12 @@ function SectionCard({ children, sx = {} }) {
 
 // ── Main Component ────────────────────────────────────────────────────────────
 
-export default function L1RejectFirstModal({ onClose, rowData }) {
+export default function L1RejectFirstModal({
+  onClose,
+  rowData,
+  loadingFalse,
+  openCreateMateralRequestModal,
+}) {
   const [resubmitReason, setResubmitReason] = useState("");
   const [value, setValue] = useState({});
   const navigate = useNavigate();
@@ -205,7 +210,7 @@ export default function L1RejectFirstModal({ onClose, rowData }) {
               gap: 1,
             }}
           >
-            <StatusBadge label={rowData.Status} />
+            <StatusBadge label={rowData.Status_text} />
           </Box>
         </Box>
 
@@ -262,6 +267,12 @@ export default function L1RejectFirstModal({ onClose, rowData }) {
                 py: 0.8,
                 bgcolor: "#1D4ED8",
                 "&:hover": { bgcolor: "#1E40AF" },
+              }}
+              onClick={() => {
+                openCreateMateralRequestModal(
+                  rowData.Status,
+                  rowData.MaterialRequestId,
+                );
               }}
             >
               Edit Request
@@ -466,9 +477,10 @@ export default function L1RejectFirstModal({ onClose, rowData }) {
               px: 3,
               py: 1,
               fontSize: 13,
-              "&:hover": { bgcolor: "#FB7185" },
+              cursor: "not-allowed",
+              // "&:hover": { bgcolor: "#FB7185" },
             }}
-            onClick={() => alert("Request Resubmitted!")}
+            // onClick={() => alert("Request Resubmitted!")}
           >
             Resubmit Request
           </Button>
@@ -482,7 +494,9 @@ export default function L1RejectFirstModal({ onClose, rowData }) {
               fontSize: 13,
               "&:hover": { borderColor: "#9CA3AF", bgcolor: "#F9FAFB" },
             }}
-            onClick={onClose}
+            onClick={() => {
+              loadingFalse();
+            }}
           >
             Cancel
           </Button>

@@ -101,54 +101,6 @@ const cardData = [
   },
 ];
 
-const dummyData = [
-  {
-    id: "MR-1023",
-    numMaterials: 5,
-    requiredDate: "10 May 2026",
-    requestedOn: "24 April 2026",
-    handledBy: "Kannan",
-    level: null,
-    status: "Pending",
-  },
-  {
-    id: "MR-1028",
-    numMaterials: 2,
-    requiredDate: "10 May 2026",
-    requestedOn: "24 April 2026",
-    handledBy: "Senthil",
-    level: "L2",
-    status: "Final Review",
-  },
-  {
-    id: "MR-1035",
-    numMaterials: 5,
-    requiredDate: "10 May 2026",
-    requestedOn: "24 April 2026",
-    handledBy: "Kannan",
-    level: null,
-    status: "Approved",
-  },
-  {
-    id: "MR-1019",
-    numMaterials: 4,
-    requiredDate: "10 May 2026",
-    requestedOn: "24 April 2026",
-    handledBy: "Kannan",
-    level: null,
-    status: "Approved",
-  },
-  {
-    id: "MR-1028",
-    numMaterials: 3,
-    requiredDate: "10 May 2026",
-    requestedOn: "24 April 2026",
-    handledBy: "Senthil",
-    level: "L2",
-    status: "Rejected",
-  },
-];
-
 const style = {
   position: "absolute",
   top: "50%",
@@ -311,6 +263,7 @@ export default function Home() {
   const [showSearch, setShowSearch] = useState(false);
   const [passRowData, setPassRowData] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [l1ReSubmit, setL1Resubmit] = useState(null);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -335,7 +288,7 @@ export default function Home() {
         console.log(res.data);
         const updatedRows = res.data.data.map((item) => ({
           ...item,
-          Status:
+          Status_text:
             item.Status == "0"
               ? "L1 Review"
               : item.Status == "1"
@@ -398,10 +351,12 @@ export default function Home() {
       row.HandledBy?.toLowerCase().includes(searchText.toLowerCase());
 
     // Status filter
-    const statusMatch = statusFilter === "All" || row.Status === statusFilter;
+    const statusMatch =
+      statusFilter === "All" || row.Status_text === statusFilter;
 
     return tabMatch && searchMatch && statusMatch;
   });
+
   useEffect(() => {
     fetchTabledata();
   }, []);
@@ -413,6 +368,16 @@ export default function Home() {
   const loadingFalse = () => {
     setLoading(false);
     setApproveModal(false);
+  };
+
+  const openCreateMateralRequestModal = (Status, MaterialRequestId) => {
+    setOpen(true);
+    setApproveModal(false);
+    setL1Resubmit({ MaterialRequestId: MaterialRequestId, Status: Status });
+  };
+
+  const CancelResubmit = () => {
+    setL1Resubmit(null);
   };
 
   return (
@@ -761,15 +726,6 @@ export default function Home() {
               >
                 L2 Approved
               </MenuItem>
-
-              <MenuItem
-                onClick={() => {
-                  setStatusFilter("L2 Mixed");
-                  setAnchorEl(null);
-                }}
-              >
-                L2 Mixed
-              </MenuItem>
             </Menu>
             <Divider />
 
@@ -896,17 +852,18 @@ export default function Home() {
                         onClick={() => {
                           setApproveModal(true);
 
-                          if (row.Status == "L1 Review") {
+                          if (row.Status_text == "L1 Review") {
                             setModalName("ApproveModal");
                             setPassRowData(row);
-                          } else if (row.Status == "L2 Review") {
+                          } else if (row.Status_text == "L2 Review") {
                             setModalName("ApproveModal");
                             setPassRowData(row);
-                          } else if (row.Status == "L1 Rejected") {
+                          } else if (row.Status_text == "L1 Rejected") {
                             setModalName("L1RejectFirstModal");
                             setPassRowData(row);
-                          } else if (row.Status == "L2 Mixed") {
+                          } else if (row.Status_text == "Processing") {
                             setModalName("L2RejectModal");
+                            setPassRowData(row);
                           } else {
                             setModalName("");
                           }
@@ -934,7 +891,11 @@ export default function Home() {
                               <BadgeIcon key={i} type={b} />
                             ))}
                             {row.Resubmitted ? (
-                              <img src={loop} alt='Resubmitted' />
+                              <img
+                                src={loop}
+                                alt='Resubmitted'
+                                style={{ width: "20px" }}
+                              />
                             ) : null}
                           </Stack>
                         </TableCell>
@@ -943,7 +904,7 @@ export default function Home() {
                         <TableCell
                           sx={{
                             fontFamily: "Poppins, sans-serif",
-                            fontSize: "0.70rem",
+                            fontSize: "0.76rem",
                             textAlign: "left",
                           }}
                         >
@@ -1003,7 +964,7 @@ export default function Home() {
                             >
                               {row.HandledBy}
                             </Typography>
-                            <Chip
+                            {/* <Chip
                               label={row.level}
                               size='small'
                               sx={{
@@ -1016,7 +977,7 @@ export default function Home() {
                                 borderRadius: "6px",
                                 "& .MuiChip-label": { px: 1 },
                               }}
-                            />
+                            /> */}
                           </Stack>
                         </TableCell>
 
@@ -1039,7 +1000,7 @@ export default function Home() {
                         {/* Status */}
                         <TableCell sx={{ textAlign: "center" }}>
                           <StatusCell
-                            status={row.Status}
+                            status={row.Status_text}
                             // approved={row.approved}
                             // rejected={row.rejected}
                           />
@@ -1109,9 +1070,14 @@ export default function Home() {
                   loadingFalse={loadingFalse}
                 />
               ) : modalName == "L1RejectFirstModal" ? (
-                <L1RejectFirstModal rowData={passRowData} />
+                <L1RejectFirstModal
+                  rowData={passRowData}
+                  loadingTrue={loadingTrue}
+                  loadingFalse={loadingFalse}
+                  openCreateMateralRequestModal={openCreateMateralRequestModal}
+                />
               ) : modalName == "L2RejectModal" ? (
-                <L2RejectModal />
+                <L2RejectModal rowData={passRowData} />
               ) : (
                 ""
               )}
@@ -1145,6 +1111,8 @@ export default function Home() {
               <CreateMaterialRequest
                 loadingTrue={loadingTrue}
                 loadingFalse={loadingFalse}
+                l1ReSubmit={l1ReSubmit}
+                CancelResubmit={CancelResubmit}
               />
             </Box>
           </Modal>

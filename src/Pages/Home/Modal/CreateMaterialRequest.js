@@ -17,6 +17,7 @@ import {
   Autocomplete,
   Chip,
   Grid,
+  Stack,
 } from "@mui/material";
 import { Refresh, Close, AddCircleOutline } from "@mui/icons-material";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -120,13 +121,34 @@ const bodyCellSx = {
   color: tokens.colors.text.primary,
 };
 
-export default function CreateMaterialRequest() {
+function SectionCard({ children, sx = {} }) {
+  return (
+    <Paper
+      elevation={0}
+      sx={{
+        fontFamily: "Poppins, sans-serif",
+        // border: "1px solid #E5E7EB",
+        backgroundColor: "#F1F5F9",
+        borderRadius: 3,
+        p: 2.5,
+        mb: 2,
+        ...sx,
+      }}
+    >
+      {children}
+    </Paper>
+  );
+}
+
+export default function CreateMaterialRequest(props) {
   const [requiredDate, setRequiredDate] = useState(dayjs());
   const [purpose, setPurpose] = useState("");
   const [rows, setRows] = useState([emptyRow()]);
   const [materialNameList, setMaterialNameList] = useState([]);
   const [materialCategoryList, setMaterialCategoryList] = useState([]);
   const [loading, setLoading] = useState("");
+  const [materialLoading, setMaterialLoading] = useState(false);
+  const [resubmitReason, setResubmitReason] = useState("");
 
   const [modal, setModal] = useState({
     open: false,
@@ -134,6 +156,8 @@ export default function CreateMaterialRequest() {
     title: "",
     message: "",
   });
+
+  const [value, setValue] = useState({});
 
   const navigate = useNavigate();
 
@@ -184,16 +208,11 @@ export default function CreateMaterialRequest() {
               ? item.newmaterialName
               : item.materialName?.name,
           UOM: item.uom,
-          AvailableStock: item.availableStock == "" ? "0" : item.availableStock,
-          Quantity: item.quantity == "" ? "0" : Number(item.quantity),
+          AvailableStock:
+            item.availableStock == "" ? "0" : String(item.availableStock),
+          Quantity: item.quantity == "" ? "0" : String(item.quantity),
           ItemTag:
-            item.objectitem === "New"
-              ? "1"
-              : item.materialName?.tag == 0
-                ? "2"
-                : item.materialName?.tag === 1
-                  ? "0"
-                  : "",
+            item.objectitem === "New" ? "2" : String(item.materialName?.tag),
           CategoryId:
             item.materialCategory == null ? "" : item.materialCategory,
           MovementJournalIdLine: "",
@@ -248,24 +267,94 @@ export default function CreateMaterialRequest() {
     }
   };
 
-  const handleCancel = () => {
-    setRequiredDate("");
-    setPurpose("");
-    setRows([emptyRow()]);
-  };
-
-  const getLabels = async () => {
+  const RehandleSubmit = async () => {
     setLoading(true);
+    const payload = {
+      _request: {
+        MaterialRequirementManagementHeader: {
+          HIQ_RequestNo: "",
+          HIQ_requester_id: "Hi-Q-000922",
+          HIQ_requester_Name: "USR_SHIP",
+          HIQ_L1ApproverName: "",
+          HIQ_L2ApproverName: "",
+          HIQ_L2UserId: "",
+          HIQ_L1UserId: "",
+          HIQ_Required_date: dayjs(requiredDate).format(
+            "YYYY-MM-DD[T]00:00:00",
+          ),
+          HIQ_purpose: purpose,
+          HIQ_Status: "0",
+          HIQ_movement_Journal_Id: "",
+          HIQ_purcharse_Req_Id: "",
+          HIQ_commentL1: value?.rejectionReason,
+          HIQ_commentL2: "",
+          HIQ_resubmit_count: value?.resubmitCount + 1,
+          HIQ_submitted_at: dayjs().format("YYYY-MM-DD[T]HH:mm:ss"),
+          HIQ_ApproveDateL1: "",
+          HIQ_synced_at: "",
+          // HIQ_resubmit_count: 0,
+          HIQ_sync_error: "",
+          HIQ_SyncStatus: "0",
+          HIQ_ManagerAction: "2",
+          resubmissionReason: resubmitReason,
+        },
+        MaterialRequirementManagementLine: rows.map((item, i) => ({
+          HeaderRequestId: "",
+          LineNum: i + 1,
+          ItemId: item.objectitem === "New" ? "" : item.materialName?.Itemid,
+          MaterialName:
+            item.objectitem === "New"
+              ? item.newmaterialName
+              : item.materialName?.name,
+          UOM: item.uom,
+          AvailableStock:
+            item.availableStock == "" ? "0" : String(item.availableStock),
+          Quantity: item.quantity == "" ? "0" : String(item.quantity),
+          ItemTag:
+            item.objectitem === "New" ? "2" : String(item.materialName?.tag),
+          CategoryId:
+            item.materialCategory == null ? "" : item.materialCategory,
+          MovementJournalIdLine: "",
+          PurchaseReqIdLine: "",
+          SyncStatusLine: "0",
+          SyncErrorLine: "",
+          resubmissionReason: "",
+        })),
+      },
+    };
+
+    console.log(payload);
     try {
       const response = await axios.post(
-        "http://10.10.0.101:8000/mrmuser/label",
+        "http://10.10.0.101:8000/mrmuser/create",
+        payload,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
       );
-      const updatedData = (response.data.data || []).map((item) => ({
-        ...item,
-      }));
-      setMaterialNameList(updatedData);
-      setLoading(false);
+
+      if (response.data?.data?.$id === "1") {
+        setModal({
+          open: true,
+          type: "success",
+          title: "Resubmit Request Submitted",
+          message: response.data.data.DebugMessage,
+        });
+        props.CancelResubmit();
+      } else {
+        setModal({
+          open: true,
+          type: "error",
+          title: "Submission Failed",
+          message:
+            response.data?.data?.DebugMessage ||
+            "Something went wrong. Please try again later.",
+        });
+      }
     } catch (err) {
+      alert("hii");
       const errorMessage =
         err.response?.data?.detail || err.detail || "Something went wrong";
 
@@ -273,6 +362,42 @@ export default function CreateMaterialRequest() {
 
       navigate("/ErrorHandling");
       setLoading(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCancel = () => {
+    setRequiredDate("");
+    setPurpose("");
+    setRows([emptyRow()]);
+    props.CancelResubmit();
+  };
+
+  const getLabels = async () => {
+    if (materialNameList.length > 0) return;
+
+    setMaterialLoading(true);
+
+    try {
+      console.time("Material API");
+
+      const response = await axios.post(
+        "http://10.10.0.101:8000/mrmuser/label",
+      );
+
+      console.timeEnd("Material API");
+
+      setMaterialNameList(response.data.data || []);
+    } catch (err) {
+      const errorMessage =
+        err.response?.data?.detail || err.detail || "Something went wrong";
+
+      sessionStorage.setItem("errormessage", errorMessage);
+
+      navigate("/ErrorHandling");
+    } finally {
+      setMaterialLoading(false);
     }
   };
 
@@ -340,7 +465,63 @@ export default function CreateMaterialRequest() {
       }
 
       return hasQuantity;
-    });
+    }) &&
+    (!props.l1ReSubmit || resubmitReason.trim() !== "");
+
+  const fetchData = async () => {
+    try {
+      const payload = {
+        materialRequestId: props.l1ReSubmit?.MaterialRequestId,
+        status: props.l1ReSubmit?.Status,
+      };
+
+      const res = await axios.post(
+        "http://10.10.0.101:8000/mrmuser/l1rejected/details",
+        payload,
+      );
+
+      console.log(res.data);
+      setRequiredDate(dayjs(res.data.data.requiredDate));
+      setPurpose(res.data.data.purpose);
+
+      const updateData = res.data.data.materials.map((item) => ({
+        itemId: item.itemId,
+
+        materialName:
+          item.itemtag === 0 || item.itemtag === 1
+            ? {
+                Itemid: item.itemId,
+                name: item.materialName,
+                tag: item.itemtag,
+              }
+            : "",
+
+        materialCategory: item.category,
+        uom: item.uom,
+        availableStock: item.availableStock,
+        quantity: Number(item.quantity),
+
+        newmaterialName: item.itemtag === 2 ? item.materialName : "",
+        objectitem: item.itemtag === 2 ? "New" : "",
+      }));
+
+      console.log(updateData);
+
+      setRows(updateData);
+
+      setValue(res.data.data);
+    } catch (err) {
+      // navigate("/ErrorHandling");
+    }
+  };
+
+  useEffect(() => {
+    if (props.l1ReSubmit) {
+      fetchData();
+    }
+  }, [props.l1ReSubmit]);
+
+  console.log(JSON.stringify(rows));
 
   return (
     <div>
@@ -377,7 +558,8 @@ export default function CreateMaterialRequest() {
                   letterSpacing: "-0.3px",
                 }}
               >
-                Material Request
+                Material Request{" "}
+                {props.l1ReSubmit ? value?.materialRequestId : ""}
               </Typography>
               <Typography
                 sx={{
@@ -659,7 +841,32 @@ export default function CreateMaterialRequest() {
                                   disableClearable
                                   freeSolo
                                   size='small'
+                                  onOpen={() => {
+                                    if (materialNameList.length === 0) {
+                                      getLabels();
+                                    }
+                                  }}
                                   options={materialNameList}
+                                  filterOptions={(options, state) => {
+                                    const search =
+                                      state.inputValue.toLowerCase();
+
+                                    if (search.length < 2) {
+                                      return [];
+                                    }
+
+                                    return options
+                                      .filter(
+                                        (option) =>
+                                          option.name
+                                            ?.toLowerCase()
+                                            .includes(search) ||
+                                          option.Itemid?.toLowerCase()?.includes(
+                                            search,
+                                          ),
+                                      )
+                                      .slice(0, 50);
+                                  }}
                                   value={row.materialName ?? null}
                                   getOptionLabel={(option) =>
                                     typeof option === "string"
@@ -737,9 +944,105 @@ export default function CreateMaterialRequest() {
                                       {...params}
                                       placeholder='Search material…'
                                       sx={{ ...inputSx, width: 200 }}
+                                      InputProps={{
+                                        ...params.InputProps,
+                                        endAdornment: (
+                                          <>
+                                            {materialLoading && (
+                                              <CircularProgress size={18} />
+                                            )}
+                                            {params.InputProps.endAdornment}
+                                          </>
+                                        ),
+                                      }}
                                     />
                                   )}
                                 />
+                                // <Autocomplete
+                                //   disableClearable
+                                //   freeSolo
+                                //   size='small'
+                                //   options={materialNameList}
+                                //   value={row.materialName ?? null}
+                                //   getOptionLabel={(option) =>
+                                //     typeof option === "string"
+                                //       ? option
+                                //       : option
+                                //         ? `${option.name} - ${option.Itemid}`
+                                //         : ""
+                                //   }
+                                //   isOptionEqualToValue={(option, value) =>
+                                //     option.Itemid === value.Itemid
+                                //   }
+                                //   onInputChange={(_, newInputValue, reason) => {
+                                //     if (reason === "input")
+                                //       handleRowChange(
+                                //         index,
+                                //         "newmaterialName",
+                                //         newInputValue,
+                                //       );
+                                //   }}
+                                //   onChange={(_, val) => {
+                                //     handleRowChange(index, "materialName", val);
+                                //     handleRowChange(
+                                //       index,
+                                //       "newmaterialName",
+                                //       "",
+                                //     );
+                                //   }}
+                                //   PaperComponent={({ children }) => (
+                                //     <Paper
+                                //       sx={{
+                                //         fontFamily: tokens.fontFamily,
+                                //         fontSize: "12px",
+                                //         borderRadius: tokens.radius.md,
+                                //         border: `1px solid ${tokens.colors.border}`,
+                                //         boxShadow:
+                                //           "0 4px 16px rgba(0,0,0,0.08)",
+                                //       }}
+                                //     >
+                                //       {children}
+                                //     </Paper>
+                                //   )}
+                                //   renderOption={(props, option) => (
+                                //     <li
+                                //       {...props}
+                                //       key={option.Itemid}
+                                //       style={{
+                                //         fontSize: "12px",
+                                //         fontFamily: tokens.fontFamily,
+                                //         padding: "8px 12px",
+                                //         display: "flex",
+                                //         alignItems: "center",
+                                //         gap: 8,
+                                //       }}
+                                //     >
+                                //       <span>
+                                //         {option.name} — {option.Itemid}
+                                //       </span>
+                                //       {Number(option.tag) === 1 && (
+                                //         <Chip
+                                //           label='Critical'
+                                //           size='small'
+                                //           sx={{
+                                //             fontSize: "10px",
+                                //             height: 18,
+                                //             backgroundColor: "#FEF2F2",
+                                //             color: "#DC2626",
+                                //             fontFamily: tokens.fontFamily,
+                                //           }}
+                                //         />
+                                //       )}
+                                //     </li>
+                                //   )}
+                                //   renderInput={(params) => (
+                                //     <TextField
+                                //       {...params}
+                                //       placeholder='Search material…'
+                                //       sx={{ ...inputSx, width: 200 }}
+                                //     />
+                                //   )}
+                                // />
                               )}
                             </Box>
 
@@ -1100,6 +1403,130 @@ export default function CreateMaterialRequest() {
               </Box>
             </Paper>
 
+            {props.l1ReSubmit ? (
+              <>
+                {/* ── Rejection Reason ── */}
+                <SectionCard
+                  sx={{ bgcolor: "#FFF5F5", border: "1px solid #FECACA" }}
+                >
+                  <Typography
+                    sx={{
+                      fontWeight: 700,
+                      fontSize: 14,
+                      color: "#111827",
+                      mb: 1,
+                      fontFamily: "Poppins, sans-serif",
+                    }}
+                  >
+                    Rejection Reason
+                  </Typography>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      flexWrap: "wrap",
+                      gap: 1,
+                    }}
+                  >
+                    <Typography
+                      sx={{
+                        fontSize: 13,
+                        color: "#374151",
+                        fontFamily: "Poppins, sans-serif",
+                      }}
+                    >
+                      {value.rejectionReason}
+                    </Typography>
+                    <Stack direction='row' spacing={1} alignItems='center'>
+                      <Typography
+                        sx={{
+                          fontSize: 12,
+                          color: "#6B7280",
+                          fontFamily: "Poppins, sans-serif",
+                        }}
+                      >
+                        Rejected by
+                      </Typography>
+                      <Typography
+                        sx={{
+                          fontSize: 12,
+                          fontWeight: 700,
+                          color: "#111827",
+                          fontFamily: "Poppins, sans-serif",
+                        }}
+                      >
+                        {value.rejectedBy}
+                      </Typography>
+                      <Box
+                        sx={{
+                          width: 22,
+                          height: 22,
+                          borderRadius: "50%",
+                          bgcolor: "#6366F1",
+                          color: "#fff",
+                          fontSize: 10,
+                          fontWeight: 700,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontFamily: "Poppins, sans-serif",
+                        }}
+                      >
+                        {value.approvalLevel}
+                      </Box>
+                    </Stack>
+                  </Box>
+                </SectionCard>
+
+                {/* ── Resubmission Reason ── */}
+                <Box
+                  sx={{
+                    mb: 3,
+                    backgroundColor: "#F1F5F9",
+                    p: 2,
+                    borderRadius: "10px",
+                  }}
+                >
+                  <Typography
+                    sx={{
+                      fontSize: 13,
+                      fontWeight: 600,
+                      color: "#111827",
+                      mb: 1,
+                      fontFamily: "Poppins, sans-serif",
+                    }}
+                  >
+                    Resubmission Reason{" "}
+                    <Box component='span' sx={{ color: "#EF4444" }}>
+                      * (R)
+                    </Box>
+                  </Typography>
+                  <TextField
+                    fullWidth
+                    placeholder='Explain the changes made or justify the update'
+                    value={resubmitReason}
+                    onChange={(e) => setResubmitReason(e.target.value)}
+                    size='small'
+                    sx={{
+                      "& .MuiInputBase-root": {
+                        fontFamily: "Poppins, sans-serif",
+                        fontSize: 13,
+                        borderRadius: 2,
+                      },
+                      "& .MuiOutlinedInput-root": {
+                        "& fieldset": { borderColor: "#D1D5DB" },
+                        "&:hover fieldset": { borderColor: "#9CA3AF" },
+                        "&.Mui-focused fieldset": { borderColor: "#2563EB" },
+                      },
+                    }}
+                  />
+                </Box>
+              </>
+            ) : (
+              ""
+            )}
+
             {/* Action Buttons */}
             <Box
               sx={{
@@ -1134,38 +1561,73 @@ export default function CreateMaterialRequest() {
                 Cancel
               </Button>
               <>
-                <Button
-                  onClick={handleSubmit}
-                  disabled={!isFormValid}
-                  sx={{
-                    backgroundColor: tokens.colors.accent.indigo,
-                    color: "#fff",
-                    fontWeight: 600,
-                    fontSize: "12px",
-                    fontFamily: tokens.fontFamily,
-                    px: 3.5,
-                    py: 0.9,
-                    borderRadius: tokens.radius.sm,
-                    textTransform: "none",
-                    minHeight: "36px",
-                    boxShadow: "none",
-                    transition: "background 0.15s",
-
-                    "&:hover": {
-                      backgroundColor: tokens.colors.accent.indigoDark,
+                {props.l1ReSubmit ? (
+                  <Button
+                    onClick={RehandleSubmit}
+                    disabled={!isFormValid}
+                    sx={{
+                      backgroundColor: tokens.colors.accent.indigo,
+                      color: "#fff",
+                      fontWeight: 600,
+                      fontSize: "12px",
+                      fontFamily: tokens.fontFamily,
+                      px: 3.5,
+                      py: 0.9,
+                      borderRadius: tokens.radius.sm,
+                      textTransform: "none",
+                      minHeight: "36px",
                       boxShadow: "none",
-                    },
+                      transition: "background 0.15s",
 
-                    "&.Mui-disabled": {
-                      backgroundColor: "#e0e0e0",
-                      color: "red",
-                      cursor: "not-allowed",
-                      opacity: 1,
-                    },
-                  }}
-                >
-                  Submit Request
-                </Button>
+                      "&:hover": {
+                        backgroundColor: tokens.colors.accent.indigoDark,
+                        boxShadow: "none",
+                      },
+
+                      "&.Mui-disabled": {
+                        backgroundColor: "#e0e0e0",
+                        color: "red",
+                        cursor: "not-allowed",
+                        opacity: 1,
+                      },
+                    }}
+                  >
+                    Resubmit Request
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={handleSubmit}
+                    disabled={!isFormValid}
+                    sx={{
+                      backgroundColor: tokens.colors.accent.indigo,
+                      color: "#fff",
+                      fontWeight: 600,
+                      fontSize: "12px",
+                      fontFamily: tokens.fontFamily,
+                      px: 3.5,
+                      py: 0.9,
+                      borderRadius: tokens.radius.sm,
+                      textTransform: "none",
+                      minHeight: "36px",
+                      boxShadow: "none",
+                      transition: "background 0.15s",
+
+                      "&:hover": {
+                        backgroundColor: tokens.colors.accent.indigoDark,
+                        boxShadow: "none",
+                      },
+
+                      "&.Mui-disabled": {
+                        backgroundColor: "#e0e0e0",
+                        color: "red",
+                        cursor: "not-allowed",
+                        opacity: 1,
+                      },
+                    }}
+                  >
+                    Submit Request
+                  </Button>
+                )}
 
                 {!isFormValid && (
                   <Typography
@@ -1182,6 +1644,11 @@ export default function CreateMaterialRequest() {
                     • For New Material: Material Category, UOM and Quantity are
                     required.
                     <br />• For Old Material: Quantity is required.
+                    {props.l1ReSubmit && (
+                      <>
+                        <br />• Resubmission Reason is required.
+                      </>
+                    )}
                   </Typography>
                 )}
               </>
