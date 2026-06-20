@@ -277,7 +277,7 @@ function MaterialDetails({ data }) {
 }
 
 // ── Previous Review Comments Section ─────────────────────────
-function ReviewComments() {
+function ReviewComments({ data }) {
   return (
     <SectionCard title='Previous Review Comments' sx={{ mt: 2 }}>
       <Box
@@ -295,7 +295,9 @@ function ReviewComments() {
             color: colors.labelGray,
           }}
         >
-          Requested quantity exceeds the approved consumption limit.
+          {data?.previousReviewComment == ""
+            ? "-"
+            : data?.previousReviewComment}
         </Typography>
         <Box
           sx={{ display: "flex", alignItems: "center", gap: 1, flexShrink: 0 }}
@@ -317,7 +319,7 @@ function ReviewComments() {
               color: colors.valueBlack,
             }}
           >
-            Kannon
+            {data?.rejectedBy}
           </Typography>
           <Avatar
             sx={{
@@ -330,7 +332,7 @@ function ReviewComments() {
               fontWeight: 600,
             }}
           >
-            LI
+            {data?.approvalLevel}
           </Avatar>
         </Box>
       </Box>
@@ -339,7 +341,7 @@ function ReviewComments() {
 }
 
 // ── Requester Resubmission Note Section ──────────────────────
-function ResubmissionNote() {
+function ResubmissionNote({ data }) {
   return (
     <SectionCard title='Requester Resubmission Note' sx={{ mt: 2 }}>
       <Box
@@ -357,8 +359,7 @@ function ResubmissionNote() {
             color: colors.labelGray,
           }}
         >
-          Requested quantities have been revised to align with approved
-          consumption limits and current operational requirements.
+          {data?.resubmissionReason == "" ? "-" : data?.resubmissionReason}
         </Typography>
         <Box
           sx={{ display: "flex", alignItems: "center", gap: 1, flexShrink: 0 }}
@@ -380,7 +381,7 @@ function ResubmissionNote() {
               color: colors.valueBlack,
             }}
           >
-            Vishnu
+            {data?.requestedBy}
           </Typography>
         </Box>
       </Box>
@@ -464,7 +465,9 @@ export default function ApproveMaterial(props) {
       .post(
         props?.rowData?.Status_text === "L2 Review"
           ? "http://10.10.0.101:8000/mrmuser/L2Review"
-          : "http://10.10.0.101:8000/mrmuser/l1review/details",
+          : props?.rowData?.Resubmitted == true
+            ? "http://10.10.0.101:8000/mrmuser/Resubmitted"
+            : "http://10.10.0.101:8000/mrmuser/l1review/details",
         payload,
       )
       .then((res) => {
@@ -808,8 +811,8 @@ export default function ApproveMaterial(props) {
 
                 {props?.rowData?.Resubmitted == true && (
                   <>
-                    <ReviewComments />
-                    <ResubmissionNote />
+                    <ReviewComments data={data} />
+                    <ResubmissionNote data={data} />
                   </>
                 )}
               </Grid>

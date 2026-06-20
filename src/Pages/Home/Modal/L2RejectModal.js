@@ -211,6 +211,8 @@ export default function L2RejectModal(props) {
     DetailsAPi();
   }, []);
 
+  console.log(props.rowData);
+
   return (
     <div>
       {loading ? (
@@ -272,7 +274,7 @@ export default function L2RejectModal(props) {
                   >
                     Material Request {data?.materialRequestId}
                   </Typography>
-                  <Box
+                  {/* <Box
                     sx={{
                       position: "absolute",
                       right: 0,
@@ -283,7 +285,7 @@ export default function L2RejectModal(props) {
                     }}
                   >
                     <HeaderStatusBadge label='L2 Rejected' />
-                  </Box>
+                  </Box> */}
                 </Box>
 
                 <Box
@@ -481,64 +483,71 @@ export default function L2RejectModal(props) {
                   </Paper>
                 </Box>
 
-                {/* ── Action Buttons ── */}
-                <Stack
-                  direction='row'
-                  spacing={1.5}
-                  justifyContent='center'
-                  alignItems='center'
-                  sx={{ mt: 2 }}
-                >
-                  <Button
-                    variant='contained'
-                    sx={{
-                      bgcolor: "#F43F5E",
-                      color: "#fff",
-                      px: 3,
-                      py: 1,
-                      "&:hover": { bgcolor: "#E11D48" },
-                    }}
-                    onClick={() => {
-                      props.openCreateMateralRequestModal(
-                        props.rowData?.Status,
-                        data?.materialRequestId,
-                        "L2 Reject",
-                      );
+                {props.rowData?.Status == 5 && (
+                  <>
+                    {/* ── Action Buttons ── */}
+                    <Stack
+                      direction='row'
+                      spacing={1.5}
+                      justifyContent='center'
+                      alignItems='center'
+                      sx={{ mt: 2 }}
+                    >
+                      <Button
+                        variant='contained'
+                        sx={{
+                          bgcolor: "#F43F5E",
+                          color: "#fff",
+                          px: 3,
+                          py: 1,
+                          "&:hover": { bgcolor: "#E11D48" },
+                        }}
+                        onClick={() => {
+                          props.openCreateMateralRequestModal(
+                            props.rowData?.Status,
+                            data?.materialRequestId,
+                            "L2 Reject",
+                          );
 
-                      console.log(
-                        props.rowData?.Status,
-                        data?.materialRequestId,
-                      );
-                    }}
-                  >
-                    Create New Request
-                  </Button>
-                  <Button
-                    variant='outlined'
-                    sx={{
-                      borderColor: "#E5E7EB",
-                      color: "#374151",
-                      px: 3,
-                      py: 1,
-                      "&:hover": { borderColor: "#9CA3AF", bgcolor: "#F9FAFB" },
-                    }}
-                    onClick={() => {
-                      props.loadingFalse();
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                  <Typography
-                    sx={{
-                      fontSize: 13,
-                      color: "#EF4444",
-                      fontWeight: 600,
-                      fontFamily: "Poppins, sans-serif",
-                    }}
-                  >
-                    (R)
-                  </Typography>
-                </Stack>
+                          console.log(
+                            props.rowData?.Status,
+                            data?.materialRequestId,
+                          );
+                        }}
+                      >
+                        Create New Request
+                      </Button>
+                      <Button
+                        variant='outlined'
+                        sx={{
+                          borderColor: "#E5E7EB",
+                          color: "#374151",
+                          px: 3,
+                          py: 1,
+                          "&:hover": {
+                            borderColor: "#9CA3AF",
+                            bgcolor: "#F9FAFB",
+                          },
+                        }}
+                        onClick={() => {
+                          props.loadingFalse();
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                      <Typography
+                        sx={{
+                          fontSize: 13,
+                          color: "#EF4444",
+                          fontWeight: 600,
+                          fontFamily: "Poppins, sans-serif",
+                        }}
+                      >
+                        (R)
+                      </Typography>
+                    </Stack>
+                  </>
+                )}
               </Box>
             </Box>
           )}

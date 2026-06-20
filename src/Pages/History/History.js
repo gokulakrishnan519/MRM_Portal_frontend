@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "../../Navbars/Navbar";
 import right_icon from "../../Images/Home/Right_icon.png";
-import { Grid, Modal } from "@mui/material";
+import { Grid, Modal, Stack } from "@mui/material";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import loop from "../../Images/History/loop_icon.png";
 import warning from "../../Images/Home/warning_icon.png";
 import addfile from "../../Images/Home/add_file.png";
+// import loading from "../../Loading/Loading";
+import CircularProgress from "@mui/material/CircularProgress";
+import CheckIcon from "@mui/icons-material/Check";
 
 import {
   Box,
@@ -179,36 +182,94 @@ const levelConfig = {
 
 const ALL_STATUSES = ["Fulfilled", "L2 Rejected"];
 
-function StatusChip({ status }) {
-  const cfg = statusConfig[status] || {
-    color: "#888",
-    bg: "#f5f5f5",
-    border: "#ddd",
-  };
+function StatusCell({ status, approved, rejected }) {
+  const cfg = statusConfig[status] || statusConfig["L1 Review"];
+
+  if (status === "L2 Mixed") {
+    return (
+      <Stack
+        direction='row'
+        spacing={0.5}
+        alignItems='center'
+        justifyContaent='flex-end'
+      >
+        <Chip
+          label='L2'
+          size='small'
+          sx={{
+            height: 24,
+            fontSize: "0.7rem",
+            fontWeight: 500,
+            fontFamily: "Poppins, sans-serif",
+            bgcolor: cfg.bg,
+            color: cfg.color,
+            borderRadius: "15px",
+            "& .MuiChip-label": { px: 1 },
+          }}
+        />
+        <Chip
+          icon={
+            <CheckIcon
+              sx={{ fontSize: "11px !important", color: "#059669 !important" }}
+            />
+          }
+          label={approved}
+          size='small'
+          sx={{
+            height: 24,
+            fontSize: "0.7rem",
+            fontWeight: 500,
+            fontFamily: "Poppins, sans-serif",
+            bgcolor: "#D1FAE5",
+            color: "#059669",
+            borderRadius: "15px",
+            "& .MuiChip-label": { px: 0.5 },
+          }}
+        />
+        <Chip
+          icon={
+            <CloseIcon
+              sx={{ fontSize: "11px !important", color: "#DC2626 !important" }}
+            />
+          }
+          label={rejected}
+          size='small'
+          sx={{
+            height: 24,
+            fontSize: "0.7rem",
+            fontWeight: 500,
+            fontFamily: "Poppins, sans-serif",
+            bgcolor: "#FEE2E2",
+            color: "#DC2626",
+            borderRadius: "15px",
+            "& .MuiChip-label": { px: 0.5 },
+          }}
+        />
+      </Stack>
+    );
+  }
+
   return (
-    <Box
-      sx={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        px: 1.5,
-        py: 0.5,
-        borderRadius: "15px",
-        // border: `1px solid ${cfg.border}`,
-        background: cfg.bg,
-        color: cfg.color,
-        fontWeight: 500,
-        fontSize: "0.70rem",
-        whiteSpace: "nowrap",
-        fontFamily: FONT,
-        width: "100px",
-      }}
-    >
-      {status}
+    <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+      <Chip
+        label={status}
+        size='small'
+        sx={{
+          height: 26,
+          fontSize: "0.70rem",
+          fontWeight: 500,
+          fontFamily: "Poppins, sans-serif",
+          bgcolor: cfg.bg,
+          color: cfg.color,
+          // border: `1px solid ${cfg.border}`,
+          borderRadius: "15px",
+          width: "100px",
+          "& .MuiChip-label": { px: 1.5 },
+        }}
+      />
     </Box>
   );
 }
-
 function LevelBadge({ level }) {
   const cfg = levelConfig[level] || { color: "#555", bg: "#eee" };
   return (
@@ -256,7 +317,7 @@ export default function History() {
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-
+  const [loading, setLoading] = useState(false);
   const handleFilterOpen = (e) => setFilterAnchor(e.currentTarget);
   const handleFilterClose = () => setFilterAnchor(null);
   const [rows, setRows] = useState([]);
@@ -281,6 +342,7 @@ export default function History() {
       Id: sessionStorage.getItem("user_id"),
       Role: sessionStorage.getItem("role"),
     };
+    setLoading(true);
     await axios
       .post("http://10.10.0.101:8000/history/requests", payload)
       .then((res) => {
@@ -599,13 +661,27 @@ export default function History() {
             // component={Paper}
             elevation={0}
             sx={{
-              border: "1px solid #e5e7eb",
-              overflow: "hidden",
+              borderTop: "1px solid #E2E8F0",
+              borderLeft: "1px solid #E2E8F0",
+              borderRight: "1px solid #E2E8F0",
             }}
           >
-            <Table>
+            <Table
+              sx={{
+                "& .MuiTableCell-root": {
+                  py: 1, // vertical padding
+                  px: 1.5,
+                },
+              }}
+            >
               <TableHead>
-                <TableRow sx={{ background: "#f9fafb" }}>
+                <TableRow
+                  sx={{
+                    "& .MuiTableCell-root": {
+                      py: 2, // vertical padding
+                    },
+                  }}
+                >
                   {[
                     "Material Request ID",
                     "Requested By",
@@ -618,9 +694,9 @@ export default function History() {
                     <TableCell
                       key={col}
                       sx={{
-                        fontWeight: 600,
-                        fontSize: "0.82rem",
-                        color: "#6b7280",
+                        fontWeight: 500,
+                        fontSize: "0.8rem",
+
                         borderBottom: "1px solid #e5e7eb",
                         py: 1.5,
                         whiteSpace: "nowrap",
@@ -636,12 +712,17 @@ export default function History() {
               <TableBody>
                 {filtered.length === 0 ? (
                   <TableRow>
-                    <TableCell
-                      colSpan={6}
-                      align='center'
-                      sx={{ py: 4, color: "#9ca3af" }}
-                    >
-                      No records found
+                    <TableCell colSpan={100} align='center'>
+                      <Box
+                        sx={{
+                          minHeight: "50px",
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                      >
+                        <CircularProgress aria-label='Loading…' />
+                      </Box>
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -657,9 +738,9 @@ export default function History() {
                     >
                       <TableCell
                         sx={{
-                          fontSize: "0.70rem",
+                          fontSize: "0.76rem",
                           fontWeight: 500,
-                          color: "#111827",
+                          // color: "#111827",
                           borderBottom: "1px solid #f3f4f6",
                           textAlign: "center",
                           fontFamily: FONT,
@@ -725,8 +806,8 @@ export default function History() {
                       </TableCell>
                       <TableCell
                         sx={{
-                          fontSize: "0.70rem",
-                          color: "#374151",
+                          fontSize: "0.76rem",
+                          // color: "#374151",
                           borderBottom: "1px solid #f3f4f6",
                           textAlign: "center",
                           pr: 6,
@@ -738,8 +819,8 @@ export default function History() {
                       </TableCell>
                       <TableCell
                         sx={{
-                          fontSize: "0.70rem",
-                          color: "#374151",
+                          fontSize: "0.76rem",
+                          // color: "#374151",
                           borderBottom: "1px solid #f3f4f6",
                           textAlign: "right",
                           pr: 6,
@@ -751,8 +832,8 @@ export default function History() {
                       </TableCell>
                       <TableCell
                         sx={{
-                          fontSize: "0.70rem",
-                          color: "#374151",
+                          fontSize: "0.76rem",
+                          // color: "#374151",
                           borderBottom: "1px solid #f3f4f6",
                           fontFamily: FONT,
                           textAlign: "center",
@@ -763,8 +844,8 @@ export default function History() {
                       </TableCell>
                       <TableCell
                         sx={{
-                          fontSize: "0.70rem",
-                          color: "#374151",
+                          fontSize: "0.76rem",
+                          // color: "#374151",
                           borderBottom: "1px solid #f3f4f6",
                           fontFamily: FONT,
                           textAlign: "center",
@@ -775,8 +856,8 @@ export default function History() {
                       </TableCell>
                       <TableCell
                         sx={{
-                          fontSize: "0.70rem",
-                          color: "#374151",
+                          fontSize: "0.76rem",
+                          // color: "#374151",
                           borderBottom: "1px solid #f3f4f6",
                           fontFamily: FONT,
 
@@ -796,7 +877,7 @@ export default function History() {
                       <TableCell
                         sx={{ borderBottom: "1px solid #f3f4f6", py: 1 }}
                       >
-                        <StatusChip status={row.Status_text} />
+                        <StatusCell status={row.Status_text} />
                       </TableCell>
                     </TableRow>
                   ))

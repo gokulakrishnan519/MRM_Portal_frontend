@@ -184,6 +184,7 @@ export default function MaterialRequest({ data }) {
           fontWeight: 700,
           color: "#101828",
           mb: 1,
+          mt: 2,
           fontSize: "22px",
           fontFamily: "Poppins, sans-serif",
           textAlign: "center",
@@ -197,6 +198,7 @@ export default function MaterialRequest({ data }) {
           gap: 2,
           justifyContent: "center",
           marginBottom: 2,
+          mb: 4,
         }}
       >
         <Typography sx={{ fontFamily: "Poppins", fontSize: "12px" }}>
@@ -226,6 +228,7 @@ export default function MaterialRequest({ data }) {
           px: 2,
           borderRadius: "10px",
           fontFamily: "Poppins, sans-serif",
+          mx: 3,
         }}
       >
         {/* Requirement Details */}
@@ -278,7 +281,13 @@ export default function MaterialRequest({ data }) {
               Required Date
             </Typography>
 
-            <Typography sx={{ fontSize: "0.7rem", fontFamily: "Poppins" }}>
+            <Typography
+              sx={{
+                fontSize: "0.7rem",
+                fontFamily: "Poppins",
+                fontWeight: 600,
+              }}
+            >
               {dayjs(value.requiredDate).format("DD-MMM-YYYY")}
             </Typography>
             {/* </LocalizationProvider> */}
@@ -308,6 +317,7 @@ export default function MaterialRequest({ data }) {
               sx={{
                 fontWeight: 500,
                 fontSize: "11px",
+                fontWeight: 600,
               }}
             >
               {" "}

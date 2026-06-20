@@ -119,11 +119,53 @@ const style = {
 };
 
 const statusConfig = {
-  "L1 Review": { bg: "#FEEFDA", color: "#F99709", border: "#FDE68A" },
-  "L1 Rejected": { bg: "#FBE3EA", color: "#E34472", border: "#FECACA" },
-  "L2 Review": { bg: "#EBE9FD", color: "#7C6CF2", border: "#DDD6FE" },
-  "L2 Approved": { bg: "#DCF7F7", color: "#16C8C7", border: "#A7F3D0" },
-  "L2 Mixed": { bg: "#E8EDFF", color: "#7C3AED", border: "#DDD6FE" },
+  Submitted: {
+    bg: "#EFF6FF",
+    color: "#2563EB",
+    border: "#BFDBFE",
+  },
+
+  "L1 Review": {
+    bg: "#FEEFDA",
+    color: "#F99709",
+    border: "#FDE68A",
+  },
+
+  "L1 Rejected": {
+    bg: "#FBE3EA",
+    color: "#E34472",
+    border: "#FECACA",
+  },
+
+  "L2 Review": {
+    bg: "#EBE9FD",
+    color: "#7C6CF2",
+    border: "#DDD6FE",
+  },
+
+  "L2 Approved": {
+    bg: "#DCF7F7",
+    color: "#16C8C7",
+    border: "#A7F3D0",
+  },
+
+  "L2 Partial Approved": {
+    bg: "#F3E8FF",
+    color: "#9333EA",
+    border: "#DDD6FE",
+  },
+
+  "L2 Rejected": {
+    bg: "#FBE3EA",
+    color: "#E34472",
+    border: "#FECACA",
+  },
+
+  "L2 Mixed": {
+    bg: "#E8EDFF",
+    color: "#7C3AED",
+    border: "#DDD6FE",
+  },
 };
 
 function BadgeIcon({ type }) {
@@ -300,12 +342,14 @@ export default function Home() {
                     : item.Status == "4"
                       ? "L2 Approved"
                       : item.Status == "5"
-                        ? "Processing"
+                        ? "L2 Partial Approved"
                         : item.Status == "6"
                           ? "Fulfilled"
-                          : item.Cancelled == "7"
+                          : item.Status == "7"
                             ? "Cancelled"
-                            : item.Status,
+                            : item.Status == "8"
+                              ? "Submitted"
+                              : item.Status,
         }));
 
         setRows(updatedRows);
@@ -868,8 +912,10 @@ export default function Home() {
                             setModalName("L1RejectFirstModal");
                             setPassRowData(row);
                           } else if (
-                            row.Status_text == "L2 Rejected" ||
-                            row.Status_text == "Processing"
+                            row.Status_text == "Submitted" ||
+                            row.Status_text == "L2 Partial Approved" ||
+                            row.Status_text == "L2 Approved" ||
+                            row.Status_text == "L2 Rejected"
                           ) {
                             setModalName("L2RejectModal");
                             setPassRowData(row);
