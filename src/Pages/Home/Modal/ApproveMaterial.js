@@ -485,6 +485,7 @@ export default function ApproveMaterial(props) {
   console.log(data);
 
   const handleApprove = async () => {
+    props.loadingTrue();
     setLoading(true);
     const payload = {
       _request: {
@@ -620,8 +621,6 @@ export default function ApproveMaterial(props) {
         },
       );
 
-      setLoading(false);
-
       setModal({
         open: true,
         type: "success",
@@ -647,6 +646,7 @@ export default function ApproveMaterial(props) {
   };
 
   const handleReject = async () => {
+    props.loadingTrue();
     setLoading(true);
     const payload = {
       _request: {
@@ -742,8 +742,6 @@ export default function ApproveMaterial(props) {
           },
         },
       );
-
-      setLoading(false);
 
       setModal({
         open: true,

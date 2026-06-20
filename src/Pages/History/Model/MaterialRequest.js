@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
+  Stack,
+  Chip,
   Typography,
   TextField,
   Button,
@@ -23,6 +25,7 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
 import { Link } from "react-router-dom";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import axios from "axios";
 
 const materialOptions = [
   "Cement",
@@ -53,7 +56,7 @@ const emptyRow = () => ({
   quantity: "",
 });
 
-export default function MaterialRequest({ mrDetails }) {
+export default function MaterialRequest({ data }) {
   const [requiredDate, setRequiredDate] = useState(dayjs());
   const [purpose, setPurpose] = useState("");
   const [rows, setRows] = useState([emptyRow()]);
@@ -63,7 +66,26 @@ export default function MaterialRequest({ mrDetails }) {
     setPurpose("");
     setRows([emptyRow()]);
   };
-
+  const [value, setValue] = useState({});
+  const fetchData = async () => {
+    const payload = {
+      material_request_id: data.MaterialRequestId,
+    };
+    await axios
+      .post("http://10.10.0.101:8000/history/details", payload)
+      .then((res) => {
+        console.log(res.data);
+        setValue(res.data.data);
+      })
+      .catch((err) => {
+        const errorMessage =
+          err.response?.data?.detail || err.detail || "Something went wrong";
+        sessionStorage.setItem("errormessge", errorMessage);
+      });
+  };
+  useEffect(() => {
+    fetchData();
+  }, []);
   const inputSx = {
     "& .MuiOutlinedInput-root": {
       borderRadius: "5px",
@@ -113,7 +135,7 @@ export default function MaterialRequest({ mrDetails }) {
       background: "#fff4e5",
       color: "#f79009",
     },
-    "Final Review": {
+    Fulfilled: {
       background: "#e0f2fe",
       color: "#0284c7",
     },
@@ -125,13 +147,13 @@ export default function MaterialRequest({ mrDetails }) {
       background: "#dcfce7",
       color: "#16a34a",
     },
-    Rejected: {
+    "L2 Rejected": {
       background: "#fee2e2",
       color: "#dc2626",
     },
   };
 
-  const currentStyle = statusStyles[mrDetails.status] || {
+  const currentStyle = statusStyles[data.Status_text] || {
     background: "#f2f4f7",
     color: "#667085",
   };
@@ -147,17 +169,17 @@ export default function MaterialRequest({ mrDetails }) {
           background: currentStyle.background,
           color: currentStyle.color,
           fontFamily: "Poppins",
-          fontSize: "10px",
+          fontSize: "0.7rem",
           borderRadius: "15px",
           width: "80px",
           textAlign: "center",
         }}
       >
-        {mrDetails.status}
+        {data.Status_text}
       </Box>
       {/* Title */}
       <Typography
-        variant="h4"
+        variant='h4'
         sx={{
           fontWeight: 700,
           color: "#101828",
@@ -167,7 +189,7 @@ export default function MaterialRequest({ mrDetails }) {
           textAlign: "center",
         }}
       >
-        Material Request {mrDetails.requestId}
+        Material Request {data.MaterialRequestId}
       </Typography>
       <Box
         sx={{
@@ -178,14 +200,20 @@ export default function MaterialRequest({ mrDetails }) {
         }}
       >
         <Typography sx={{ fontFamily: "Poppins", fontSize: "12px" }}>
+          <span style={{ fontWeight: 500 }}>Reference No </span>{" "}
+          {value.referenceNo}
+        </Typography>
+        <Typography sx={{ fontFamily: "Poppins", fontSize: "12px" }}>
           <span style={{ fontWeight: 500 }}>Requested Date</span>{" "}
-          {mrDetails.requestedOn}
+          {dayjs(value.requestedDate).format("DD-MMM-YYYY")}
         </Typography>
         <Typography sx={{ fontFamily: "Poppins", fontSize: "12px" }}>
-          <span style={{ fontWeight: 500 }}>Approved on</span> 12 April 2026
+          <span style={{ fontWeight: 500 }}>Approved on</span>{" "}
+          {dayjs(value.approvedDate).format("DD-MMM-YYYY")}
         </Typography>
         <Typography sx={{ fontFamily: "Poppins", fontSize: "12px" }}>
-          <span style={{ fontWeight: 500 }}>Approved on</span> 12 April 2026
+          <span style={{ fontWeight: 500 }}>Fulfilled Date</span>{" "}
+          {dayjs(value.fulfilledDate).format("DD-MMM-YYYY")}
         </Typography>
       </Box>
       <Box
@@ -249,42 +277,9 @@ export default function MaterialRequest({ mrDetails }) {
             >
               Required Date
             </Typography>
-            {/* <LocalizationProvider dateAdapter={AdapterDayjs}> */}
-            {/* <DatePicker
-              value={requiredDate}
-              onChange={(newValue) => setRequiredDate(newValue)}
-              format="DD/MM/YYYY"
-              slotProps={{
-                textField: {
-                  variant: "standard",
 
-                  inputProps: {
-                    readOnly: true,
-                  },
-                  sx: {
-                    border: "1px solid #d0d5dd",
-                    backgroundColor: "#fff",
-                    borderRadius: "4px",
-                    width: 130,
-                  },
-                  InputProps: {
-                    disableUnderline: true,
-
-                    sx: {
-                      px: "8px",
-                      fontSize: "0.8rem",
-                      height: 30,
-
-                      "& .MuiSvgIcon-root": {
-                        fontSize: "1rem",
-                      },
-                    },
-                  },
-                },
-              }}
-              /> */}
             <Typography sx={{ fontSize: "0.7rem", fontFamily: "Poppins" }}>
-              {mrDetails.requiredDate}
+              {dayjs(value.requiredDate).format("DD-MMM-YYYY")}
             </Typography>
             {/* </LocalizationProvider> */}
           </Box>
@@ -309,7 +304,15 @@ export default function MaterialRequest({ mrDetails }) {
             >
               Purpose
             </Typography>
-            <Typography>-</Typography>
+            <Typography
+              sx={{
+                fontWeight: 500,
+                fontSize: "11px",
+              }}
+            >
+              {" "}
+              {value.purpose}
+            </Typography>
           </Box>
         </Paper>
 
@@ -344,10 +347,10 @@ export default function MaterialRequest({ mrDetails }) {
             sx={{
               border: "1px solid #d0d5dd",
               borderRadius: "6px",
-              overflow: "hidden",
+              // overflow: "hidden",
             }}
           >
-            <Table size="small">
+            <Table size='small'>
               <TableHead>
                 <TableRow>
                   <TableCell sx={{ ...headerCellSx, width: "28%" }}>
@@ -378,40 +381,80 @@ export default function MaterialRequest({ mrDetails }) {
                 </TableRow>
               </TableHead>
               <TableBody>
-                <TableRow>
-                  <TableCell sx={{ ...bodyCellSx, width: "12%" }}>
-                    General Purpose
-                  </TableCell>
-                  <TableCell sx={{ ...bodyCellSx, width: "12%" }}>
-                    Solvant
-                  </TableCell>
-                  <TableCell sx={{ ...bodyCellSx, width: "12%" }}>L</TableCell>
-                  <TableCell sx={{ ...bodyCellSx, width: "12%" }}>
-                    50L
-                  </TableCell>
-                  <TableCell
-                    sx={{ ...bodyCellSx, width: "12%", textAlign: "right" }}
+                {value.materials?.map((row, index) => (
+                  <TableRow
+                    key={index}
+                    sx={{
+                      "&:last-child td": { border: 0 },
+                      "&:hover": { bgcolor: "#F9FAFB" },
+                    }}
                   >
-                    5L
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell sx={{ ...bodyCellSx, width: "12%" }}>
-                    Mild Detergent
-                  </TableCell>
-                  <TableCell sx={{ ...bodyCellSx, width: "12%" }}>
-                    Sanitation Suplies
-                  </TableCell>
-                  <TableCell sx={{ ...bodyCellSx, width: "12%" }}>L</TableCell>
-                  <TableCell sx={{ ...bodyCellSx, width: "12%" }}>
-                    45kg
-                  </TableCell>
-                  <TableCell
-                    sx={{ ...bodyCellSx, width: "12%", textAlign: "right" }}
-                  >
-                    5L
-                  </TableCell>
-                </TableRow>
+                    <TableCell>
+                      <Stack direction='row' spacing={0.8} alignItems='center'>
+                        <Typography
+                          sx={{
+                            fontSize: "0.7rem",
+                            fontFamily: "Poppins, sans-serif",
+                            color: "#111827",
+                          }}
+                        >
+                          {row.materialName}
+                        </Typography>
+                        {row.itemtag && (
+                          <Chip
+                            label={
+                              row.itemTag === 1
+                                ? "Critical"
+                                : row.itemTag === 2
+                                  ? "New"
+                                  : ""
+                            }
+                            size='small'
+                            sx={{
+                              bgcolor:
+                                row.itemTag === 1
+                                  ? "#FEE2E2"
+                                  : row.itemTag === 2
+                                    ? "#DBEAFE"
+                                    : "#F3F4F6",
+                              color:
+                                row.itemTag === 1
+                                  ? "#EF4444"
+                                  : row.itemTag === 2
+                                    ? "#2563EB"
+                                    : "#6B7280",
+                            }}
+                          />
+                        )}
+                      </Stack>
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        color: "#6B7280",
+                        textAlign: "center",
+                        fontSize: "0.7rem",
+                      }}
+                    >
+                      {row.category ? row.category : "-"}
+                    </TableCell>
+                    <TableCell sx={{ color: "#6B7280", fontSize: "0.7rem" }}>
+                      {row.uom}
+                    </TableCell>
+                    <TableCell sx={{ color: "#6B7280", fontSize: "0.7rem" }}>
+                      {row.availableStock}
+                    </TableCell>
+                    <TableCell
+                      align='right'
+                      sx={{
+                        fontWeight: 600,
+                        color: "#111827",
+                        fontSize: "0.7rem",
+                      }}
+                    >
+                      {row.quantity}
+                    </TableCell>
+                  </TableRow>
+                ))}
               </TableBody>
             </Table>
           </TableContainer>
@@ -438,51 +481,7 @@ export default function MaterialRequest({ mrDetails }) {
           </Box>
         </Paper>
       </Box>
-      {/* Buttons */}
-      {/* <Box sx={{ display: "flex", gap: 1.5 }}>
-        <Button
-          onClick={handleSubmit}
-          sx={{
-            background: "linear-gradient(135deg, #f78ca2 0%, #f9748f 100%)",
-            color: "#fff",
-            fontWeight: 600,
-            fontSize: "11px",
-            fontFamily: "Poppins, sans-serif",
-            px: 3,
-            py: 0.8,
-            borderRadius: "6px",
-            textTransform: "none",
-            minHeight: "34px",
-            "&:hover": {
-              background: "linear-gradient(135deg, #f9748f 0%, #f5576c 100%)",
-            },
-          }}
-        >
-          Submit Request
-        </Button>
 
-        <Button
-          onClick={handleCancel}
-          sx={{
-            border: "1.5px solid #e74c3c",
-            color: "#e74c3c",
-            fontWeight: 600,
-            fontSize: "11px",
-            fontFamily: "Poppins, sans-serif",
-            px: 3,
-            py: 0.8,
-            borderRadius: "6px",
-            textTransform: "none",
-            backgroundColor: "transparent",
-            minHeight: "34px",
-            "&:hover": {
-              backgroundColor: "#fff5f5",
-            },
-          }}
-        >
-          Cancel
-        </Button>
-      </Box> */}
       <hr
         style={{ textAlign: "center", marginTop: "30px", width: "900px" }}
       ></hr>
@@ -508,7 +507,7 @@ export default function MaterialRequest({ mrDetails }) {
           }}
         >
           <Typography
-            variant="h6"
+            variant='h6'
             sx={{ fontFamily: "Poppins", fontSize: "15px" }}
           >
             Activity Timeline
@@ -523,7 +522,7 @@ export default function MaterialRequest({ mrDetails }) {
         </Box>
         {open && (
           <TableContainer>
-            <Table size="small">
+            <Table size='small'>
               <TableBody>
                 <TableRow>
                   <TableCell

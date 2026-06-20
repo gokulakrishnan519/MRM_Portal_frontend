@@ -171,6 +171,7 @@ export default function CreateMaterialRequest(props) {
 
   const handleSubmit = async () => {
     setLoading(true);
+    props.loadingTrue();
     const payload = {
       _request: {
         MaterialRequirementManagementHeader: {
@@ -254,7 +255,6 @@ export default function CreateMaterialRequest(props) {
         });
       }
     } catch (err) {
-      alert("hii");
       const errorMessage =
         err.response?.data?.detail || err.detail || "Something went wrong";
 
@@ -264,10 +264,12 @@ export default function CreateMaterialRequest(props) {
       setLoading(false);
     } finally {
       setLoading(false);
+      props.loadingFalse();
     }
   };
 
   const RehandleSubmit = async () => {
+    props.loadingTrue();
     setLoading(true);
     const payload = {
       _request: {
@@ -352,6 +354,7 @@ export default function CreateMaterialRequest(props) {
             response.data?.data?.DebugMessage ||
             "Something went wrong. Please try again later.",
         });
+        props.CancelResubmit();
       }
     } catch (err) {
       alert("hii");
@@ -364,6 +367,7 @@ export default function CreateMaterialRequest(props) {
       setLoading(false);
     } finally {
       setLoading(false);
+      props.loadingFalse();
     }
   };
 
@@ -466,7 +470,7 @@ export default function CreateMaterialRequest(props) {
 
       return hasQuantity;
     }) &&
-    (!props.l1ReSubmit || resubmitReason.trim() !== "");
+    (props.l1ReSubmit?.level !== "L1 Reject" || resubmitReason.trim() !== "");
 
   const fetchData = async () => {
     try {
@@ -476,7 +480,9 @@ export default function CreateMaterialRequest(props) {
       };
 
       const res = await axios.post(
-        "http://10.10.0.101:8000/mrmuser/l1rejected/details",
+        props.l1ReSubmit?.level == "L2 Reject"
+          ? "http://10.10.0.101:8000/request/details"
+          : "http://10.10.0.101:8000/mrmuser/l1rejected/details",
         payload,
       );
 
@@ -507,7 +513,11 @@ export default function CreateMaterialRequest(props) {
 
       console.log(updateData);
 
-      setRows(updateData);
+      setRows(
+        props.l1ReSubmit?.level === "L2 Reject"
+          ? updateData.filter((item) => item.status === "Rejected")
+          : updateData,
+      );
 
       setValue(res.data.data);
     } catch (err) {
@@ -573,6 +583,88 @@ export default function CreateMaterialRequest(props) {
               </Typography>
             </Box>
 
+            {props.l1ReSubmit?.level == "L2 Reject" && (
+              <>
+                {/* Privios Review Command */}
+                <Paper
+                  elevation={0}
+                  sx={{
+                    width: "100%",
+                    maxWidth: 1140,
+                    mx: "auto",
+                    borderRadius: tokens.radius.lg,
+                    border: `1px solid ${tokens.colors.border}`,
+                    backgroundColor: tokens.colors.cardBg,
+                    p: 3,
+                    mb: 2.5,
+                  }}
+                >
+                  {/* Section Label */}
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                      mb: 2.5,
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        width: 3,
+                        height: 18,
+                        borderRadius: "2px",
+                        backgroundColor: tokens.colors.accent.indigo,
+                      }}
+                    />
+                    <Typography
+                      sx={{
+                        fontWeight: 600,
+                        fontSize: "13px",
+                        color: tokens.colors.text.primary,
+                        fontFamily: tokens.fontFamily,
+                        letterSpacing: "-0.1px",
+                      }}
+                    >
+                      Privious Review Command
+                    </Typography>
+                  </Box>
+
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 3,
+                      flexWrap: "wrap",
+                    }}
+                  >
+                    {/* Review Comand */}
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: 0.6,
+                        flex: 1,
+                        minWidth: 260,
+                      }}
+                    >
+                      <Typography
+                        sx={{
+                          fontWeight: 500,
+                          fontSize: "12px",
+                          color: tokens.colors.text.secondary,
+                          fontFamily: tokens.fontFamily,
+                        }}
+                      >
+                        {value?.previousReviewComment == ""
+                          ? "-"
+                          : value?.previousReviewComment}
+                      </Typography>
+                    </Box>
+                  </Box>
+                </Paper>
+              </>
+            )}
+
             {/* Requirement Details Card */}
             <Paper
               elevation={0}
@@ -637,13 +729,21 @@ export default function CreateMaterialRequest(props) {
                   </Typography>
                   <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <DatePicker
+                      minDate={dayjs()}
                       value={requiredDate}
                       onChange={(newValue) => setRequiredDate(newValue)}
                       format='DD/MM/YYYY'
+                      slots={
+                        {
+                          // optional: keep default field but block typing
+                        }
+                      }
                       slotProps={{
                         textField: {
                           variant: "standard",
-                          inputProps: { readOnly: true },
+                          // onKeyDown blocks all keyboard input including paste-triggered changes
+                          onKeyDown: (e) => e.preventDefault(),
+                          onPaste: (e) => e.preventDefault(),
                           sx: {
                             border: `1px solid ${tokens.colors.border}`,
                             backgroundColor: "#fff",
@@ -1403,7 +1503,7 @@ export default function CreateMaterialRequest(props) {
               </Box>
             </Paper>
 
-            {props.l1ReSubmit ? (
+            {props.l1ReSubmit?.level == "L1 Reject" ? (
               <>
                 {/* ── Rejection Reason ── */}
                 <SectionCard
@@ -1561,7 +1661,7 @@ export default function CreateMaterialRequest(props) {
                 Cancel
               </Button>
               <>
-                {props.l1ReSubmit ? (
+                {props.l1ReSubmit?.level == "L1 Reject" ? (
                   <Button
                     onClick={RehandleSubmit}
                     disabled={!isFormValid}
@@ -1644,7 +1744,7 @@ export default function CreateMaterialRequest(props) {
                     • For New Material: Material Category, UOM and Quantity are
                     required.
                     <br />• For Old Material: Quantity is required.
-                    {props.l1ReSubmit && (
+                    {props.l1ReSubmit?.level == "L1 Reject" && (
                       <>
                         <br />• Resubmission Reason is required.
                       </>

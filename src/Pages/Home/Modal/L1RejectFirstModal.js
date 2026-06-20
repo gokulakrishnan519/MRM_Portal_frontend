@@ -162,7 +162,7 @@ export default function L1RejectFirstModal({
     try {
       const payload = {
         materialRequestId: rowData.MaterialRequestId,
-        status: 2,
+        status: rowData?.Status,
       };
 
       const res = await axios.post(
@@ -272,6 +272,7 @@ export default function L1RejectFirstModal({
                 openCreateMateralRequestModal(
                   rowData.Status,
                   rowData.MaterialRequestId,
+                  "L1 Reject",
                 );
               }}
             >
@@ -339,19 +340,35 @@ export default function L1RejectFirstModal({
                           >
                             {row.materialName}
                           </Typography>
-                          {row.itemtag && (
+                          {row.itemtag == 0 ? (
+                            ""
+                          ) : (
                             <Chip
-                              label={row.itemtag}
+                              label={
+                                row.itemtag == 1
+                                  ? "Critical"
+                                  : row.itemtag == 2
+                                    ? "New"
+                                    : row.itemtag
+                              }
                               size='small'
                               sx={{
+                                fontFamily: "Poppins, sans-serif",
+                                fontSize: "0.62rem",
+                                fontWeight: 500,
                                 bgcolor:
-                                  row.itemtag === "Critical"
-                                    ? "#FEE2E2"
-                                    : "#DBEAFE",
+                                  row.itemtag == 1
+                                    ? "#FEE2E2" // Critical Background
+                                    : row.itemtag == 2
+                                      ? "#DBEAFE" // New Background
+                                      : "#F3F4F6",
                                 color:
-                                  row.itemtag === "Critical"
-                                    ? "#EF4444"
-                                    : "#2563EB",
+                                  row.itemtag == 1
+                                    ? "#DC2626" // Critical Text
+                                    : row.itemtag == 2
+                                      ? "#2563EB" // New Text
+                                      : "#374151",
+                                height: 20,
                               }}
                             />
                           )}
@@ -480,7 +497,13 @@ export default function L1RejectFirstModal({
               cursor: "not-allowed",
               // "&:hover": { bgcolor: "#FB7185" },
             }}
-            // onClick={() => alert("Request Resubmitted!")}
+            onClick={() => {
+              openCreateMateralRequestModal(
+                rowData.Status,
+                rowData.MaterialRequestId,
+                "L1 Reject",
+              );
+            }}
           >
             Resubmit Request
           </Button>

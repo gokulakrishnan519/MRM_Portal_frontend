@@ -14,12 +14,15 @@ import {
   Paper,
   Stack,
   Divider,
+  Grid,
 } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import CloseIcon from "@mui/icons-material/Close";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import InboxIcon from "@mui/icons-material/Inbox";
+import CircularProgress from "@mui/material/CircularProgress";
+import dayjs from "dayjs";
 
 // ── Theme ─────────────────────────────────────────────────────────────────────
 const theme = createTheme({
@@ -168,23 +171,28 @@ function HeaderStatusBadge({ label }) {
 // ── Main Component ────────────────────────────────────────────────────────────
 export default function L2RejectModal(props) {
   const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
   console.log(props);
 
   const DetailsAPi = () => {
+    setLoading(true);
     const payload = {
       materialRequestId: props.rowData.MaterialRequestId,
+      // materialRequestId: "Hi-Q-012253",
     };
 
     axios
-      .post("http://10.10.0.101:8000/mrmuser/request/details", payload)
+      .post("http://10.10.0.101:8000/request/details", payload)
       .then((res) => {
         console.log(console.log(res));
         setData(res.data.data);
+        setLoading(false);
       })
       .catch((err) => {
+        setLoading(false);
         if (err.response?.status === 404) {
           setData(null);
         } else {
@@ -204,413 +212,338 @@ export default function L2RejectModal(props) {
   }, []);
 
   return (
-    <ThemeProvider theme={theme}>
-      {/* Backdrop */}
-
-      {data == null ? (
-        <Box
+    <div>
+      {loading ? (
+        <Grid
           sx={{
+            minHeight: "50vh",
             display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
             justifyContent: "center",
-            height: "300px",
-            gap: 2,
+            alignItems: "center",
           }}
         >
-          <InboxIcon sx={{ fontSize: 60, color: "#BDBDBD" }} />
-          <Typography variant='h6' color='text.secondary'>
-            No Data Available
-          </Typography>
-          <Typography variant='body2' color='text.secondary'>
-            There is nothing to display at the moment.
-          </Typography>
-        </Box>
+          <CircularProgress aria-label='Loading…' />
+        </Grid>
       ) : (
-        <Box>
-          {/* Modal Card */}
-          <Box sx={{ padding: 1 }}>
-            {/* ── Header ── */}
+        <ThemeProvider theme={theme}>
+          {/* Backdrop */}
+
+          {data == null ? (
             <Box
               sx={{
                 display: "flex",
+                flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "center",
-                mb: 2.5,
-                position: "relative",
+                height: "300px",
+                gap: 2,
               }}
             >
-              <Typography
-                variant='h6'
-                sx={{
-                  fontWeight: 700,
-                  fontSize: 18,
-                  color: "#111827",
-                  fontFamily: "Poppins, sans-serif",
-                }}
-              >
-                Material Request MR-1022
+              <InboxIcon sx={{ fontSize: 60, color: "#BDBDBD" }} />
+              <Typography variant='h6' color='text.secondary'>
+                No Data Available
               </Typography>
-              <Box
-                sx={{
-                  position: "absolute",
-                  right: 0,
-                  top: 0,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 1,
-                }}
-              >
-                <HeaderStatusBadge label='L2 Rejected' />
-              </Box>
+              <Typography variant='body2' color='text.secondary'>
+                There is nothing to display at the moment.
+              </Typography>
             </Box>
-
-            <Box
-              sx={{ background: "#F1F5F9", px: 3, py: 2, borderRadius: "13px" }}
-            >
-              {/* ── Requirement Details ── */}
-              <Paper
-                elevation={0}
-                sx={{
-                  borderRadius: 3,
-                  p: 2.5,
-                  mb: 2,
-                }}
-              >
-                <Stack direction='row' spacing={3} alignItems='center'>
+          ) : (
+            <Box>
+              {/* Modal Card */}
+              <Box sx={{ padding: 1 }}>
+                {/* ── Header ── */}
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    mb: 2.5,
+                    position: "relative",
+                  }}
+                >
                   <Typography
+                    variant='h6'
                     sx={{
                       fontWeight: 700,
-                      fontSize: 14,
+                      fontSize: 18,
                       color: "#111827",
                       fontFamily: "Poppins, sans-serif",
                     }}
                   >
-                    Requirement Details
+                    Material Request {data?.materialRequestId}
                   </Typography>
-                  <Typography
+                  <Box
                     sx={{
-                      fontSize: 12,
-                      color: "#6B7280",
-                      fontFamily: "Poppins, sans-serif",
+                      position: "absolute",
+                      right: 0,
+                      top: 0,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
                     }}
                   >
-                    Required Date{" "}
-                    <Box
-                      component='span'
-                      sx={{ fontWeight: 600, color: "#111827" }}
-                    >
-                      10 May 2026
-                    </Box>
-                  </Typography>
-                  <Typography
+                    <HeaderStatusBadge label='L2 Rejected' />
+                  </Box>
+                </Box>
+
+                <Box
+                  sx={{
+                    background: "#F1F5F9",
+                    px: 3,
+                    py: 2,
+                    borderRadius: "13px",
+                  }}
+                >
+                  {/* ── Requirement Details ── */}
+                  <Paper
+                    elevation={0}
                     sx={{
-                      fontSize: 12,
-                      color: "#6B7280",
-                      fontFamily: "Poppins, sans-serif",
+                      borderRadius: 3,
+                      p: 2.5,
+                      mb: 2,
                     }}
                   >
-                    Purpose{" "}
-                    <Box component='span' sx={{ color: "#9CA3AF" }}>
-                      –
-                    </Box>
-                  </Typography>
-                </Stack>
-              </Paper>
-
-              {/* ── Material Details ── */}
-              <Paper
-                elevation={0}
-                sx={{
-                  borderRadius: 3,
-                  p: 2.5,
-                  mb: 3,
-                }}
-              >
-                <Typography
-                  sx={{
-                    fontWeight: 700,
-                    fontSize: 14,
-                    color: "#111827",
-                    mb: 1.5,
-                    fontFamily: "Poppins, sans-serif",
-                  }}
-                >
-                  Material Details
-                </Typography>
-
-                <TableContainer
-                  sx={{
-                    border: "1px solid #E5E7EB",
-                    borderRadius: 2,
-                    overflow: "hidden",
-                  }}
-                >
-                  <Table size='small'>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>Material Name</TableCell>
-                        <TableCell>Material Category</TableCell>
-                        <TableCell>UOM</TableCell>
-                        <TableCell>Available Stock</TableCell>
-                        <TableCell>Quantity</TableCell>
-                        <TableCell>Status</TableCell>
-                        <TableCell>Reference No.</TableCell>
-                        <TableCell>Review Notes</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {/* Row 1 — General Purpose Solvent (no status, spans visually grouped with Mild Detergent) */}
-                      <TableRow sx={{ "&:hover": { bgcolor: "#F9FAFB" } }}>
-                        <TableCell>
-                          <Stack
-                            direction='row'
-                            spacing={0.8}
-                            alignItems='center'
-                          >
-                            <Typography
-                              sx={{
-                                fontSize: 13,
-                                fontFamily: "Poppins, sans-serif",
-                                color: "#111827",
-                              }}
-                            >
-                              General Purpose Solvent
-                            </Typography>
-                            <Chip
-                              label='Critical'
-                              size='small'
-                              sx={{ bgcolor: "#FEE2E2", color: "#EF4444" }}
-                            />
-                          </Stack>
-                        </TableCell>
-                        <TableCell sx={{ color: "#6B7280" }}>Solvent</TableCell>
-                        <TableCell sx={{ color: "#6B7280" }}>L</TableCell>
-                        <TableCell sx={{ color: "#6B7280" }}>50 L</TableCell>
-                        <TableCell sx={{ fontWeight: 600, color: "#111827" }}>
-                          5 L
-                        </TableCell>
-                        {/* Status + Ref + Notes span 2 rows (Mild Detergent group) */}
-                        <TableCell
-                          rowSpan={2}
-                          sx={{
-                            verticalAlign: "middle",
-                            borderLeft: "1px solid #E5E7EB",
-                          }}
-                        >
-                          <StatusChip status='Rejected' />
-                        </TableCell>
-                        <TableCell
-                          rowSpan={2}
-                          sx={{
-                            verticalAlign: "middle",
-                            color: "#6B7280",
-                            borderLeft: "1px solid #E5E7EB",
-                          }}
-                        >
-                          MJ-234
-                        </TableCell>
-                        <TableCell
-                          rowSpan={2}
-                          sx={{
-                            verticalAlign: "top",
-                            maxWidth: 200,
-                            borderLeft: "1px solid #E5E7EB",
-                          }}
-                        >
-                          <Typography
-                            sx={{
-                              fontSize: 12,
-                              color: "#374151",
-                              fontFamily: "Poppins, sans-serif",
-                              lineHeight: 1.5,
-                            }}
-                          >
-                            Regarding Mild Detergent does not comply with
-                            procurement guidelines.
-                          </Typography>
-                          <ReviewerBadge name='Senthil' badge='L2' />
-                        </TableCell>
-                      </TableRow>
-
-                      {/* Row 2 — Mild Detergent */}
-                      <TableRow sx={{ "&:hover": { bgcolor: "#F9FAFB" } }}>
-                        <TableCell>
-                          <Typography
-                            sx={{
-                              fontSize: 13,
-                              fontFamily: "Poppins, sans-serif",
-                              color: "#111827",
-                            }}
-                          >
-                            Mild Detergent
-                          </Typography>
-                        </TableCell>
-                        <TableCell sx={{ color: "#6B7280" }}>
-                          Sanitation Supplies
-                        </TableCell>
-                        <TableCell sx={{ color: "#6B7280" }}>Kg</TableCell>
-                        <TableCell sx={{ color: "#6B7280" }}>45 Kg</TableCell>
-                        <TableCell sx={{ fontWeight: 600, color: "#111827" }}>
-                          10 L
-                        </TableCell>
-                      </TableRow>
-
-                      {/* Row 3 — Gloves (spans with Mask for Approved group) */}
-                      <TableRow sx={{ "&:hover": { bgcolor: "#F9FAFB" } }}>
-                        <TableCell>
-                          <Stack
-                            direction='row'
-                            spacing={0.8}
-                            alignItems='center'
-                          >
-                            <Typography
-                              sx={{
-                                fontSize: 13,
-                                fontFamily: "Poppins, sans-serif",
-                                color: "#111827",
-                              }}
-                            >
-                              Gloves
-                            </Typography>
-                            <Chip
-                              label='New'
-                              size='small'
-                              sx={{ bgcolor: "#DBEAFE", color: "#2563EB" }}
-                            />
-                          </Stack>
-                        </TableCell>
-                        <TableCell sx={{ color: "#6B7280" }}>
-                          Safety Equipments
-                        </TableCell>
-                        <TableCell sx={{ color: "#6B7280" }}>NOS</TableCell>
-                        <TableCell sx={{ color: "#6B7280" }}>–</TableCell>
-                        <TableCell sx={{ fontWeight: 600, color: "#111827" }}>
-                          100 NOS
-                        </TableCell>
-                        <TableCell
-                          rowSpan={2}
-                          sx={{
-                            verticalAlign: "middle",
-                            borderLeft: "1px solid #E5E7EB",
-                          }}
-                        >
-                          <StatusChip status='Approved' />
-                        </TableCell>
-                        <TableCell
-                          rowSpan={2}
-                          sx={{
-                            verticalAlign: "middle",
-                            color: "#6B7280",
-                            borderLeft: "1px solid #E5E7EB",
-                          }}
-                        >
-                          PR-109
-                        </TableCell>
-                        <TableCell
-                          rowSpan={2}
-                          sx={{
-                            verticalAlign: "middle",
-                            color: "#9CA3AF",
-                            borderLeft: "1px solid #E5E7EB",
-                          }}
-                        >
-                          –
-                        </TableCell>
-                      </TableRow>
-
-                      {/* Row 4 — Mask */}
-                      <TableRow
+                    <Stack direction='row' spacing={3} alignItems='center'>
+                      <Typography
                         sx={{
-                          "&:last-child td": { border: 0 },
-                          "&:hover": { bgcolor: "#F9FAFB" },
+                          fontWeight: 700,
+                          fontSize: 14,
+                          color: "#111827",
+                          fontFamily: "Poppins, sans-serif",
                         }}
                       >
-                        <TableCell>
-                          <Stack
-                            direction='row'
-                            spacing={0.8}
-                            alignItems='center'
-                          >
-                            <Typography
-                              sx={{
-                                fontSize: 13,
-                                fontFamily: "Poppins, sans-serif",
-                                color: "#111827",
-                              }}
-                            >
-                              Mask
-                            </Typography>
-                            <Chip
-                              label='New'
-                              size='small'
-                              sx={{ bgcolor: "#DBEAFE", color: "#2563EB" }}
-                            />
-                          </Stack>
-                        </TableCell>
-                        <TableCell sx={{ color: "#6B7280" }}>
-                          Safety Equipments
-                        </TableCell>
-                        <TableCell sx={{ color: "#6B7280" }}>NOS</TableCell>
-                        <TableCell sx={{ color: "#6B7280" }}>–</TableCell>
-                        <TableCell sx={{ fontWeight: 600, color: "#111827" }}>
-                          100 NOS
-                        </TableCell>
-                      </TableRow>
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </Paper>
-            </Box>
+                        Requirement Details
+                      </Typography>
+                      <Typography
+                        sx={{
+                          fontSize: 12,
+                          color: "#6B7280",
+                          fontFamily: "Poppins, sans-serif",
+                        }}
+                      >
+                        Required Date{" "}
+                        <Box
+                          component='span'
+                          sx={{ fontWeight: 600, color: "#111827" }}
+                        >
+                          {dayjs(data?.requiredDate).format("DD MMM YYYY")}
+                        </Box>
+                      </Typography>
+                      <Typography
+                        sx={{
+                          fontSize: 12,
+                          color: "#6B7280",
+                          fontFamily: "Poppins, sans-serif",
+                        }}
+                      >
+                        Purpose{" "}
+                        <Box component='span' sx={{ color: "#9CA3AF" }}>
+                          {data?.purpose}
+                        </Box>
+                      </Typography>
+                    </Stack>
+                  </Paper>
 
-            {/* ── Action Buttons ── */}
-            <Stack
-              direction='row'
-              spacing={1.5}
-              justifyContent='center'
-              alignItems='center'
-              sx={{ mt: 2 }}
-            >
-              <Button
-                variant='contained'
-                sx={{
-                  bgcolor: "#F43F5E",
-                  color: "#fff",
-                  px: 3,
-                  py: 1,
-                  "&:hover": { bgcolor: "#E11D48" },
-                }}
-                onClick={() => alert("Creating New Request...")}
-              >
-                Create New Request
-              </Button>
-              <Button
-                variant='outlined'
-                sx={{
-                  borderColor: "#E5E7EB",
-                  color: "#374151",
-                  px: 3,
-                  py: 1,
-                  "&:hover": { borderColor: "#9CA3AF", bgcolor: "#F9FAFB" },
-                }}
-                // onClick={onClose}
-              >
-                Cancel
-              </Button>
-              <Typography
-                sx={{
-                  fontSize: 13,
-                  color: "#EF4444",
-                  fontWeight: 600,
-                  fontFamily: "Poppins, sans-serif",
-                }}
-              >
-                (R)
-              </Typography>
-            </Stack>
-          </Box>
-        </Box>
+                  {/* ── Material Details ── */}
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      borderRadius: 3,
+                      p: 2.5,
+                      mb: 3,
+                    }}
+                  >
+                    <Typography
+                      sx={{
+                        fontWeight: 700,
+                        fontSize: 14,
+                        color: "#111827",
+                        mb: 1.5,
+                        fontFamily: "Poppins, sans-serif",
+                      }}
+                    >
+                      Material Details
+                    </Typography>
+
+                    <TableContainer
+                      sx={{
+                        border: "1px solid #E5E7EB",
+                        borderRadius: 2,
+                        overflow: "hidden",
+                      }}
+                    >
+                      <Table size='small'>
+                        <TableHead>
+                          <TableRow>
+                            <TableCell>Material Name</TableCell>
+                            <TableCell>Material Category</TableCell>
+                            <TableCell>UOM</TableCell>
+                            <TableCell>Available Stock</TableCell>
+                            <TableCell>Quantity</TableCell>
+                            <TableCell>Status</TableCell>
+                            <TableCell>Reference No.</TableCell>
+                            <TableCell>Review Notes</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {data?.materials.map((item, index) => (
+                            <TableRow
+                              key={index}
+                              sx={{ "&:hover": { bgcolor: "#F9FAFB" } }}
+                            >
+                              <TableCell>
+                                <Stack
+                                  direction='row'
+                                  spacing={0.8}
+                                  alignItems='center'
+                                >
+                                  <Typography
+                                    sx={{
+                                      fontSize: 13,
+                                      fontFamily: "Poppins, sans-serif",
+                                      color: "#111827",
+                                    }}
+                                  >
+                                    {item.materialName}
+                                  </Typography>
+
+                                  {item.itemtag == 0 ? (
+                                    ""
+                                  ) : (
+                                    <Chip
+                                      label={
+                                        item.itemtag == 1
+                                          ? "Critical"
+                                          : item.itemtag == 2
+                                            ? "New"
+                                            : item.itemtag
+                                      }
+                                      size='small'
+                                      sx={{
+                                        fontFamily: "Poppins, sans-serif",
+                                        fontSize: "0.62rem",
+                                        fontWeight: 500,
+                                        bgcolor:
+                                          item.itemtag == 1
+                                            ? "#FEE2E2" // Critical Background
+                                            : item.itemtag == 2
+                                              ? "#DBEAFE" // New Background
+                                              : "#F3F4F6",
+                                        color:
+                                          item.itemtag == 1
+                                            ? "#DC2626" // Critical Text
+                                            : item.itemtag == 2
+                                              ? "#2563EB" // New Text
+                                              : "#374151",
+                                        height: 20,
+                                      }}
+                                    />
+                                  )}
+                                </Stack>
+                              </TableCell>
+
+                              <TableCell sx={{ color: "#6B7280" }}>
+                                {item.category || "-"}
+                              </TableCell>
+
+                              <TableCell sx={{ color: "#6B7280" }}>
+                                {item.uom}
+                              </TableCell>
+
+                              <TableCell sx={{ color: "#6B7280" }}>
+                                {item.availableStock}
+                              </TableCell>
+
+                              <TableCell
+                                sx={{ fontWeight: 600, color: "#111827" }}
+                              >
+                                {item.quantity}
+                              </TableCell>
+
+                              <TableCell>
+                                <StatusChip status={item.status} />
+                              </TableCell>
+
+                              <TableCell sx={{ color: "#6B7280" }}>
+                                {item.referenceNo}
+                              </TableCell>
+
+                              <TableCell
+                                sx={{ color: "#374151", maxWidth: 250 }}
+                              >
+                                {item.reviewNotes || "-"}
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  </Paper>
+                </Box>
+
+                {/* ── Action Buttons ── */}
+                <Stack
+                  direction='row'
+                  spacing={1.5}
+                  justifyContent='center'
+                  alignItems='center'
+                  sx={{ mt: 2 }}
+                >
+                  <Button
+                    variant='contained'
+                    sx={{
+                      bgcolor: "#F43F5E",
+                      color: "#fff",
+                      px: 3,
+                      py: 1,
+                      "&:hover": { bgcolor: "#E11D48" },
+                    }}
+                    onClick={() => {
+                      props.openCreateMateralRequestModal(
+                        props.rowData?.Status,
+                        data?.materialRequestId,
+                        "L2 Reject",
+                      );
+
+                      console.log(
+                        props.rowData?.Status,
+                        data?.materialRequestId,
+                      );
+                    }}
+                  >
+                    Create New Request
+                  </Button>
+                  <Button
+                    variant='outlined'
+                    sx={{
+                      borderColor: "#E5E7EB",
+                      color: "#374151",
+                      px: 3,
+                      py: 1,
+                      "&:hover": { borderColor: "#9CA3AF", bgcolor: "#F9FAFB" },
+                    }}
+                    onClick={() => {
+                      props.loadingFalse();
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                  <Typography
+                    sx={{
+                      fontSize: 13,
+                      color: "#EF4444",
+                      fontWeight: 600,
+                      fontFamily: "Poppins, sans-serif",
+                    }}
+                  >
+                    (R)
+                  </Typography>
+                </Stack>
+              </Box>
+            </Box>
+          )}
+        </ThemeProvider>
       )}
-    </ThemeProvider>
+    </div>
   );
 }

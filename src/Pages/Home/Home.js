@@ -337,7 +337,7 @@ export default function Home() {
         tabMatch = row.CriticalStatus?.includes("Normal");
         break;
       case 4:
-        tabMatch = row.Resubmitted;
+        tabMatch = row.Resubmitted == true;
         break;
       default:
         tabMatch = true;
@@ -370,10 +370,14 @@ export default function Home() {
     setApproveModal(false);
   };
 
-  const openCreateMateralRequestModal = (Status, MaterialRequestId) => {
+  const openCreateMateralRequestModal = (Status, MaterialRequestId, level) => {
     setOpen(true);
     setApproveModal(false);
-    setL1Resubmit({ MaterialRequestId: MaterialRequestId, Status: Status });
+    setL1Resubmit({
+      MaterialRequestId: MaterialRequestId,
+      Status: Status,
+      level: level,
+    });
   };
 
   const CancelResubmit = () => {
@@ -657,6 +661,7 @@ export default function Home() {
                   }}
                   onClick={() => {
                     setOpen(true);
+                    setL1Resubmit(false);
                   }}
                 >
                   New Request
@@ -848,6 +853,7 @@ export default function Home() {
                         sx={{
                           "&:hover": { bgcolor: "#F8FAFC" },
                           transition: "background 0.1s",
+                          cursor: "pointer",
                         }}
                         onClick={() => {
                           setApproveModal(true);
@@ -861,7 +867,10 @@ export default function Home() {
                           } else if (row.Status_text == "L1 Rejected") {
                             setModalName("L1RejectFirstModal");
                             setPassRowData(row);
-                          } else if (row.Status_text == "Processing") {
+                          } else if (
+                            row.Status_text == "L2 Rejected" ||
+                            row.Status_text == "Processing"
+                          ) {
                             setModalName("L2RejectModal");
                             setPassRowData(row);
                           } else {
@@ -1043,25 +1052,26 @@ export default function Home() {
         <div>
           <Modal
             open={approveModal}
-            onClose={handleClose}
             aria-labelledby='modal-modal-title'
             aria-describedby='modal-modal-description'
           >
             <Box sx={style}>
-              <Grid
-                sx={{
-                  position: "absolute",
-                  top: 10,
-                  right: 10,
-                  cursor: "pointer",
-                }}
-              >
-                <CloseIcon
-                  onClick={() => {
-                    setApproveModal(false);
+              {!loading && (
+                <Grid
+                  sx={{
+                    position: "absolute",
+                    top: 10,
+                    right: 10,
+                    cursor: "pointer",
                   }}
-                />
-              </Grid>
+                >
+                  <CloseIcon
+                    onClick={() => {
+                      setApproveModal(false);
+                    }}
+                  />
+                </Grid>
+              )}
 
               {modalName == "ApproveModal" ? (
                 <ApproveMaterial
@@ -1077,7 +1087,12 @@ export default function Home() {
                   openCreateMateralRequestModal={openCreateMateralRequestModal}
                 />
               ) : modalName == "L2RejectModal" ? (
-                <L2RejectModal rowData={passRowData} />
+                <L2RejectModal
+                  rowData={passRowData}
+                  loadingTrue={loadingTrue}
+                  loadingFalse={loadingFalse}
+                  openCreateMateralRequestModal={openCreateMateralRequestModal}
+                />
               ) : (
                 ""
               )}

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Navbar from "../../Navbars/Navbar";
 import right_icon from "../../Images/Home/Right_icon.png";
 import { Grid, Modal } from "@mui/material";
@@ -40,6 +40,8 @@ import kpi_img4 from "../../Images/Home/MRM KPI 4.png";
 import MaterialRequest from "./Model/MaterialRequest";
 
 import CloseIcon from "@mui/icons-material/Close";
+import axios from "axios";
+import dayjs from "dayjs";
 
 const FONT = "Poppins, sans-serif";
 
@@ -94,58 +96,58 @@ const cardData = [
   },
 ];
 
-const dummyData = [
-  {
-    id: "MR-1023",
-    requestedby: "Vishnu",
-    numMaterials: 5,
-    requiredDate: "10 May 2026",
-    requestedOn: "28 April 2026",
-    handledBy: "Kannan",
-    level: null,
-    status: "Pending",
-  },
-  {
-    id: "MR-1028",
-    requestedby: "Vishnu",
-    numMaterials: 2,
-    requiredDate: "12 May 2026",
-    requestedOn: "4 April 2026",
-    handledBy: "Senthil",
-    level: "L2",
-    status: "Final Review",
-  },
-  {
-    id: "MR-1035",
-    requestedby: "Vishnu",
-    numMaterials: 5,
-    requiredDate: "10 May 2026",
-    requestedOn: "24 April 2026",
-    handledBy: "Kannan",
-    level: null,
-    status: "Approved",
-  },
-  {
-    id: "MR-1019",
-    requestedby: "Vishnu",
-    numMaterials: 4,
-    requiredDate: "5 May 2026",
-    requestedOn: "14 April 2026",
-    handledBy: "Kannan",
-    level: null,
-    status: "Approved",
-  },
-  {
-    id: "MR-1028",
-    requestedby: "Vishnu",
-    numMaterials: 3,
-    requiredDate: "20 May 2026",
-    requestedOn: "29 April 2026",
-    handledBy: "Senthil",
-    level: "L2",
-    status: "Rejected",
-  },
-];
+// const dummyData = [
+//   {
+//     id: "MR-1023",
+//     requestedby: "Vishnu",
+//     numMaterials: 5,
+//     requiredDate: "10 May 2026",
+//     requestedOn: "28 April 2026",
+//     handledBy: "Kannan",
+//     level: null,
+//     status: "Pending",
+//   },
+//   {
+//     id: "MR-1028",
+//     requestedby: "Vishnu",
+//     numMaterials: 2,
+//     requiredDate: "12 May 2026",
+//     requestedOn: "4 April 2026",
+//     handledBy: "Senthil",
+//     level: "L2",
+//     status: "Final Review",
+//   },
+//   {
+//     id: "MR-1035",
+//     requestedby: "Vishnu",
+//     numMaterials: 5,
+//     requiredDate: "10 May 2026",
+//     requestedOn: "24 April 2026",
+//     handledBy: "Kannan",
+//     level: null,
+//     status: "Approved",
+//   },
+//   {
+//     id: "MR-1019",
+//     requestedby: "Vishnu",
+//     numMaterials: 4,
+//     requiredDate: "5 May 2026",
+//     requestedOn: "14 April 2026",
+//     handledBy: "Kannan",
+//     level: null,
+//     status: "Approved",
+//   },
+//   {
+//     id: "MR-1028",
+//     requestedby: "Vishnu",
+//     numMaterials: 3,
+//     requiredDate: "20 May 2026",
+//     requestedOn: "29 April 2026",
+//     handledBy: "Senthil",
+//     level: "L2",
+//     status: "Rejected",
+//   },
+// ];
 
 const statusConfig = {
   Pending: {
@@ -153,7 +155,7 @@ const statusConfig = {
     bg: "#fffbeb",
     border: "#fde68a",
   },
-  "Final Review": {
+  Fulfilled: {
     color: "#6366f1",
     bg: "#eef2ff",
     border: "#c7d2fe",
@@ -163,7 +165,7 @@ const statusConfig = {
     bg: "#ecfdf5",
     border: "#a7f3d0",
   },
-  Rejected: {
+  "L2 Rejected": {
     color: "#f43f5e",
     bg: "#fff1f2",
     border: "#fecdd3",
@@ -175,7 +177,7 @@ const levelConfig = {
   L2: { color: "#8b5cf6", bg: "#f5f3ff" },
 };
 
-const ALL_STATUSES = ["Pending", "Final Review", "Approved", "Rejected"];
+const ALL_STATUSES = ["Fulfilled", "L2 Rejected"];
 
 function StatusChip({ status }) {
   const cfg = statusConfig[status] || {
@@ -191,15 +193,15 @@ function StatusChip({ status }) {
         justifyContent: "center",
         px: 1.5,
         py: 0.5,
-        borderRadius: "20px",
+        borderRadius: "15px",
         // border: `1px solid ${cfg.border}`,
         background: cfg.bg,
         color: cfg.color,
         fontWeight: 500,
-        fontSize: "0.8rem",
+        fontSize: "0.70rem",
         whiteSpace: "nowrap",
         fontFamily: FONT,
-        minWidth: 80,
+        width: "100px",
       }}
     >
       {status}
@@ -257,23 +259,13 @@ export default function History() {
 
   const handleFilterOpen = (e) => setFilterAnchor(e.currentTarget);
   const handleFilterClose = () => setFilterAnchor(null);
-
-  const [formData, setFormData] = React.useState({
-    requestId: "",
-    requiredDate: null,
-    requestedOn: "",
-    status: "",
-  });
+  const [rows, setRows] = useState([]);
+  const [selectedRow, setSelectedRow] = useState(null);
   const [selectedid, setSelectedid] = React.useState(null);
   //   const [reqDate, serReqDate] = React.useState(null);
 
   const handleRowClick = (row) => {
-    setFormData({
-      requestId: row.id,
-      requiredDate: row.requiredDate,
-      requestedOn: row.requestedOn,
-      status: row.status,
-    });
+    setSelectedRow(row);
     setOpen(true);
   };
 
@@ -284,15 +276,63 @@ export default function History() {
         : [...prev, status],
     );
   };
+  const fetchTabledata = async () => {
+    const payload = {
+      Id: sessionStorage.getItem("user_id"),
+      Role: sessionStorage.getItem("role"),
+    };
+    await axios
+      .post("http://10.10.0.101:8000/history/requests", payload)
+      .then((res) => {
+        console.log(res.data);
+        const updatedRows = res.data.data.map((item) => ({
+          ...item,
+          Status_text:
+            item.Status == "0"
+              ? "L1 Review"
+              : item.Status == "1"
+                ? "L2 Review"
+                : item.Status == "2"
+                  ? "L1 Rejected"
+                  : item.Status == "3"
+                    ? "L2 Rejected"
+                    : item.Status == "4"
+                      ? "L2 Approved"
+                      : item.Status == "5"
+                        ? "Processing"
+                        : item.Status == "6"
+                          ? "Fulfilled"
+                          : item.Cancelled == "7"
+                            ? "Cancelled"
+                            : item.Status,
+        }));
 
-  const filtered = dummyData.filter((row) => {
+        setRows(updatedRows);
+      })
+      .catch((err) => {
+        const errorMessage =
+          err.response?.data?.detail || err.detail || "Something went wrong";
+        sessionStorage.setItem("errormessge", errorMessage);
+      });
+  };
+  useEffect(() => {
+    fetchTabledata();
+  }, []);
+
+  const filtered = rows.filter((row) => {
+    const searchText = search.toLowerCase();
+
     const matchSearch =
       search === "" ||
-      row.id.toLowerCase().includes(search.toLowerCase()) ||
-      row.handledBy.toLowerCase().includes(search.toLowerCase()) ||
-      row.status.toLowerCase().includes(search.toLowerCase());
+      row.MaterialRequestId?.toLowerCase().includes(searchText) ||
+      row.Requester?.toLowerCase().includes(searchText) ||
+      row.HandledBy?.toLowerCase().includes(searchText) ||
+      row.Status_text?.toLowerCase().includes(searchText);
+
     const matchStatus =
-      selectedStatuses.length === 0 || selectedStatuses.includes(row.status);
+      selectedStatuses.length === 0 ||
+      selectedStatuses.includes(row.Status_text);
+
     return matchSearch && matchStatus;
   });
 
@@ -319,9 +359,9 @@ export default function History() {
                     >
                       {/* Image */}
                       <Box
-                        component="img"
+                        component='img'
                         src={item.image}
-                        alt=""
+                        alt=''
                         sx={{
                           position: "absolute",
                           inset: 0,
@@ -411,7 +451,7 @@ export default function History() {
           <Grid size={{ lg: 7, xs: 12, md: 12, sm: 12 }}>
             <img
               src={right_icon}
-              alt="icon"
+              alt='icon'
               style={{
                 width: "100%",
                 objectFit: "contain",
@@ -444,7 +484,7 @@ export default function History() {
             }}
           >
             <Typography
-              variant="h5"
+              variant='h5'
               sx={{
                 fontWeight: 700,
                 color: "#1a1a2e",
@@ -458,13 +498,13 @@ export default function History() {
             <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
               {/* Search */}
               <TextField
-                size="small"
-                placeholder="Search..."
+                size='small'
+                placeholder='Search...'
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 InputProps={{
                   startAdornment: (
-                    <InputAdornment position="start">
+                    <InputAdornment position='start'>
                       <SearchIcon sx={{ fontSize: 18, color: "#9ca3af" }} />
                     </InputAdornment>
                   ),
@@ -483,8 +523,8 @@ export default function History() {
 
               {/* Filter */}
               <Button
-                variant="outlined"
-                size="small"
+                variant='outlined'
+                size='small'
                 onClick={handleFilterOpen}
                 endIcon={<KeyboardArrowDownIcon />}
                 startIcon={<FilterListIcon />}
@@ -519,7 +559,7 @@ export default function History() {
                   <MenuItem key={s} onClick={() => toggleStatus(s)} dense>
                     <Checkbox
                       checked={selectedStatuses.includes(s)}
-                      size="small"
+                      size='small'
                       sx={{ p: 0.5 }}
                     />
                     <ListItemText
@@ -598,7 +638,7 @@ export default function History() {
                   <TableRow>
                     <TableCell
                       colSpan={6}
-                      align="center"
+                      align='center'
                       sx={{ py: 4, color: "#9ca3af" }}
                     >
                       No records found
@@ -617,7 +657,7 @@ export default function History() {
                     >
                       <TableCell
                         sx={{
-                          fontSize: "0.875rem",
+                          fontSize: "0.70rem",
                           fontWeight: 500,
                           color: "#111827",
                           borderBottom: "1px solid #f3f4f6",
@@ -633,8 +673,8 @@ export default function History() {
                             justifyContent: "space-between",
                           }}
                         >
-                          {row.id}
-                          <Box sx={{ display: "flex", gap: 1 }}>
+                          {row.MaterialRequestId}
+                          {/* <Box sx={{ display: "flex", gap: 1 }}>
                             {idx === 1 && (
                               <>
                                 {" "}
@@ -680,12 +720,12 @@ export default function History() {
                                 />
                               </>
                             )}
-                          </Box>
+                          </Box> */}
                         </Box>
                       </TableCell>
                       <TableCell
                         sx={{
-                          fontSize: "0.875rem",
+                          fontSize: "0.70rem",
                           color: "#374151",
                           borderBottom: "1px solid #f3f4f6",
                           textAlign: "center",
@@ -694,24 +734,24 @@ export default function History() {
                           py: 0,
                         }}
                       >
-                        {row.requestedby}
+                        {row.Requester}
                       </TableCell>
                       <TableCell
                         sx={{
-                          fontSize: "0.875rem",
+                          fontSize: "0.70rem",
                           color: "#374151",
                           borderBottom: "1px solid #f3f4f6",
-                          textAlign: "center",
+                          textAlign: "right",
                           pr: 6,
                           fontFamily: FONT,
                           py: 0,
                         }}
                       >
-                        {row.numMaterials}
+                        {row.NumberOfMaterials}
                       </TableCell>
                       <TableCell
                         sx={{
-                          fontSize: "0.875rem",
+                          fontSize: "0.70rem",
                           color: "#374151",
                           borderBottom: "1px solid #f3f4f6",
                           fontFamily: FONT,
@@ -719,11 +759,11 @@ export default function History() {
                           py: 0,
                         }}
                       >
-                        {row.requiredDate}
+                        {dayjs(row.RequiredDate).format("DD-MMM-YYYY")}
                       </TableCell>
                       <TableCell
                         sx={{
-                          fontSize: "0.875rem",
+                          fontSize: "0.70rem",
                           color: "#374151",
                           borderBottom: "1px solid #f3f4f6",
                           fontFamily: FONT,
@@ -731,11 +771,11 @@ export default function History() {
                           py: 0,
                         }}
                       >
-                        {row.requestedOn}
+                        {dayjs(row.RequestedOn).format("DD-MMM-YYYY")}
                       </TableCell>
                       <TableCell
                         sx={{
-                          fontSize: "0.875rem",
+                          fontSize: "0.70rem",
                           color: "#374151",
                           borderBottom: "1px solid #f3f4f6",
                           fontFamily: FONT,
@@ -746,17 +786,17 @@ export default function History() {
                         <Box
                           sx={{
                             display: "flex",
-                            alignItems: "center",
+                            alignItems: "left",
                           }}
                         >
-                          {row.handledBy}
+                          {row.HandledBy}
                           {row.level && <LevelBadge level={row.level} />}
                         </Box>
                       </TableCell>
                       <TableCell
                         sx={{ borderBottom: "1px solid #f3f4f6", py: 1 }}
                       >
-                        <StatusChip status={row.status} />
+                        <StatusChip status={row.Status_text} />
                       </TableCell>
                     </TableRow>
                   ))
@@ -770,8 +810,8 @@ export default function History() {
           <Modal
             open={open}
             onClose={handleClose}
-            aria-labelledby="modal-modal-title"
-            aria-describedby="modal-modal-description"
+            aria-labelledby='modal-modal-title'
+            aria-describedby='modal-modal-description'
           >
             <Box sx={{ ...style, outline: "none" }}>
               <Grid
@@ -789,7 +829,7 @@ export default function History() {
                 />
               </Grid>
               {/* <CreateMaterialRequest /> */}
-              <MaterialRequest mrDetails={formData} />
+              <MaterialRequest data={selectedRow} />
             </Box>
           </Modal>
         </div>
