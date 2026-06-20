@@ -231,7 +231,7 @@ function MaterialDetails({ data }) {
                       <Chip
                         label={
                           row.itemtag == 1
-                            ? "Crtical"
+                            ? "Critical"
                             : row.itemtag == 2
                               ? "New"
                               : row.itemtag
@@ -389,57 +389,6 @@ function ResubmissionNote({ data }) {
   );
 }
 
-// ── Review Notes + Action Footer ─────────────────────────────
-function ReviewFooter() {
-  const [note, setNote] = useState("");
-
-  return (
-    <Box
-      sx={{
-        bgcolor: colors.cardBg,
-        borderRadius: 2,
-        px: 2.5,
-        py: 2,
-      }}
-    >
-      {/* Review Notes input */}
-      <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-        <Typography
-          sx={{
-            fontFamily: POPPINS,
-            fontWeight: 600,
-            fontSize: "0.8rem",
-            color: colors.valueBlack,
-            whiteSpace: "nowrap",
-          }}
-        >
-          Review Notes
-          <Box component='span' sx={{ color: colors.approveBtn, ml: 0.25 }}>
-            (A)
-          </Box>
-        </Typography>
-        <TextField
-          fullWidth
-          size='small'
-          placeholder='Add optional approval comments'
-          value={note}
-          onChange={(e) => setNote(e.target.value)}
-          sx={{
-            "& .MuiInputBase-root": {
-              fontFamily: POPPINS,
-              fontSize: "0.72rem",
-              bgcolor: "#FAFAFA",
-            },
-            "& .MuiOutlinedInput-notchedOutline": {
-              borderColor: colors.border,
-            },
-          }}
-        />
-      </Box>
-    </Box>
-  );
-}
-
 // ── Main Component ────────────────────────────────────────────
 export default function ApproveMaterial(props) {
   const [data, setData] = useState(null);
@@ -450,6 +399,7 @@ export default function ApproveMaterial(props) {
     message: "",
   });
   const [loading, setLoading] = useState("");
+  const [note, setNote] = useState("");
 
   const navigate = useNavigate();
 
@@ -517,7 +467,7 @@ export default function ApproveMaterial(props) {
 
           HIQ_purcharse_Req_Id: "",
 
-          HIQ_commentL1: "",
+          HIQ_commentL1: note,
 
           HIQ_commentL2: "",
 
@@ -628,7 +578,7 @@ export default function ApproveMaterial(props) {
         open: true,
         type: "success",
         title: "Request Rejected",
-        message: "The request has been rejected successfully.",
+        message: response.data.data.DebugMessage,
       });
     } catch (error) {
       console.log(error);
@@ -672,13 +622,13 @@ export default function ApproveMaterial(props) {
 
           HIQ_purpose: data?.purpose,
 
-          HIQStatus: "2",
+          HIQ_Status: "2",
 
           HIQ_movement_Journal_Id: "",
 
           HIQ_purcharse_Req_Id: "",
 
-          HIQ_commentL1: "",
+          HIQ_commentL1: note,
 
           HIQ_commentL2: "",
 
@@ -817,7 +767,7 @@ export default function ApproveMaterial(props) {
                 )}
               </Grid>
 
-              {props?.rowData?.Resubmitted == true && (
+              {props.rowData?.Status_text === "L1 Review" && (
                 <Grid
                   sx={{
                     backgroundColor: "#F1F5F9",
@@ -825,7 +775,54 @@ export default function ApproveMaterial(props) {
                     borderRadius: 2,
                   }}
                 >
-                  <ReviewFooter />
+                  <Box
+                    sx={{
+                      bgcolor: colors.cardBg,
+                      borderRadius: 2,
+                      px: 2.5,
+                      py: 2,
+                    }}
+                  >
+                    {/* Review Notes input */}
+                    <Box
+                      sx={{ display: "flex", alignItems: "center", gap: 1.5 }}
+                    >
+                      <Typography
+                        sx={{
+                          fontFamily: POPPINS,
+                          fontWeight: 600,
+                          fontSize: "0.8rem",
+                          color: colors.valueBlack,
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        Review Notes
+                        <Box
+                          component='span'
+                          sx={{ color: colors.approveBtn, ml: 0.25 }}
+                        >
+                          (A)
+                        </Box>
+                      </Typography>
+                      <TextField
+                        fullWidth
+                        size='small'
+                        placeholder='Add optional approval comments'
+                        value={note}
+                        onChange={(e) => setNote(e.target.value)}
+                        sx={{
+                          "& .MuiInputBase-root": {
+                            fontFamily: POPPINS,
+                            fontSize: "0.72rem",
+                            bgcolor: "#FAFAFA",
+                          },
+                          "& .MuiOutlinedInput-notchedOutline": {
+                            borderColor: colors.border,
+                          },
+                        }}
+                      />
+                    </Box>
+                  </Box>
                 </Grid>
               )}
 

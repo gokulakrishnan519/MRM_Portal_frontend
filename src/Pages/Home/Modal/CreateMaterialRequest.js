@@ -274,7 +274,7 @@ export default function CreateMaterialRequest(props) {
     const payload = {
       _request: {
         MaterialRequirementManagementHeader: {
-          HIQ_RequestNo: "",
+          HIQ_RequestNo: value?.materialRequestId,
           HIQ_requester_id: "Hi-Q-000922",
           HIQ_requester_Name: "USR_SHIP",
           HIQ_L1ApproverName: "",
@@ -509,12 +509,13 @@ export default function CreateMaterialRequest(props) {
 
         newmaterialName: item.itemtag === 2 ? item.materialName : "",
         objectitem: item.itemtag === 2 ? "New" : "",
+        status: item.status,
       }));
 
       console.log(updateData);
 
       setRows(
-        props.l1ReSubmit?.level === "L2 Reject"
+        props.l1ReSubmit?.level == "L2 Reject"
           ? updateData.filter((item) => item.status === "Rejected")
           : updateData,
       );
@@ -524,6 +525,8 @@ export default function CreateMaterialRequest(props) {
       // navigate("/ErrorHandling");
     }
   };
+
+  console.log(props.l1ReSubmit);
 
   useEffect(() => {
     if (props.l1ReSubmit) {
@@ -625,7 +628,7 @@ export default function CreateMaterialRequest(props) {
                         letterSpacing: "-0.1px",
                       }}
                     >
-                      Privious Review Command
+                      Previous Review Command
                     </Typography>
                   </Box>
 
@@ -1807,6 +1810,7 @@ export default function CreateMaterialRequest(props) {
                   setModal({ ...modal, open: false });
                   setRows([emptyRow()]);
                   setPurpose("");
+                  setValue({});
                 }}
                 sx={{ fontFamily: "'Inter', 'Poppins', sans-serif" }}
               >

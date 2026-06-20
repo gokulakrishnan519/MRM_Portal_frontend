@@ -303,7 +303,7 @@ export default function L1RejectFirstModal({
               sx={{
                 border: "1px solid #E5E7EB",
                 borderRadius: 2,
-                overflow: "hidden",
+                // overflow: "hidden",
               }}
             >
               <Table size='small'>

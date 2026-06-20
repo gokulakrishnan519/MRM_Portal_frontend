@@ -41,7 +41,8 @@ const theme = createTheme({
         root: {
           fontFamily: "Poppins, sans-serif",
           fontSize: 13,
-          padding: "10px 14px",
+          // padding: "10px 14px",
+          whiteSpace: "nowrap",
         },
         head: {
           fontWeight: 600,
@@ -371,18 +372,18 @@ export default function L2RejectModal(props) {
                       sx={{
                         border: "1px solid #E5E7EB",
                         borderRadius: 2,
-                        overflow: "hidden",
+                        // overflow: "hidden",
                       }}
                     >
                       <Table size='small'>
                         <TableHead>
                           <TableRow>
-                            <TableCell>Material Name</TableCell>
+                            <TableCell sx>Material Name</TableCell>
                             <TableCell>Material Category</TableCell>
                             <TableCell>UOM</TableCell>
                             <TableCell>Available Stock</TableCell>
                             <TableCell>Quantity</TableCell>
-                            <TableCell>Status</TableCell>
+                            <TableCell align='center'>Status</TableCell>
                             <TableCell>Reference No.</TableCell>
                             <TableCell>Review Notes</TableCell>
                           </TableRow>
@@ -471,7 +472,11 @@ export default function L2RejectModal(props) {
                               </TableCell>
 
                               <TableCell
-                                sx={{ color: "#374151", maxWidth: 250 }}
+                                sx={{
+                                  color: "#374151",
+                                  // maxWidth: 250,
+                                  whiteSpace: "nowrap",
+                                }}
                               >
                                 {item.reviewNotes || "-"}
                               </TableCell>

@@ -50,57 +50,6 @@ import loop from "../../Images/History/loop_icon.png";
 import dayjs from "dayjs";
 const FONT = "Poppins, sans-serif";
 
-const cardData = [
-  {
-    count: "03",
-    title: "Pending Requests",
-    subtitle: "Awaiting approval",
-    color: "#6C63FF",
-    bg: "#F5F3FF",
-    image: kpi_img1,
-    imagePosition: {
-      bottom: 0,
-      left: 0,
-    },
-  },
-  {
-    count: "02",
-    title: "Awaiting Final Approval",
-    subtitle: "Pending higher-level approval",
-    color: "#5B7CFA",
-    bg: "#EEF4FF",
-    image: kpi_img2,
-    imagePosition: {
-      bottom: 0,
-      right: 0,
-    },
-  },
-  {
-    count: "12",
-    title: "Rejected Requests",
-    subtitle: "I need your action",
-    color: "#FF9800",
-    bg: "#FFF7EC",
-    image: kpi_img3,
-    imagePosition: {
-      bottom: 0,
-      left: 0,
-    },
-  },
-  {
-    count: "04",
-    title: "Approved Requests",
-    subtitle: "Approved and moved to next stage",
-    color: "#18C5C8",
-    bg: "#ECFCFC",
-    image: kpi_img4,
-    imagePosition: {
-      bottom: 0,
-      right: 0,
-    },
-  },
-];
-
 const style = {
   position: "absolute",
   top: "50%",
@@ -306,6 +255,7 @@ export default function Home() {
   const [passRowData, setPassRowData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [l1ReSubmit, setL1Resubmit] = useState(null);
+  const [kpiData, setKpiData] = useState(null);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -365,6 +315,77 @@ export default function Home() {
         console.log(err);
       });
   };
+
+  const KpiData = async () => {
+    const payload = {
+      Id: sessionStorage.getItem("user_id"),
+      Role: sessionStorage.getItem("role"),
+    };
+    await axios
+      .post("http://10.10.0.101:8000/kpis/home", payload)
+      .then((res) => {
+        console.log(res.data);
+        setKpiData(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  useEffect(() => {
+    KpiData();
+  }, []);
+
+  const cardData = [
+    {
+      count: kpiData?.data?.pending_requests,
+      title: "Pending Requests",
+      subtitle: "Awaiting approval",
+      color: "#6C63FF",
+      bg: "#F5F3FF",
+      image: kpi_img1,
+      imagePosition: {
+        bottom: 0,
+        left: 0,
+      },
+    },
+    {
+      count: kpiData?.data?.pending_requests,
+      title: "Awaiting Final Approval",
+      subtitle: "Pending higher-level approval",
+      color: "#5B7CFA",
+      bg: "#EEF4FF",
+      image: kpi_img2,
+      imagePosition: {
+        bottom: 0,
+        right: 0,
+      },
+    },
+    {
+      count: "12",
+      count: kpiData?.data?.rejected_requests,
+      subtitle: "I need your action",
+      color: "#FF9800",
+      bg: "#FFF7EC",
+      image: kpi_img3,
+      imagePosition: {
+        bottom: 0,
+        left: 0,
+      },
+    },
+    {
+      count: kpiData?.data?.approved_requests,
+      title: "Approved Requests",
+      subtitle: "Approved and moved to next stage",
+      color: "#18C5C8",
+      bg: "#ECFCFC",
+      image: kpi_img4,
+      imagePosition: {
+        bottom: 0,
+        right: 0,
+      },
+    },
+  ];
 
   const filteredRows = rows.filter((row) => {
     // Existing tab filtering
