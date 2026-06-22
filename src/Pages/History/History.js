@@ -48,57 +48,6 @@ import dayjs from "dayjs";
 
 const FONT = "Poppins, sans-serif";
 
-const cardData = [
-  {
-    count: "03",
-    title: "Pending Requests",
-    subtitle: "Awaiting approval",
-    color: "#6C63FF",
-    bg: "#F5F3FF",
-    image: kpi_img1,
-    imagePosition: {
-      bottom: 0,
-      left: 0,
-    },
-  },
-  {
-    count: "02",
-    title: "Awaiting Final Approval",
-    subtitle: "Pending higher-level approval",
-    color: "#5B7CFA",
-    bg: "#EEF4FF",
-    image: kpi_img2,
-    imagePosition: {
-      bottom: 0,
-      right: 0,
-    },
-  },
-  {
-    count: "12",
-    title: "Rejected Requests",
-    subtitle: "I need your action",
-    color: "#FF9800",
-    bg: "#FFF7EC",
-    image: kpi_img3,
-    imagePosition: {
-      bottom: 0,
-      left: 0,
-    },
-  },
-  {
-    count: "04",
-    title: "Approved Requests",
-    subtitle: "Approved and moved to next stage",
-    color: "#18C5C8",
-    bg: "#ECFCFC",
-    image: kpi_img4,
-    imagePosition: {
-      bottom: 0,
-      right: 0,
-    },
-  },
-];
-
 // const dummyData = [
 //   {
 //     id: "MR-1023",
@@ -324,11 +273,81 @@ export default function History() {
   const [selectedRow, setSelectedRow] = useState(null);
   const [selectedid, setSelectedid] = React.useState(null);
   //   const [reqDate, serReqDate] = React.useState(null);
-
+  const [kpiData, setKpiData] = useState(null);
   const handleRowClick = (row) => {
     setSelectedRow(row);
     setOpen(true);
   };
+  const KpiData = async () => {
+    const payload = {
+      Id: sessionStorage.getItem("user_id"),
+      Role: sessionStorage.getItem("role"),
+    };
+    await axios
+      .post("http://10.10.0.101:8000/kpis/history", payload)
+      .then((res) => {
+        console.log(res.data);
+        setKpiData(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  useEffect(() => {
+    KpiData();
+  }, []);
+
+  const cardData = [
+    {
+      count: kpiData?.data?.pendingRequests,
+      title: "Pending Requests",
+      subtitle: "Awaiting approval",
+      color: "#6C63FF",
+      bg: "#F5F3FF",
+      image: kpi_img1,
+      imagePosition: {
+        bottom: 0,
+        left: 0,
+      },
+    },
+    {
+      count: kpiData?.data?.awaitingFinalApproval,
+      title: "Awaiting Final Approval",
+      subtitle: "Pending higher-level approval",
+      color: "#5B7CFA",
+      bg: "#EEF4FF",
+      image: kpi_img2,
+      imagePosition: {
+        bottom: 0,
+        right: 0,
+      },
+    },
+    {
+      count: kpiData?.data?.rejectedRequests,
+      title: "Rejected Requests",
+      subtitle: "I need your action",
+      color: "#FF9800",
+      bg: "#FFF7EC",
+      image: kpi_img3,
+      imagePosition: {
+        bottom: 0,
+        left: 0,
+      },
+    },
+    {
+      count: kpiData?.data?.approvedRequests,
+      title: "Approved Requests",
+      subtitle: "Approved and moved to next stage",
+      color: "#18C5C8",
+      bg: "#ECFCFC",
+      image: kpi_img4,
+      imagePosition: {
+        bottom: 0,
+        right: 0,
+      },
+    },
+  ];
 
   const toggleStatus = (status) => {
     setSelectedStatuses((prev) =>
@@ -338,11 +357,12 @@ export default function History() {
     );
   };
   const fetchTabledata = async () => {
+    setLoading(true);
     const payload = {
       Id: sessionStorage.getItem("user_id"),
       Role: sessionStorage.getItem("role"),
     };
-    setLoading(true);
+
     await axios
       .post("http://10.10.0.101:8000/history/requests", payload)
       .then((res) => {
@@ -368,7 +388,7 @@ export default function History() {
                             ? "Cancelled"
                             : item.Status,
         }));
-
+        setLoading(false);
         setRows(updatedRows);
       })
       .catch((err) => {
@@ -710,7 +730,7 @@ export default function History() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {filtered.length === 0 ? (
+                {loading ? (
                   <TableRow>
                     <TableCell colSpan={100} align='center'>
                       <Box
@@ -721,8 +741,22 @@ export default function History() {
                           alignItems: "center",
                         }}
                       >
-                        <CircularProgress aria-label='Loading…' />
+                        <CircularProgress aria-label='Loading...' />
                       </Box>
+                    </TableCell>
+                  </TableRow>
+                ) : filtered.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={100} align='center'>
+                      <Typography
+                        sx={{
+                          fontFamily: "Poppins",
+                          fontSize: "12px",
+                          color: "gray",
+                        }}
+                      >
+                        No Data Found
+                      </Typography>
                     </TableCell>
                   </TableRow>
                 ) : (

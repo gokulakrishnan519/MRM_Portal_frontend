@@ -22,6 +22,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import axios from "axios";
 import dayjs from "dayjs";
 import { useNavigate } from "react-router-dom";
+import Timeline from "../../TimeLine";
 
 // ── Theme ────────────────────────────────────────────────────────────────────
 const theme = createTheme({
@@ -527,6 +528,8 @@ export default function L1RejectFirstModal({
             (R)
           </Typography>
         </Stack>
+
+        <Timeline id={rowData.MaterialRequestId} />
       </Box>
     </ThemeProvider>
   );

@@ -30,7 +30,7 @@ import InsertDriveFileOutlinedIcon from "@mui/icons-material/InsertDriveFileOutl
 import CheckIcon from "@mui/icons-material/Check";
 import right_icon from "../../Images/Home/Right_icon.png";
 
-import ContentCopyOutlinedIcon from "@mui/icons-material/ContentCopyOutlined";
+import ClearIcon from "@mui/icons-material/Clear";
 
 import kpi_img1 from "../../Images/Home/MRM KPI 1.png";
 import kpi_img2 from "../../Images/Home/MRM KPI 2.png";
@@ -48,6 +48,7 @@ import axios from "axios";
 import warning from "../../Images/Home/warning_icon.png";
 import loop from "../../Images/History/loop_icon.png";
 import dayjs from "dayjs";
+import Loading from "../../Loading/Loading";
 const FONT = "Poppins, sans-serif";
 
 const style = {
@@ -68,7 +69,7 @@ const style = {
 };
 
 const statusConfig = {
-  Submitted: {
+  "L2 Under Review": {
     bg: "#EFF6FF",
     color: "#2563EB",
     border: "#BFDBFE",
@@ -153,70 +154,6 @@ function BadgeIcon({ type }) {
 function StatusCell({ status, approved, rejected }) {
   const cfg = statusConfig[status] || statusConfig["L1 Review"];
 
-  if (status === "L2 Mixed") {
-    return (
-      <Stack
-        direction='row'
-        spacing={0.5}
-        alignItems='center'
-        justifyContaent='flex-end'
-      >
-        <Chip
-          label='L2'
-          size='small'
-          sx={{
-            height: 24,
-            fontSize: "0.7rem",
-            fontWeight: 500,
-            fontFamily: "Poppins, sans-serif",
-            bgcolor: cfg.bg,
-            color: cfg.color,
-            borderRadius: "15px",
-            "& .MuiChip-label": { px: 1 },
-          }}
-        />
-        <Chip
-          icon={
-            <CheckIcon
-              sx={{ fontSize: "11px !important", color: "#059669 !important" }}
-            />
-          }
-          label={approved}
-          size='small'
-          sx={{
-            height: 24,
-            fontSize: "0.7rem",
-            fontWeight: 500,
-            fontFamily: "Poppins, sans-serif",
-            bgcolor: "#D1FAE5",
-            color: "#059669",
-            borderRadius: "15px",
-            "& .MuiChip-label": { px: 0.5 },
-          }}
-        />
-        <Chip
-          icon={
-            <CloseIcon
-              sx={{ fontSize: "11px !important", color: "#DC2626 !important" }}
-            />
-          }
-          label={rejected}
-          size='small'
-          sx={{
-            height: 24,
-            fontSize: "0.7rem",
-            fontWeight: 500,
-            fontFamily: "Poppins, sans-serif",
-            bgcolor: "#FEE2E2",
-            color: "#DC2626",
-            borderRadius: "15px",
-            "& .MuiChip-label": { px: 0.5 },
-          }}
-        />
-      </Stack>
-    );
-  }
-
   return (
     <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
       <Chip
@@ -231,7 +168,7 @@ function StatusCell({ status, approved, rejected }) {
           color: cfg.color,
           // border: `1px solid ${cfg.border}`,
           borderRadius: "15px",
-          width: "100px",
+          width: "120px",
           "& .MuiChip-label": { px: 1.5 },
         }}
       />
@@ -267,17 +204,40 @@ export default function Home() {
   };
 
   const navigate = useNavigate();
-  const handleClose = () => setOpen(false);
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const KpiData = async () => {
+    setLoading(true);
+    const payload = {
+      Id: sessionStorage.getItem("user_id"),
+      Role: sessionStorage.getItem("role"),
+    };
+    await axios
+      .post("http://10.10.0.101:8000/kpis/home", payload)
+      .then((res) => {
+        console.log(res.data);
+        setKpiData(res.data);
+        fetchTabledata();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
   const fetchTabledata = async () => {
     const payload = {
       Id: sessionStorage.getItem("user_id"),
       Role: sessionStorage.getItem("role"),
     };
+
     await axios
       .post("http://10.10.0.101:8000/home", payload)
       .then((res) => {
         console.log(res.data);
+
         const updatedRows = res.data.data.map((item) => ({
           ...item,
           Status_text:
@@ -298,11 +258,12 @@ export default function Home() {
                           : item.Status == "7"
                             ? "Cancelled"
                             : item.Status == "8"
-                              ? "Submitted"
+                              ? "L2 Under Review"
                               : item.Status,
         }));
 
         setRows(updatedRows);
+
         setTabs([
           { label: "All", count: res.data.counts.total },
           { label: "Critical", count: res.data.counts.critical },
@@ -313,22 +274,10 @@ export default function Home() {
       })
       .catch((err) => {
         console.log(err);
-      });
-  };
-
-  const KpiData = async () => {
-    const payload = {
-      Id: sessionStorage.getItem("user_id"),
-      Role: sessionStorage.getItem("role"),
-    };
-    await axios
-      .post("http://10.10.0.101:8000/kpis/home", payload)
-      .then((res) => {
-        console.log(res.data);
-        setKpiData(res.data);
       })
-      .catch((err) => {
-        console.log(err);
+      .finally(() => {
+        // Runs whether API succeeds or fails
+        setLoading(false);
       });
   };
 
@@ -338,7 +287,7 @@ export default function Home() {
 
   const cardData = [
     {
-      count: kpiData?.data?.pending_requests,
+      count: kpiData?.data?.pendingRequests,
       title: "Pending Requests",
       subtitle: "Awaiting approval",
       color: "#6C63FF",
@@ -350,7 +299,7 @@ export default function Home() {
       },
     },
     {
-      count: kpiData?.data?.pending_requests,
+      count: kpiData?.data?.awaitingFinalApproval,
       title: "Awaiting Final Approval",
       subtitle: "Pending higher-level approval",
       color: "#5B7CFA",
@@ -362,9 +311,9 @@ export default function Home() {
       },
     },
     {
-      count: "12",
-      count: kpiData?.data?.rejected_requests,
-      subtitle: "I need your action",
+      count: kpiData?.data?.returnedByL1,
+      title: "Returned by L1",
+      subtitle: "Returned after initial review",
       color: "#FF9800",
       bg: "#FFF7EC",
       image: kpi_img3,
@@ -374,9 +323,9 @@ export default function Home() {
       },
     },
     {
-      count: kpiData?.data?.approved_requests,
-      title: "Approved Requests",
-      subtitle: "Approved and moved to next stage",
+      count: kpiData?.data?.returnedByL2,
+      title: "Returned by L2",
+      subtitle: "Returned after final review",
       color: "#18C5C8",
       bg: "#ECFCFC",
       image: kpi_img4,
@@ -388,7 +337,6 @@ export default function Home() {
   ];
 
   const filteredRows = rows.filter((row) => {
-    // Existing tab filtering
     let tabMatch = true;
 
     switch (activeTab) {
@@ -402,29 +350,23 @@ export default function Home() {
         tabMatch = row.CriticalStatus?.includes("Normal");
         break;
       case 4:
-        tabMatch = row.Resubmitted == true;
+        tabMatch = row.Resubmitted === true;
         break;
       default:
         tabMatch = true;
     }
 
-    // Search filter
     const searchMatch =
       !searchText ||
-      row.MaterialRequestId?.toLowerCase().includes(searchText.toLowerCase()) ||
-      row.Requester?.toLowerCase().includes(searchText.toLowerCase()) ||
-      row.HandledBy?.toLowerCase().includes(searchText.toLowerCase());
+      Object.values(row).some((value) =>
+        String(value).toLowerCase().includes(searchText.toLowerCase()),
+      );
 
-    // Status filter
     const statusMatch =
       statusFilter === "All" || row.Status_text === statusFilter;
 
     return tabMatch && searchMatch && statusMatch;
   });
-
-  useEffect(() => {
-    fetchTabledata();
-  }, []);
 
   const loadingTrue = () => {
     setLoading(true);
@@ -451,596 +393,616 @@ export default function Home() {
 
   return (
     <div>
-      <Navbar>
-        <Grid
-          container
-          sx={{ display: "flex", justifyContent: "center" }}
-          spacing={3}
-        >
-          <Grid size={{ lg: 5, xs: 12, md: 12, sm: 12 }}>
-            <Paper sx={{ padding: 2 }} elevation={0}>
-              <Grid container spacing={2}>
-                {cardData.map((item, index) => (
-                  <Grid size={{ lg: 6, xs: 12, md: 12, sm: 12 }} key={index}>
-                    {/* Full Image */}
-                    <Box
-                      sx={{
-                        position: "relative",
-                        width: 200,
-                        height: 150,
-                      }}
-                    >
-                      {/* Image */}
-                      <Box
-                        component='img'
-                        src={item.image}
-                        alt=''
-                        sx={{
-                          position: "absolute",
-                          inset: 0,
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "contain",
-                          pointerEvents: "none",
-                        }}
-                      />
-
-                      {/* Content inside image */}
+      {loading ? (
+        <Loading />
+      ) : (
+        <Navbar>
+          <Grid
+            container
+            sx={{ display: "flex", justifyContent: "center" }}
+            spacing={3}
+          >
+            <Grid size={{ lg: 5, xs: 12, md: 12, sm: 12 }}>
+              <Paper sx={{ padding: 2 }} elevation={0}>
+                <Grid container spacing={2}>
+                  {cardData.map((item, index) => (
+                    <Grid size={{ lg: 6, xs: 12, md: 12, sm: 12 }} key={index}>
+                      {/* Full Image */}
                       <Box
                         sx={{
                           position: "relative",
-                          zIndex: 2,
-                          width: "100%",
-                          height: "100%",
-                          px: 3,
-                          boxSizing: "border-box",
+                          width: 200,
+                          height: 150,
                         }}
                       >
-                        {/* Count - Top 5 */}
-                        <Typography
+                        {/* Image */}
+                        <Box
+                          component='img'
+                          src={item.image}
+                          alt=''
                           sx={{
                             position: "absolute",
-                            top: 15,
-                            left: 14,
-                            fontSize: "28px",
-                            fontWeight: 700,
-                            color: item.color,
-                            fontFamily: "Poppins, sans-serif",
+                            inset: 0,
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "contain",
+                            pointerEvents: "none",
                           }}
-                        >
-                          {item.count}
-                        </Typography>
+                        />
 
-                        {/* Title - Center */}
+                        {/* Content inside image */}
                         <Box
                           sx={{
-                            position: "absolute",
-                            top: "50%",
-                            left: "43%",
-                            transform: "translate(-50%, -50%)",
-                            width: "70%",
-                            display: "flex",
-                            justifyContent: "left",
+                            position: "relative",
+                            zIndex: 2,
+                            width: "100%",
+                            height: "100%",
+                            px: 3,
+                            boxSizing: "border-box",
                           }}
                         >
+                          {/* Count - Top 5 */}
                           <Typography
                             sx={{
-                              fontSize: "14px",
-                              fontWeight: 500,
-                              color: "#222",
-                              textAlign: "left",
+                              position: "absolute",
+                              top: 15,
+                              left: 14,
+                              fontSize: "28px",
+                              fontWeight: 700,
+                              color: item.color,
                               fontFamily: "Poppins, sans-serif",
                             }}
                           >
-                            {item.title}
+                            {item.count}
+                          </Typography>
+
+                          {/* Title - Center */}
+                          <Box
+                            sx={{
+                              position: "absolute",
+                              top: "50%",
+                              left: "43%",
+                              transform: "translate(-50%, -50%)",
+                              width: "70%",
+                              display: "flex",
+                              justifyContent: "left",
+                            }}
+                          >
+                            <Typography
+                              sx={{
+                                fontSize: "14px",
+                                fontWeight: 500,
+                                color: "#222",
+                                textAlign: "left",
+                                fontFamily: "Poppins, sans-serif",
+                              }}
+                            >
+                              {item.title}
+                            </Typography>
+                          </Box>
+
+                          {/* Subtitle - Bottom 5 */}
+                          <Typography
+                            sx={{
+                              position: "absolute",
+                              bottom: 18,
+                              left: "48%",
+                              transform: "translateX(-50%)",
+                              width: "80%",
+                              fontSize: "11px",
+                              color: "#555",
+                              fontStyle: "italic",
+                              textAlign: "left",
+                              fontFamily: "Poppins, sans-serif",
+                              lineHeight: 1.2,
+                            }}
+                          >
+                            {item.subtitle}
                           </Typography>
                         </Box>
+                      </Box>
+                    </Grid>
+                  ))}
+                </Grid>
+              </Paper>
+            </Grid>
+            <Grid size={{ lg: 7, xs: 12, md: 12, sm: 12 }}>
+              <img
+                src={right_icon}
+                alt='icon'
+                style={{
+                  width: "100%",
+                  objectFit: "contain",
+                }}
+              />
+            </Grid>
+          </Grid>
 
-                        {/* Subtitle - Bottom 5 */}
-                        <Typography
-                          sx={{
-                            position: "absolute",
-                            bottom: 18,
-                            left: "48%",
-                            transform: "translateX(-50%)",
-                            width: "80%",
-                            fontSize: "11px",
-                            color: "#555",
-                            fontStyle: "italic",
-                            textAlign: "left",
-                            fontFamily: "Poppins, sans-serif",
-                            lineHeight: 1.2,
-                          }}
-                        >
-                          {item.subtitle}
-                        </Typography>
+          <Box>
+            <Grid
+              sx={{
+                mt: 2,
+                background: "#fff",
+                // borderRadius: "16px",
+                // border: "1px solid #E2E8F0",
+                overflow: "hidden",
+              }}
+            >
+              {/* Header */}
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  px: 3,
+                  py: 2.5,
+                  gap: 2,
+                  flexWrap: "wrap",
+                }}
+              >
+                <Typography
+                  variant='h6'
+                  fontWeight={700}
+                  color='#0F172A'
+                  sx={{ fontSize: "1.1rem", fontFamily: "Poppins, sans-serif" }}
+                >
+                  Request Center
+                </Typography>
+
+                {/* Tabs */}
+                <Stack direction='row' spacing={1} flexWrap='wrap'>
+                  {tabs.map((tab, i) => (
+                    <Box
+                      key={i}
+                      onClick={() => setActiveTab(i)}
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 0.75,
+                        px: 1.5,
+                        py: 0.75,
+                        borderRadius: "8px",
+                        cursor: "pointer",
+                        bgcolor: activeTab === i ? "#DBEAFE" : "transparent",
+                        border:
+                          activeTab === i
+                            ? "1px solid #BFDBFE"
+                            : "1px solid transparent",
+                        transition: "all 0.15s",
+                        "&:hover": { bgcolor: "#F0F9FF" },
+                      }}
+                    >
+                      <Box
+                        sx={{ color: activeTab === i ? "#2563EB" : "#94A3B8" }}
+                      >
+                        {tab.icon}
+                      </Box>
+                      <Typography
+                        variant='body2'
+                        fontWeight={activeTab === i ? 700 : 500}
+                        color={activeTab === i ? "#2563EB" : "#64748B"}
+                        sx={{
+                          fontSize: "0.70rem",
+                          fontFamily: "Poppins, sans-serif",
+                        }}
+                      >
+                        {tab.label}
+                      </Typography>
+                      <Box
+                        sx={{
+                          bgcolor: activeTab === i ? "#2563EB" : "#E2E8F0",
+                          color: activeTab === i ? "#fff" : "#64748B",
+                          borderRadius: "4px",
+                          px: 0.6,
+                          py: 0.1,
+                          fontSize: "0.7rem",
+                          fontWeight: 700,
+                          fontFamily: "Poppins, sans-serif",
+                          minWidth: 20,
+                          textAlign: "center",
+                        }}
+                      >
+                        {tab.count}
                       </Box>
                     </Box>
-                  </Grid>
-                ))}
-              </Grid>
-            </Paper>
-          </Grid>
-          <Grid size={{ lg: 7, xs: 12, md: 12, sm: 12 }}>
-            <img
-              src={right_icon}
-              alt='icon'
-              style={{
-                width: "100%",
-                objectFit: "contain",
-              }}
-            />
-          </Grid>
-        </Grid>
+                  ))}
+                </Stack>
 
-        <Box>
-          <Grid
-            sx={{
-              mt: 2,
-              background: "#fff",
-              // borderRadius: "16px",
-              // border: "1px solid #E2E8F0",
-              overflow: "hidden",
-            }}
-          >
-            {/* Header */}
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                px: 3,
-                py: 2.5,
-                gap: 2,
-                flexWrap: "wrap",
-              }}
-            >
-              <Typography
-                variant='h6'
-                fontWeight={700}
-                color='#0F172A'
-                sx={{ fontSize: "1.1rem", fontFamily: "Poppins, sans-serif" }}
-              >
-                Request Center
-              </Typography>
-
-              {/* Tabs */}
-              <Stack direction='row' spacing={1} flexWrap='wrap'>
-                {tabs.map((tab, i) => (
-                  <Box
-                    key={i}
-                    onClick={() => setActiveTab(i)}
+                {/* Actions */}
+                <Stack direction='row' spacing={1} alignItems='center'>
+                  {showSearch && (
+                    <Box sx={{ p: 1 }}>
+                      <TextField
+                        size='small'
+                        placeholder='Search...'
+                        value={searchText}
+                        onChange={(e) => {
+                          setSearchText(e.target.value);
+                          setPage(0);
+                        }}
+                        sx={{
+                          width: "140px",
+                          "& .MuiOutlinedInput-root": {
+                            height: "28px",
+                            borderRadius: "6px",
+                            fontSize: "0.7rem",
+                          },
+                          "& .MuiOutlinedInput-input": {
+                            padding: "4px 8px",
+                          },
+                        }}
+                      />
+                    </Box>
+                  )}
+                  <IconButton
+                    size='small'
+                    onClick={() => setShowSearch(!showSearch)}
                     sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 0.75,
-                      px: 1.5,
-                      py: 0.75,
+                      border: "1px solid #E2E8F0",
                       borderRadius: "8px",
-                      cursor: "pointer",
-                      bgcolor: activeTab === i ? "#DBEAFE" : "transparent",
-                      border:
-                        activeTab === i
-                          ? "1px solid #BFDBFE"
-                          : "1px solid transparent",
-                      transition: "all 0.15s",
-                      "&:hover": { bgcolor: "#F0F9FF" },
+                      p: 0.75,
                     }}
                   >
-                    <Box
-                      sx={{ color: activeTab === i ? "#2563EB" : "#94A3B8" }}
-                    >
-                      {tab.icon}
-                    </Box>
-                    <Typography
-                      variant='body2'
-                      fontWeight={activeTab === i ? 700 : 500}
-                      color={activeTab === i ? "#2563EB" : "#64748B"}
-                      sx={{
-                        fontSize: "0.70rem",
-                        fontFamily: "Poppins, sans-serif",
-                      }}
-                    >
-                      {tab.label}
-                    </Typography>
-                    <Box
-                      sx={{
-                        bgcolor: activeTab === i ? "#2563EB" : "#E2E8F0",
-                        color: activeTab === i ? "#fff" : "#64748B",
-                        borderRadius: "4px",
-                        px: 0.6,
-                        py: 0.1,
-                        fontSize: "0.7rem",
-                        fontWeight: 700,
-                        fontFamily: "Poppins, sans-serif",
-                        minWidth: 20,
-                        textAlign: "center",
-                      }}
-                    >
-                      {tab.count}
-                    </Box>
-                  </Box>
-                ))}
-              </Stack>
-
-              {/* Actions */}
-              <Stack direction='row' spacing={1} alignItems='center'>
-                {showSearch && (
-                  <Box sx={{ p: 1 }}>
-                    <TextField
-                      size='small'
-                      placeholder='Search...'
-                      value={searchText}
-                      onChange={(e) => setSearchText(e.target.value)}
-                      sx={{
-                        width: "140px",
-                        "& .MuiOutlinedInput-root": {
-                          height: "28px",
-                          borderRadius: "6px",
-                          fontSize: "0.7rem",
-                        },
-                        "& .MuiOutlinedInput-input": {
-                          padding: "4px 8px",
-                        },
-                      }}
-                    />
-                  </Box>
-                )}
-                <IconButton
-                  size='small'
-                  onClick={() => setShowSearch(!showSearch)}
-                  sx={{
-                    border: "1px solid #E2E8F0",
+                    <SearchIcon sx={{ fontSize: 18, color: "#64748B" }} />
+                  </IconButton>
+                  <IconButton
+                    size='small'
+                    onClick={(e) => setAnchorEl(e.currentTarget)}
+                    sx={{
+                      border: "1px solid #E2E8F0",
+                      borderRadius: "8px",
+                      p: 0.75,
+                    }}
+                  >
+                    <FilterListIcon sx={{ fontSize: 18, color: "#64748B" }} />
+                  </IconButton>
+                  <Button
+                    variant='contained'
+                    startIcon={<AddIcon />}
+                    size='small'
+                    sx={{
+                      bgcolor: "#2563EB",
+                      borderRadius: "8px",
+                      textTransform: "none",
+                      fontWeight: 600,
+                      fontSize: "0.70rem",
+                      fontFamily: "Poppins, sans-serif",
+                      px: 2,
+                      py: 0.875,
+                      boxShadow: "none",
+                      "&:hover": { bgcolor: "#1D4ED8", boxShadow: "none" },
+                    }}
+                    onClick={() => {
+                      setOpen(true);
+                      setL1Resubmit(false);
+                    }}
+                  >
+                    New Request
+                  </Button>
+                </Stack>
+              </Box>
+              <Menu
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={() => setAnchorEl(null)}
+                PaperProps={{
+                  sx: {
+                    minWidth: 160,
                     borderRadius: "8px",
-                    p: 0.75,
-                  }}
-                >
-                  <SearchIcon sx={{ fontSize: 18, color: "#64748B" }} />
-                </IconButton>
-                <IconButton
-                  size='small'
-                  onClick={(e) => setAnchorEl(e.currentTarget)}
-                  sx={{
-                    border: "1px solid #E2E8F0",
-                    borderRadius: "8px",
-                    p: 0.75,
-                  }}
-                >
-                  <FilterListIcon sx={{ fontSize: 18, color: "#64748B" }} />
-                </IconButton>
-                <Button
-                  variant='contained'
-                  startIcon={<AddIcon />}
-                  size='small'
-                  sx={{
-                    bgcolor: "#2563EB",
-                    borderRadius: "8px",
-                    textTransform: "none",
-                    fontWeight: 600,
-                    fontSize: "0.70rem",
-                    fontFamily: "Poppins, sans-serif",
-                    px: 2,
-                    py: 0.875,
-                    boxShadow: "none",
-                    "&:hover": { bgcolor: "#1D4ED8", boxShadow: "none" },
-                  }}
+                    boxShadow: "0px 4px 12px rgba(0,0,0,0.08)",
+                    "& .MuiMenuItem-root": {
+                      minHeight: "30px",
+                      fontSize: "0.75rem",
+                      fontFamily: "Poppins, sans-serif",
+                      py: 0.5,
+                      px: 1.5,
+                    },
+                  },
+                }}
+              >
+                <MenuItem
                   onClick={() => {
-                    setOpen(true);
-                    setL1Resubmit(false);
+                    setStatusFilter("All");
+                    setAnchorEl(null);
                   }}
                 >
-                  New Request
-                </Button>
-              </Stack>
-            </Box>
-            <Menu
-              anchorEl={anchorEl}
-              open={Boolean(anchorEl)}
-              onClose={() => setAnchorEl(null)}
-              PaperProps={{
-                sx: {
-                  minWidth: 140,
-                  borderRadius: "8px",
-                  boxShadow: "0px 4px 12px rgba(0,0,0,0.08)",
-                  "& .MuiMenuItem-root": {
-                    minHeight: "30px",
-                    fontSize: "0.75rem",
-                    fontFamily: "Poppins, sans-serif",
-                    py: 0.5,
-                    px: 1.5,
-                  },
-                },
-              }}
-            >
-              <MenuItem
-                onClick={() => {
-                  setStatusFilter("All");
-                  setAnchorEl(null);
-                }}
-              >
-                All Statuses
-              </MenuItem>
+                  All Statuses
+                </MenuItem>
 
-              <MenuItem
-                onClick={() => {
-                  setStatusFilter("L1 Review");
-                  setAnchorEl(null);
-                }}
-              >
-                L1 Review
-              </MenuItem>
-
-              <MenuItem
-                onClick={() => {
-                  setStatusFilter("L2 Review");
-                  setAnchorEl(null);
-                }}
-              >
-                L2 Review
-              </MenuItem>
-
-              <MenuItem
-                onClick={() => {
-                  setStatusFilter("L1 Rejected");
-                  setAnchorEl(null);
-                }}
-              >
-                L1 Rejected
-              </MenuItem>
-
-              <MenuItem
-                onClick={() => {
-                  setStatusFilter("L2 Approved");
-                  setAnchorEl(null);
-                }}
-              >
-                L2 Approved
-              </MenuItem>
-            </Menu>
-            <Divider />
-
-            {/* Table */}
-            <TableContainer
-              sx={{
-                borderLeft: "1px solid #E2E8F0",
-                borderRight: "1px solid #E2E8F0",
-              }}
-            >
-              <Table
+                {[
+                  "L1 Review",
+                  "L2 Review",
+                  "L2 Under Review",
+                  "L1 Rejected",
+                  "L2 Rejected",
+                  "L2 Approved",
+                  "L2 Partial Approved",
+                ].map((status) => (
+                  <MenuItem
+                    key={status}
+                    onClick={() => {
+                      setStatusFilter(status);
+                      setAnchorEl(null);
+                    }}
+                  >
+                    {status}
+                  </MenuItem>
+                ))}
+              </Menu>
+              <Divider />
+              {/* Table */}
+              <TableContainer
                 sx={{
-                  "& .MuiTableCell-root": {
-                    py: 1, // vertical padding
-                    px: 1.5,
-                  },
+                  borderLeft: "1px solid #E2E8F0",
+                  borderRight: "1px solid #E2E8F0",
                 }}
               >
-                <TableHead>
-                  <TableRow>
-                    <TableCell
-                      sx={{
-                        fontFamily: "Poppins, sans-serif",
-                        fontSize: "0.8rem",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      Material Request ID
-                    </TableCell>
-                    <TableCell
-                      sx={{
-                        fontFamily: "Poppins, sans-serif",
-                        fontSize: "0.8rem",
-                        textAlign: "center",
-                      }}
-                    >
-                      Requester
-                      <Typography
-                        component='span'
+                <Table
+                  sx={{
+                    "& .MuiTableCell-root": {
+                      py: 1, // vertical padding
+                      px: 1.5,
+                    },
+                  }}
+                >
+                  <TableHead>
+                    <TableRow>
+                      <TableCell
                         sx={{
-                          color: "#DC2626",
-                          fontWeight: 600,
-                          ml: 0.5,
+                          fontFamily: "Poppins, sans-serif",
+                          fontSize: "0.8rem",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        Material Request ID
+                      </TableCell>
+                      {sessionStorage.getItem("role") == "L1_APPROVER" && (
+                        <TableCell
+                          sx={{
+                            fontFamily: "Poppins, sans-serif",
+                            fontSize: "0.8rem",
+                            textAlign: "center",
+                          }}
+                        >
+                          Requester
+                          <Typography
+                            component='span'
+                            sx={{
+                              color: "#DC2626",
+                              fontWeight: 600,
+                              ml: 0.5,
+                              fontFamily: "Poppins, sans-serif",
+                              fontSize: "0.8rem",
+                              textAlign: "center",
+                            }}
+                          >
+                            (Approver)
+                          </Typography>
+                        </TableCell>
+                      )}
+
+                      <TableCell
+                        align='center'
+                        sx={{
+                          fontFamily: "Poppins, sans-serif",
+                          fontSize: "0.8rem",
+                          textAlign: "center",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        Number of Materials
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          fontFamily: "Poppins, sans-serif",
+                          fontSize: "0.8rem",
+                          textAlign: "center",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        Requested On
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          fontFamily: "Poppins, sans-serif",
+                          fontSize: "0.8rem",
+                          textAlign: "center",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        Required Date
+                      </TableCell>
+                      <TableCell
+                        sx={{
                           fontFamily: "Poppins, sans-serif",
                           fontSize: "0.8rem",
                           textAlign: "center",
                         }}
                       >
-                        (Approver)
-                      </Typography>
-                    </TableCell>
-                    <TableCell
-                      align='center'
-                      sx={{
-                        fontFamily: "Poppins, sans-serif",
-                        fontSize: "0.8rem",
-                        textAlign: "center",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      Number of Materials
-                    </TableCell>
-                    <TableCell
-                      sx={{
-                        fontFamily: "Poppins, sans-serif",
-                        fontSize: "0.8rem",
-                        textAlign: "center",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      Requested On
-                    </TableCell>
-                    <TableCell
-                      sx={{
-                        fontFamily: "Poppins, sans-serif",
-                        fontSize: "0.8rem",
-                        textAlign: "center",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      Required Date
-                    </TableCell>
-                    <TableCell
-                      sx={{
-                        fontFamily: "Poppins, sans-serif",
-                        fontSize: "0.8rem",
-                        textAlign: "center",
-                      }}
-                    >
-                      Handled by
-                    </TableCell>
-                    <TableCell
-                      sx={{
-                        fontFamily: "Poppins, sans-serif",
-                        fontSize: "0.8rem",
-                        textAlign: "center",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      Reference No
-                    </TableCell>
-                    <TableCell
-                      // align="right"
-                      sx={{
-                        fontFamily: "Poppins, sans-serif",
-                        textAlign: "center",
-                        fontSize: "0.8rem",
-                      }}
-                    >
-                      Status
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {filteredRows
-                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                    .map((row) => (
-                      <TableRow
-                        key={row.id}
+                        Handled by
+                      </TableCell>
+                      <TableCell
                         sx={{
-                          "&:hover": { bgcolor: "#F8FAFC" },
-                          transition: "background 0.1s",
-                          cursor: "pointer",
-                        }}
-                        onClick={() => {
-                          setApproveModal(true);
-
-                          if (row.Status_text == "L1 Review") {
-                            setModalName("ApproveModal");
-                            setPassRowData(row);
-                          } else if (row.Status_text == "L2 Review") {
-                            setModalName("ApproveModal");
-                            setPassRowData(row);
-                          } else if (row.Status_text == "L1 Rejected") {
-                            setModalName("L1RejectFirstModal");
-                            setPassRowData(row);
-                          } else if (
-                            row.Status_text == "Submitted" ||
-                            row.Status_text == "L2 Partial Approved" ||
-                            row.Status_text == "L2 Approved" ||
-                            row.Status_text == "L2 Rejected"
-                          ) {
-                            setModalName("L2RejectModal");
-                            setPassRowData(row);
-                          } else {
-                            setModalName("");
-                          }
+                          fontFamily: "Poppins, sans-serif",
+                          fontSize: "0.8rem",
+                          textAlign: "center",
+                          whiteSpace: "nowrap",
                         }}
                       >
-                        {/* ID + Badges */}
-                        <TableCell>
-                          <Stack
-                            direction='row'
-                            alignItems='center'
-                            spacing={1}
-                          >
-                            <Typography
-                              fontWeight={500}
-                              fontSize='0.70rem'
-                              color='#1E293B'
-                              sx={{
-                                fontFamily: "Poppins, sans-serif",
-                                whiteSpace: "nowrap",
-                              }}
-                            >
-                              {row.MaterialRequestId}
-                            </Typography>
-                            {row.CriticalStatus.map((b, i) => (
-                              <BadgeIcon key={i} type={b} />
-                            ))}
-                            {row.Resubmitted ? (
-                              <img
-                                src={loop}
-                                alt='Resubmitted'
-                                style={{ width: "20px" }}
-                              />
-                            ) : null}
-                          </Stack>
-                        </TableCell>
-
-                        {/* Requester */}
-                        <TableCell
-                          sx={{
-                            fontFamily: "Poppins, sans-serif",
-                            fontSize: "0.76rem",
-                            textAlign: "left",
-                          }}
-                        >
-                          {row.Requester}
-                        </TableCell>
-
-                        {/* Materials */}
-                        <TableCell
-                          align='right'
-                          sx={{
-                            fontFamily: "Poppins, sans-serif",
-                          }}
-                        >
-                          <Typography
-                            fontWeight={500}
+                        Reference No
+                      </TableCell>
+                      <TableCell
+                        // align="right"
+                        sx={{
+                          fontFamily: "Poppins, sans-serif",
+                          textAlign: "center",
+                          fontSize: "0.8rem",
+                        }}
+                      >
+                        Status
+                      </TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {filteredRows.length > 0 ? (
+                      filteredRows
+                        .slice(
+                          page * rowsPerPage,
+                          page * rowsPerPage + rowsPerPage,
+                        )
+                        .map((row) => (
+                          <TableRow
+                            key={row.id}
                             sx={{
-                              fontFamily: "Poppins, sans-serif",
-                              fontSize: "0.76rem",
+                              "&:hover": { bgcolor: "#F8FAFC" },
+                              transition: "background 0.1s",
+                              cursor: "pointer",
+                            }}
+                            onClick={() => {
+                              if (
+                                sessionStorage.getItem("role") == "L1_APPROVER"
+                              ) {
+                                setApproveModal(true);
+
+                                if (row.Status_text == "L1 Review") {
+                                  setModalName("ApproveModal");
+                                  setPassRowData(row);
+                                } else if (row.Status_text == "L2 Review") {
+                                  setModalName("ApproveModal");
+                                  setPassRowData(row);
+                                } else if (row.Status_text == "L1 Rejected") {
+                                  setModalName("L1RejectFirstModal");
+                                  setPassRowData(row);
+                                } else if (
+                                  row.Status_text == "L2 Under Review" ||
+                                  row.Status_text == "L2 Partial Approved" ||
+                                  row.Status_text == "L2 Approved" ||
+                                  row.Status_text == "L2 Rejected"
+                                ) {
+                                  setModalName("L2RejectModal");
+                                  setPassRowData(row);
+                                } else {
+                                  setModalName("");
+                                }
+                              } else {
+                                if (row.Status_text == "L1 Rejected") {
+                                  setModalName("L1RejectFirstModal");
+                                  setPassRowData(row);
+                                } else if (
+                                  row.Status_text == "L2 Under Review" ||
+                                  row.Status_text == "L2 Partial Approved" ||
+                                  row.Status_text == "L2 Approved" ||
+                                  row.Status_text == "L2 Rejected"
+                                ) {
+                                  setModalName("L2RejectModal");
+                                  setPassRowData(row);
+                                }
+                              }
                             }}
                           >
-                            {row.NumberOfMaterials}
-                          </Typography>
-                        </TableCell>
+                            {/* ID + Badges */}
+                            <TableCell>
+                              <Stack
+                                direction='row'
+                                alignItems='center'
+                                spacing={1}
+                              >
+                                <Typography
+                                  fontWeight={500}
+                                  fontSize='0.70rem'
+                                  color='#1E293B'
+                                  sx={{
+                                    fontFamily: "Poppins, sans-serif",
+                                    whiteSpace: "nowrap",
+                                  }}
+                                >
+                                  {row.MaterialRequestId}
+                                </Typography>
+                                {row.CriticalStatus.map((b, i) => (
+                                  <BadgeIcon key={i} type={b} />
+                                ))}
+                                {row.Resubmitted ? (
+                                  <img
+                                    src={loop}
+                                    alt='Resubmitted'
+                                    style={{ width: "20px" }}
+                                  />
+                                ) : null}
+                              </Stack>
+                            </TableCell>
 
-                        {/* Requested On */}
-                        <TableCell
-                          sx={{
-                            fontFamily: "Poppins, sans-serif",
-                            fontSize: "0.76rem",
-                          }}
-                        >
-                          {dayjs(row.RequestedOn).format("DD-MMM-YYYY")}
-                        </TableCell>
+                            {sessionStorage.getItem("role") ==
+                              "L1_APPROVER" && (
+                              <>
+                                {/* Requester */}
+                                <TableCell
+                                  sx={{
+                                    fontFamily: "Poppins, sans-serif",
+                                    fontSize: "0.76rem",
+                                    textAlign: "left",
+                                  }}
+                                >
+                                  {row.Requester}
+                                </TableCell>
+                              </>
+                            )}
 
-                        {/* Required Date */}
-                        <TableCell
-                          sx={{
-                            fontFamily: "Poppins, sans-serif",
-                            fontSize: "0.76rem",
-                          }}
-                        >
-                          {dayjs(row.RequiredDate).format("DD-MMM-YYYY")}
-                        </TableCell>
+                            {/* Materials */}
+                            <TableCell
+                              align='right'
+                              sx={{
+                                fontFamily: "Poppins, sans-serif",
+                              }}
+                            >
+                              <Typography
+                                fontWeight={500}
+                                sx={{
+                                  fontFamily: "Poppins, sans-serif",
+                                  fontSize: "0.76rem",
+                                }}
+                              >
+                                {row.NumberOfMaterials}
+                              </Typography>
+                            </TableCell>
 
-                        {/* Handled By + Level */}
-                        <TableCell sx={{ fontFamily: "Poppins, sans-serif" }}>
-                          <Stack
-                            direction='row'
-                            alignItems='center'
-                            spacing={1}
-                          >
-                            <Typography
+                            {/* Requested On */}
+                            <TableCell
                               sx={{
                                 fontFamily: "Poppins, sans-serif",
                                 fontSize: "0.76rem",
                               }}
                             >
-                              {row.HandledBy}
-                            </Typography>
-                            {/* <Chip
+                              {dayjs(row.RequestedOn).format("DD-MMM-YYYY")}
+                            </TableCell>
+
+                            {/* Required Date */}
+                            <TableCell
+                              sx={{
+                                fontFamily: "Poppins, sans-serif",
+                                fontSize: "0.76rem",
+                              }}
+                            >
+                              {dayjs(row.RequiredDate).format("DD-MMM-YYYY")}
+                            </TableCell>
+
+                            {/* Handled By + Level */}
+                            <TableCell
+                              sx={{ fontFamily: "Poppins, sans-serif" }}
+                            >
+                              <Stack
+                                direction='row'
+                                alignItems='center'
+                                spacing={1}
+                              >
+                                <Typography
+                                  sx={{
+                                    fontFamily: "Poppins, sans-serif",
+                                    fontSize: "0.76rem",
+                                  }}
+                                >
+                                  {row.HandledBy}
+                                </Typography>
+                                {/* <Chip
                               label={row.level}
                               size='small'
                               sx={{
@@ -1054,152 +1016,228 @@ export default function Home() {
                                 "& .MuiChip-label": { px: 1 },
                               }}
                             /> */}
-                          </Stack>
-                        </TableCell>
+                              </Stack>
+                            </TableCell>
 
-                        {/* Ref No */}
-                        <TableCell>
-                          <Typography
-                            // color={
-                            //   row.ReferenceNo === "-" ? "#94A3B8" : "#1E293B"
-                            // }
-                            sx={{
-                              fontFamily: "Poppins, sans-serif",
-                              fontSize: "0.76rem",
-                              textAlign: "center",
-                            }}
-                          >
-                            {row.ReferenceNo == "" ? "-" : row.ReferenceNo}
-                          </Typography>
-                        </TableCell>
+                            {/* Ref No */}
+                            <TableCell>
+                              <Typography
+                                // color={
+                                //   row.ReferenceNo === "-" ? "#94A3B8" : "#1E293B"
+                                // }
+                                sx={{
+                                  fontFamily: "Poppins, sans-serif",
+                                  fontSize: "0.76rem",
+                                  textAlign: "center",
+                                }}
+                              >
+                                {row.ReferenceNo == "" ? "-" : row.ReferenceNo}
+                              </Typography>
+                            </TableCell>
 
-                        {/* Status */}
-                        <TableCell sx={{ textAlign: "center" }}>
-                          <StatusCell
-                            status={row.Status_text}
-                            // approved={row.approved}
-                            // rejected={row.rejected}
-                          />
+                            <TableCell sx={{ textAlign: "center" }}>
+                              {row.Status == "5" ? (
+                                <Stack
+                                  direction='row'
+                                  alignItems='center'
+                                  justifyContent='center'
+                                  spacing={0.75}
+                                  sx={{
+                                    display: "inline-flex",
+                                    px: 1,
+                                    py: 0.5,
+                                    borderRadius: "16px",
+                                    bgcolor: "#E8EDFF",
+                                  }}
+                                >
+                                  <Typography
+                                    sx={{
+                                      color: "#6787FF",
+                                      fontSize: "0.7rem",
+                                      fontWeight: 600,
+                                      fontFamily: "Poppins, sans-serif",
+                                    }}
+                                  >
+                                    L2
+                                  </Typography>
+
+                                  <Chip
+                                    icon={<CheckIcon />}
+                                    label={row.acceptedCount}
+                                    size='small'
+                                    sx={{
+                                      height: 20,
+                                      fontSize: "0.65rem",
+                                      bgcolor: "#DCF7F7",
+                                      color: "#16C8C7",
+
+                                      "& .MuiChip-icon": {
+                                        color: "#16C8C7",
+                                        fontSize: 12,
+                                        ml: 0.5,
+                                      },
+                                      "& .MuiChip-label": {
+                                        px: 0.75,
+                                      },
+                                    }}
+                                  />
+
+                                  <Chip
+                                    icon={<ClearIcon />}
+                                    label={row.rejectedCount}
+                                    size='small'
+                                    sx={{
+                                      height: 20,
+                                      fontSize: "0.65rem",
+                                      bgcolor: "#FBE3EA",
+                                      color: "#E34472",
+
+                                      "& .MuiChip-icon": {
+                                        color: "#E34472",
+                                        fontSize: 12,
+                                        ml: 0.5,
+                                      },
+                                      "& .MuiChip-label": {
+                                        px: 0.75,
+                                      },
+                                    }}
+                                  />
+                                </Stack>
+                              ) : (
+                                <StatusCell status={row.Status_text} />
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        ))
+                    ) : (
+                      <TableRow>
+                        <TableCell
+                          colSpan={
+                            sessionStorage.getItem("role") === "L1_APPROVER"
+                              ? 8
+                              : 7
+                          }
+                          align='center'
+                          sx={{
+                            py: 4,
+                            color: "#64748B",
+                            fontFamily: "Poppins, sans-serif",
+                            fontSize: "0.85rem",
+                          }}
+                        >
+                          No Data Found
                         </TableCell>
                       </TableRow>
-                    ))}
-                </TableBody>
-              </Table>
-              <TablePagination
-                component='div'
-                count={filteredRows.length}
-                page={page}
-                onPageChange={handleChangePage}
-                rowsPerPage={rowsPerPage}
-                onRowsPerPageChange={handleChangeRowsPerPage}
-                rowsPerPageOptions={[5, 10, 20, 50]}
-                sx={{
-                  border: "1px solid #E2E8F0",
-                  borderTop: "none",
-                  fontFamily: "Poppins, sans-serif",
-                  "& .MuiTablePagination-toolbar": {
+                    )}
+                  </TableBody>
+                </Table>
+                <TablePagination
+                  component='div'
+                  count={filteredRows.length}
+                  page={page}
+                  onPageChange={handleChangePage}
+                  rowsPerPage={rowsPerPage}
+                  onRowsPerPageChange={handleChangeRowsPerPage}
+                  rowsPerPageOptions={[5, 10, 20, 50]}
+                  sx={{
+                    border: "1px solid #E2E8F0",
+                    borderTop: "none",
                     fontFamily: "Poppins, sans-serif",
-                    minHeight: 52,
-                  },
-                  "& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows":
-                    {
+                    "& .MuiTablePagination-toolbar": {
+                      fontFamily: "Poppins, sans-serif",
+                      minHeight: 52,
+                    },
+                    "& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows":
+                      {
+                        fontFamily: "Poppins, sans-serif",
+                        fontSize: "0.8rem",
+                      },
+                    "& .MuiTablePagination-select": {
                       fontFamily: "Poppins, sans-serif",
                       fontSize: "0.8rem",
                     },
-                  "& .MuiTablePagination-select": {
-                    fontFamily: "Poppins, sans-serif",
-                    fontSize: "0.8rem",
-                  },
-                }}
-              />
-            </TableContainer>
-          </Grid>
-        </Box>
-
-        <div>
-          <Modal
-            open={approveModal}
-            aria-labelledby='modal-modal-title'
-            aria-describedby='modal-modal-description'
-          >
-            <Box sx={style}>
-              {!loading && (
-                <Grid
-                  sx={{
-                    position: "absolute",
-                    top: 10,
-                    right: 10,
-                    cursor: "pointer",
                   }}
-                >
-                  <CloseIcon
-                    onClick={() => {
-                      setApproveModal(false);
+                />
+              </TableContainer>
+            </Grid>
+          </Box>
+
+          <div>
+            <Modal
+              open={approveModal}
+              aria-labelledby='modal-modal-title'
+              aria-describedby='modal-modal-description'
+            >
+              <Box sx={style}>
+                {!loading && (
+                  <Grid
+                    sx={{
+                      position: "absolute",
+                      top: 10,
+                      right: 10,
+                      cursor: "pointer",
                     }}
+                  >
+                    <CloseIcon
+                      onClick={() => {
+                        setApproveModal(false);
+                      }}
+                    />
+                  </Grid>
+                )}
+
+                {modalName == "ApproveModal" ? (
+                  <ApproveMaterial
+                    rowData={passRowData}
+                    loadingTrue={loadingTrue}
+                    loadingFalse={loadingFalse}
                   />
-                </Grid>
-              )}
+                ) : modalName == "L1RejectFirstModal" ? (
+                  <L1RejectFirstModal
+                    rowData={passRowData}
+                    loadingTrue={loadingTrue}
+                    loadingFalse={loadingFalse}
+                    openCreateMateralRequestModal={
+                      openCreateMateralRequestModal
+                    }
+                  />
+                ) : modalName == "L2RejectModal" ? (
+                  <L2RejectModal
+                    rowData={passRowData}
+                    loadingTrue={loadingTrue}
+                    loadingFalse={loadingFalse}
+                    openCreateMateralRequestModal={
+                      openCreateMateralRequestModal
+                    }
+                  />
+                ) : (
+                  ""
+                )}
+              </Box>
+            </Modal>
+          </div>
 
-              {modalName == "ApproveModal" ? (
-                <ApproveMaterial
-                  rowData={passRowData}
+          <div>
+            <Modal
+              open={open}
+              onClose={handleClose}
+              aria-labelledby='modal-modal-title'
+              aria-describedby='modal-modal-description'
+            >
+              <Box sx={style}>
+                <CreateMaterialRequest
                   loadingTrue={loadingTrue}
                   loadingFalse={loadingFalse}
+                  l1ReSubmit={l1ReSubmit}
+                  CancelResubmit={CancelResubmit}
+                  KpiData={KpiData}
+                  handleClose={handleClose}
                 />
-              ) : modalName == "L1RejectFirstModal" ? (
-                <L1RejectFirstModal
-                  rowData={passRowData}
-                  loadingTrue={loadingTrue}
-                  loadingFalse={loadingFalse}
-                  openCreateMateralRequestModal={openCreateMateralRequestModal}
-                />
-              ) : modalName == "L2RejectModal" ? (
-                <L2RejectModal
-                  rowData={passRowData}
-                  loadingTrue={loadingTrue}
-                  loadingFalse={loadingFalse}
-                  openCreateMateralRequestModal={openCreateMateralRequestModal}
-                />
-              ) : (
-                ""
-              )}
-            </Box>
-          </Modal>
-        </div>
-
-        <div>
-          <Modal
-            open={open}
-            onClose={handleClose}
-            aria-labelledby='modal-modal-title'
-            aria-describedby='modal-modal-description'
-          >
-            <Box sx={style}>
-              <Grid
-                sx={{
-                  position: "absolute",
-                  top: 10,
-                  right: 10,
-                  cursor: "pointer",
-                }}
-              >
-                <CloseIcon
-                  onClick={() => {
-                    setOpen(false);
-                  }}
-                />
-              </Grid>
-
-              <CreateMaterialRequest
-                loadingTrue={loadingTrue}
-                loadingFalse={loadingFalse}
-                l1ReSubmit={l1ReSubmit}
-                CancelResubmit={CancelResubmit}
-              />
-            </Box>
-          </Modal>
-        </div>
-      </Navbar>
+              </Box>
+            </Modal>
+          </div>
+        </Navbar>
+      )}
     </div>
   );
 }

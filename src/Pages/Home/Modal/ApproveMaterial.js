@@ -32,6 +32,7 @@ import {
   DialogContent,
   DialogActions,
 } from "@mui/material";
+import Timeline from "../../TimeLine";
 
 // ── Token system ──────────────────────────────────────────────
 const POPPINS = "'Poppins', 'Poppins Fallback', sans-serif";
@@ -54,7 +55,52 @@ const colors = {
   headerDivider: "#F3F4F6",
 };
 
-// ── Sub-components ────────────────────────────────────────────
+// ── HeaderStatusBadge ────────────────────────────────────────────
+function HeaderStatusBadge({ label }) {
+  const statusStyles = {
+    "L2 Rejected": {
+      border: "#F87171",
+      color: "#EF4444",
+      bg: "#FEF2F2",
+    },
+    "L1 Review": {
+      border: "#FBBF24",
+      color: "#D97706",
+      bg: "#FFFBEB",
+    },
+    "L2 Under Review": {
+      border: "#60A5FA",
+      color: "#2563EB",
+      bg: "#EFF6FF",
+    },
+  };
+
+  const style = statusStyles[label] || {
+    border: "#D1D5DB",
+    color: "#6B7280",
+    bg: "#F9FAFB",
+  };
+
+  return (
+    <Box
+      sx={{
+        px: 1.5,
+        py: 0.5,
+        borderRadius: "20px",
+
+        color: style.color,
+        bgcolor: style.bg,
+        fontSize: 11,
+        // fontWeight: 600,
+        fontFamily: "Poppins, sans-serif",
+        display: "inline-block",
+        whiteSpace: "nowrap",
+      }}
+    >
+      {label}
+    </Box>
+  );
+}
 
 /** Top header bar */
 function DialogHeader({ data, props }) {
@@ -78,29 +124,39 @@ function DialogHeader({ data, props }) {
           fontWeight: 600,
           color: colors.valueBlack,
           fontSize: "1rem",
+          textAlign: "center",
         }}
       >
         Material Request {data?.materialRequestId}
       </Typography>
 
-      {props?.rowData?.Resubmitted == true && (
-        <Chip
-          icon={<ReplayIcon sx={{ fontSize: "0.75rem !important" }} />}
-          label='Resubmitted'
-          size='small'
-          sx={{
-            position: "absolute",
-            right: 44,
-            fontFamily: POPPINS,
-            fontSize: "0.68rem",
-            bgcolor: colors.resubmitBg,
-            color: colors.resubmitText,
-            fontWeight: 500,
-            height: 24,
-            "& .MuiChip-icon": { color: colors.resubmitText },
-          }}
-        />
-      )}
+      <Box
+        sx={{
+          position: "absolute",
+          right: 16,
+          top: "50%",
+          transform: "translateY(-50%)",
+        }}
+      >
+        {props?.rowData?.Resubmitted === true ? (
+          <Chip
+            icon={<ReplayIcon sx={{ fontSize: "0.75rem !important" }} />}
+            label='Resubmitted'
+            size='small'
+            sx={{
+              fontFamily: POPPINS,
+              fontSize: "0.68rem",
+              bgcolor: colors.resubmitBg,
+              color: colors.resubmitText,
+              fontWeight: 500,
+              height: 24,
+              "& .MuiChip-icon": { color: colors.resubmitText },
+            }}
+          />
+        ) : (
+          <HeaderStatusBadge label={props.rowData?.Status_text} />
+        )}
+      </Box>
     </Box>
   );
 }
@@ -241,8 +297,18 @@ function MaterialDetails({ data }) {
                           fontFamily: POPPINS,
                           fontSize: "0.62rem",
                           fontWeight: 500,
-                          bgcolor: colors.criticalBg,
-                          color: colors.criticalText,
+                          bgcolor:
+                            row.itemtag == 1
+                              ? "#FEE2E2" // Critical
+                              : row.itemtag == 2
+                                ? "#DBEAFE" // New
+                                : "#F3F4F6",
+                          color:
+                            row.itemtag == 1
+                              ? "#DC2626" // Critical
+                              : row.itemtag == 2
+                                ? "#2563EB" // New
+                                : "#6B7280",
                           height: 20,
                         }}
                       />
@@ -406,6 +472,8 @@ export default function ApproveMaterial(props) {
   console.log(props);
 
   const DetailsAPi = () => {
+    setLoading(true);
+
     const payload = {
       materialRequestId: props?.rowData.MaterialRequestId,
       status: props.rowData?.Status,
@@ -415,39 +483,40 @@ export default function ApproveMaterial(props) {
       .post(
         props?.rowData?.Status_text === "L2 Review"
           ? "http://10.10.0.101:8000/mrmuser/L2Review"
-          : props?.rowData?.Resubmitted == true
+          : props?.rowData?.Resubmitted === true
             ? "http://10.10.0.101:8000/mrmuser/Resubmitted"
             : "http://10.10.0.101:8000/mrmuser/l1review/details",
         payload,
       )
       .then((res) => {
-        console.log(console.log(res));
+        console.log(res);
         setData(res.data.data);
       })
       .catch((err) => {
         const errorMessage =
           err.response?.data?.message || err.message || "Login failed";
 
-        //console.log(err);
-        navigate("/ErrorHandling");
         sessionStorage.setItem("errormessge", errorMessage);
-        // setLoading(false);
+        navigate("/ErrorHandling");
+      })
+      .finally(() => {
+        setLoading(false);
       });
   };
 
   console.log(data);
 
   const handleApprove = async () => {
-    props.loadingTrue();
+    // props.loadingTrue();
     setLoading(true);
     const payload = {
       _request: {
         MaterialRequirementManagementHeader: {
           HIQ_RequestNo: data?.materialRequestId,
 
-          HIQ_requester_id: "Hi-Q-000922",
+          HIQ_requester_id: sessionStorage.getItem("user_id"),
 
-          HIQ_requester_Name: "USR_SHIP",
+          HIQ_requester_Name: sessionStorage.getItem("user_name"),
 
           HIQ_L1ApproverName: "",
 
@@ -599,16 +668,16 @@ export default function ApproveMaterial(props) {
   };
 
   const handleReject = async () => {
-    props.loadingTrue();
+    // props.loadingTrue();
     setLoading(true);
     const payload = {
       _request: {
         MaterialRequirementManagementHeader: {
           HIQ_RequestNo: data?.materialRequestId,
 
-          HIQ_requester_id: "Hi-Q-000922",
+          HIQ_requester_id: sessionStorage.getItem("user_id"),
 
-          HIQ_requester_Name: "USR_SHIP",
+          HIQ_requester_Name: sessionStorage.getItem("user_name"),
 
           HIQ_L1ApproverName: "",
 
@@ -891,6 +960,10 @@ export default function ApproveMaterial(props) {
                 </>
               )}
             </Box>
+
+            {data?.materialRequestId && (
+              <Timeline id={data.materialRequestId} />
+            )}
           </Grid>
 
           <Dialog

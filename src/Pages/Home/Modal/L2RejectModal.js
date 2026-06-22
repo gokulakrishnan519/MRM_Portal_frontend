@@ -23,6 +23,7 @@ import { useNavigate } from "react-router-dom";
 import InboxIcon from "@mui/icons-material/Inbox";
 import CircularProgress from "@mui/material/CircularProgress";
 import dayjs from "dayjs";
+import Timeline from "../../TimeLine";
 
 // ── Theme ─────────────────────────────────────────────────────────────────────
 const theme = createTheme({
@@ -80,7 +81,27 @@ const theme = createTheme({
 // ── Status Chip ───────────────────────────────────────────────────────────────
 function StatusChip({ status }) {
   if (!status) return null;
-  const isApproved = status === "Approved";
+
+  const statusConfig = {
+    Approved: {
+      bg: "#D1FAE5",
+      color: "#059669",
+    },
+    Rejected: {
+      bg: "#FEE2E2",
+      color: "#EF4444",
+    },
+    "L2 Under Review": {
+      bg: "#DBEAFE",
+      color: "#2563EB",
+    },
+  };
+
+  const config = statusConfig[status] || {
+    bg: "#F3F4F6",
+    color: "#6B7280",
+  };
+
   return (
     <Box
       sx={{
@@ -90,10 +111,10 @@ function StatusChip({ status }) {
         px: 1.5,
         py: 0.4,
         borderRadius: "20px",
-        bgcolor: isApproved ? "#D1FAE5" : "#FEE2E2",
-        color: isApproved ? "#059669" : "#EF4444",
+        bgcolor: config.bg,
+        color: config.color,
         fontSize: 11,
-        fontWeight: 600,
+
         fontFamily: "Poppins, sans-serif",
         minWidth: 72,
       }}
@@ -149,16 +170,41 @@ function ReviewerBadge({ name, badge }) {
 
 // ── Header Badge ──────────────────────────────────────────────────────────────
 function HeaderStatusBadge({ label }) {
+  const statusStyles = {
+    "L2 Rejected": {
+      border: "#F87171",
+      color: "#EF4444",
+      bg: "#FEF2F2",
+    },
+    "L2 Partial Approved": {
+      border: "#FBBF24",
+      color: "#D97706",
+      bg: "#FFFBEB",
+    },
+    "L2 Under Review": {
+      border: "#60A5FA",
+      color: "#2563EB",
+      bg: "#EFF6FF",
+    },
+  };
+
+  const style = statusStyles[label] || {
+    border: "#D1D5DB",
+    color: "#6B7280",
+    bg: "#F9FAFB",
+  };
+
   return (
     <Box
       sx={{
         px: 1.5,
-        py: 0.3,
+        py: 0.5,
         borderRadius: "20px",
-        border: "1.5px solid #F87171",
-        color: "#EF4444",
+
+        color: style.color,
+        bgcolor: style.bg,
         fontSize: 11,
-        fontWeight: 600,
+        // fontWeight: 600,
         fontFamily: "Poppins, sans-serif",
         display: "inline-block",
         whiteSpace: "nowrap",
@@ -275,7 +321,8 @@ export default function L2RejectModal(props) {
                   >
                     Material Request {data?.materialRequestId}
                   </Typography>
-                  {/* <Box
+
+                  <Box
                     sx={{
                       position: "absolute",
                       right: 0,
@@ -285,8 +332,8 @@ export default function L2RejectModal(props) {
                       gap: 1,
                     }}
                   >
-                    <HeaderStatusBadge label='L2 Rejected' />
-                  </Box> */}
+                    <HeaderStatusBadge label={props.rowData?.Status_text} />
+                  </Box>
                 </Box>
 
                 <Box
@@ -415,9 +462,9 @@ export default function L2RejectModal(props) {
                                   ) : (
                                     <Chip
                                       label={
-                                        item.itemtag == 1
+                                        item.itemtag === 1
                                           ? "Critical"
-                                          : item.itemtag == 2
+                                          : item.itemtag === 2
                                             ? "New"
                                             : item.itemtag
                                       }
@@ -426,19 +473,24 @@ export default function L2RejectModal(props) {
                                         fontFamily: "Poppins, sans-serif",
                                         fontSize: "0.62rem",
                                         fontWeight: 500,
+                                        height: 22,
+                                        borderRadius: "12px",
                                         bgcolor:
-                                          item.itemtag == 1
-                                            ? "#FEE2E2" // Critical Background
-                                            : item.itemtag == 2
-                                              ? "#DBEAFE" // New Background
+                                          item.itemtag === 1
+                                            ? "#FEE2E2" // Critical
+                                            : item.itemtag === 2
+                                              ? "#DBEAFE" // New
                                               : "#F3F4F6",
                                         color:
-                                          item.itemtag == 1
-                                            ? "#DC2626" // Critical Text
-                                            : item.itemtag == 2
-                                              ? "#2563EB" // New Text
+                                          item.itemtag === 1
+                                            ? "#DC2626"
+                                            : item.itemtag === 2
+                                              ? "#2563EB"
                                               : "#374151",
-                                        height: 20,
+
+                                        "& .MuiChip-label": {
+                                          px: 1,
+                                        },
                                       }}
                                     />
                                   )}
@@ -488,7 +540,7 @@ export default function L2RejectModal(props) {
                   </Paper>
                 </Box>
 
-                {props.rowData?.Status == 5 && (
+                {(props.rowData?.Status == 5 || props.rowData?.Status == 3) && (
                   <>
                     {/* ── Action Buttons ── */}
                     <Stack
@@ -553,6 +605,8 @@ export default function L2RejectModal(props) {
                     </Stack>
                   </>
                 )}
+
+                <Timeline id={props.rowData.MaterialRequestId} />
               </Box>
             </Box>
           )}
