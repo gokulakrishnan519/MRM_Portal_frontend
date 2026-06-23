@@ -17,6 +17,7 @@ import {
   LockOutlined,
   PhoneOutlined,
 } from "@mui/icons-material";
+import PersonIcon from "@mui/icons-material/Person";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
@@ -346,7 +347,7 @@ export default function Login() {
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <PhoneOutlined sx={{ color: "#94A3B8", fontSize: 19 }} />
+                    <PersonIcon sx={{ color: "#94A3B8", fontSize: 19 }} />
                   </InputAdornment>
                 ),
               }}
@@ -385,7 +386,7 @@ export default function Login() {
               >
                 Password
               </Typography>
-              <Typography
+              {/* <Typography
                 sx={{
                   fontFamily: "Poppins, sans-serif",
                   fontSize: "12px",
@@ -395,7 +396,7 @@ export default function Login() {
                 }}
               >
                 Forgot password?
-              </Typography>
+              </Typography> */}
             </Box>
             <TextField
               fullWidth
@@ -491,7 +492,7 @@ export default function Login() {
           </Divider>
 
           {/* Footer note */}
-          <Box sx={{ textAlign: "center" }}>
+          {/* <Box sx={{ textAlign: "center" }}>
             <Typography
               sx={{
                 fontFamily: "Poppins, sans-serif",
@@ -511,7 +512,7 @@ export default function Login() {
                 Contact your administrator
               </span>
             </Typography>
-          </Box>
+          </Box> */}
         </Card>
       </Box>
       <Dialog

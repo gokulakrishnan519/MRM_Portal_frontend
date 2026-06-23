@@ -123,13 +123,13 @@ function BadgeIcon({ type }) {
   if (type === "Critical")
     return (
       // <Tooltip title="Critical">
-      <img height={20} width={20} cursor='Pointer' src={warning} />
+      <img height={20} width={20} cursor="Pointer" src={warning} />
       // </Tooltip>
     );
   if (type === "resubmitted")
     return (
-      <Tooltip title='Resubmitted'>
-        <img height={20} width={20} cursor='Pointer' src={warning} />
+      <Tooltip title="Resubmitted">
+        <img height={20} width={20} cursor="Pointer" src={warning} />
       </Tooltip>
     );
   // if (type === "New")
@@ -159,7 +159,7 @@ function StatusCell({ status, approved, rejected }) {
     <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
       <Chip
         label={status}
-        size='small'
+        size="small"
         sx={{
           height: 26,
           fontSize: "0.70rem",
@@ -289,8 +289,8 @@ export default function Home() {
   const cardData = [
     {
       count: kpiData?.data?.pendingRequests,
-      title: "Pending Requests",
-      subtitle: "Awaiting approval",
+      title: "Pending L1 Approval",
+      subtitle: "Awaiting initial review",
       color: "#6C63FF",
       bg: "#F5F3FF",
       image: kpi_img1,
@@ -301,8 +301,8 @@ export default function Home() {
     },
     {
       count: kpiData?.data?.awaitingFinalApproval,
-      title: "Awaiting Final Approval",
-      subtitle: "Pending higher-level approval",
+      title: "Pending L2 Approval",
+      subtitle: "Awaiting final review",
       color: "#5B7CFA",
       bg: "#EEF4FF",
       image: kpi_img2,
@@ -313,8 +313,8 @@ export default function Home() {
     },
     {
       count: kpiData?.data?.returnedByL1,
-      title: "Returned by L1",
-      subtitle: "Returned after initial review",
+      title: "Rejected by L1",
+      subtitle: "Rejected during initial review",
       color: "#FF9800",
       bg: "#FFF7EC",
       image: kpi_img3,
@@ -325,8 +325,8 @@ export default function Home() {
     },
     {
       count: kpiData?.data?.returnedByL2,
-      title: "Returned by L2",
-      subtitle: "Returned after final review",
+      title: "Rejected by L2",
+      subtitle: "Rejected during final review",
       color: "#18C5C8",
       bg: "#ECFCFC",
       image: kpi_img4,
@@ -419,9 +419,9 @@ export default function Home() {
                       >
                         {/* Image */}
                         <Box
-                          component='img'
+                          component="img"
                           src={item.image}
-                          alt=''
+                          alt=""
                           sx={{
                             position: "absolute",
                             inset: 0,
@@ -513,7 +513,7 @@ export default function Home() {
             <Grid size={{ lg: 7, xs: 12, md: 12, sm: 12 }}>
               <img
                 src={right_icon}
-                alt='icon'
+                alt="icon"
                 style={{
                   width: "100%",
                   objectFit: "contain",
@@ -545,16 +545,16 @@ export default function Home() {
                 }}
               >
                 <Typography
-                  variant='h6'
+                  variant="h6"
                   fontWeight={700}
-                  color='#0F172A'
+                  color="#0F172A"
                   sx={{ fontSize: "1.1rem", fontFamily: "Poppins, sans-serif" }}
                 >
                   Request Center
                 </Typography>
 
                 {/* Tabs */}
-                <Stack direction='row' spacing={1} flexWrap='wrap'>
+                <Stack direction="row" spacing={1} flexWrap="wrap">
                   {tabs.map((tab, i) => (
                     <Box
                       key={i}
@@ -582,7 +582,7 @@ export default function Home() {
                         {tab.icon}
                       </Box>
                       <Typography
-                        variant='body2'
+                        variant="body2"
                         fontWeight={activeTab === i ? 700 : 500}
                         color={activeTab === i ? "#2563EB" : "#64748B"}
                         sx={{
@@ -613,12 +613,12 @@ export default function Home() {
                 </Stack>
 
                 {/* Actions */}
-                <Stack direction='row' spacing={1} alignItems='center'>
+                <Stack direction="row" spacing={1} alignItems="center">
                   {showSearch && (
                     <Box sx={{ p: 1 }}>
                       <TextField
-                        size='small'
-                        placeholder='Search...'
+                        size="small"
+                        placeholder="Search..."
                         value={searchText}
                         onChange={(e) => {
                           setSearchText(e.target.value);
@@ -639,7 +639,7 @@ export default function Home() {
                     </Box>
                   )}
                   <IconButton
-                    size='small'
+                    size="small"
                     onClick={() => setShowSearch(!showSearch)}
                     sx={{
                       border: "1px solid #E2E8F0",
@@ -650,7 +650,7 @@ export default function Home() {
                     <SearchIcon sx={{ fontSize: 18, color: "#64748B" }} />
                   </IconButton>
                   <IconButton
-                    size='small'
+                    size="small"
                     onClick={(e) => setAnchorEl(e.currentTarget)}
                     sx={{
                       border: "1px solid #E2E8F0",
@@ -661,9 +661,9 @@ export default function Home() {
                     <FilterListIcon sx={{ fontSize: 18, color: "#64748B" }} />
                   </IconButton>
                   <Button
-                    variant='contained'
+                    variant="contained"
                     startIcon={<AddIcon />}
-                    size='small'
+                    size="small"
                     sx={{
                       bgcolor: "#2563EB",
                       borderRadius: "8px",
@@ -773,7 +773,7 @@ export default function Home() {
                       )}
 
                       <TableCell
-                        align='center'
+                        align="center"
                         sx={{
                           fontFamily: "Poppins, sans-serif",
                           fontSize: "0.8rem",
@@ -896,14 +896,14 @@ export default function Home() {
                             {/* ID + Badges */}
                             <TableCell>
                               <Stack
-                                direction='row'
-                                alignItems='center'
+                                direction="row"
+                                alignItems="center"
                                 spacing={1}
                               >
                                 <Typography
                                   fontWeight={500}
-                                  fontSize='0.70rem'
-                                  color='#1E293B'
+                                  fontSize="0.70rem"
+                                  color="#1E293B"
                                   sx={{
                                     fontFamily: "Poppins, sans-serif",
                                     whiteSpace: "nowrap",
@@ -917,14 +917,14 @@ export default function Home() {
                                 {row.Resubmitted ? (
                                   <img
                                     src={loop}
-                                    alt='Resubmitted'
+                                    alt="Resubmitted"
                                     style={{ width: "20px" }}
                                   />
                                 ) : null}
                                 {row.CriticalStatus?.includes("New") ? (
                                   <img
                                     src={addfile}
-                                    alt='Resubmitted'
+                                    alt="Resubmitted"
                                     style={{ width: "20px" }}
                                   />
                                 ) : (
@@ -951,7 +951,7 @@ export default function Home() {
 
                             {/* Materials */}
                             <TableCell
-                              align='right'
+                              align="right"
                               sx={{
                                 fontFamily: "Poppins, sans-serif",
                               }}
@@ -992,8 +992,8 @@ export default function Home() {
                               sx={{ fontFamily: "Poppins, sans-serif" }}
                             >
                               <Stack
-                                direction='row'
-                                alignItems='center'
+                                direction="row"
+                                alignItems="center"
                                 spacing={1}
                               >
                                 <Typography
@@ -1040,9 +1040,9 @@ export default function Home() {
                             <TableCell sx={{ textAlign: "center" }}>
                               {row.Status == "5" ? (
                                 <Stack
-                                  direction='row'
-                                  alignItems='center'
-                                  justifyContent='center'
+                                  direction="row"
+                                  alignItems="center"
+                                  justifyContent="center"
                                   spacing={0.75}
                                   sx={{
                                     display: "inline-flex",
@@ -1066,7 +1066,7 @@ export default function Home() {
                                   <Chip
                                     icon={<CheckIcon />}
                                     label={row.acceptedCount}
-                                    size='small'
+                                    size="small"
                                     sx={{
                                       height: 20,
                                       fontSize: "0.65rem",
@@ -1087,7 +1087,7 @@ export default function Home() {
                                   <Chip
                                     icon={<ClearIcon />}
                                     label={row.rejectedCount}
-                                    size='small'
+                                    size="small"
                                     sx={{
                                       height: 20,
                                       fontSize: "0.65rem",
@@ -1119,7 +1119,7 @@ export default function Home() {
                               ? 8
                               : 7
                           }
-                          align='center'
+                          align="center"
                           sx={{
                             py: 4,
                             color: "#64748B",
@@ -1134,7 +1134,7 @@ export default function Home() {
                   </TableBody>
                 </Table>
                 <TablePagination
-                  component='div'
+                  component="div"
                   count={filteredRows.length}
                   page={page}
                   onPageChange={handleChangePage}
@@ -1167,8 +1167,8 @@ export default function Home() {
           <div>
             <Modal
               open={approveModal}
-              aria-labelledby='modal-modal-title'
-              aria-describedby='modal-modal-description'
+              aria-labelledby="modal-modal-title"
+              aria-describedby="modal-modal-description"
             >
               <Box sx={style}>
                 {modalName == "ApproveModal" ? (
@@ -1206,8 +1206,8 @@ export default function Home() {
             <Modal
               open={open}
               onClose={handleClose}
-              aria-labelledby='modal-modal-title'
-              aria-describedby='modal-modal-description'
+              aria-labelledby="modal-modal-title"
+              aria-describedby="modal-modal-description"
             >
               <Box sx={style}>
                 <CreateMaterialRequest

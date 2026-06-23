@@ -137,14 +137,14 @@ function StatusCell({ status, approved, rejected }) {
   if (status === "L2 Mixed") {
     return (
       <Stack
-        direction='row'
+        direction="row"
         spacing={0.5}
-        alignItems='center'
-        justifyContaent='flex-end'
+        alignItems="center"
+        justifyContaent="flex-end"
       >
         <Chip
-          label='L2'
-          size='small'
+          label="L2"
+          size="small"
           sx={{
             height: 24,
             fontSize: "0.7rem",
@@ -163,7 +163,7 @@ function StatusCell({ status, approved, rejected }) {
             />
           }
           label={approved}
-          size='small'
+          size="small"
           sx={{
             height: 24,
             fontSize: "0.7rem",
@@ -182,7 +182,7 @@ function StatusCell({ status, approved, rejected }) {
             />
           }
           label={rejected}
-          size='small'
+          size="small"
           sx={{
             height: 24,
             fontSize: "0.7rem",
@@ -202,7 +202,7 @@ function StatusCell({ status, approved, rejected }) {
     <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
       <Chip
         label={status}
-        size='small'
+        size="small"
         sx={{
           height: 26,
           fontSize: "0.70rem",
@@ -301,8 +301,8 @@ export default function History() {
   const cardData = [
     {
       count: kpiData?.data?.pendingRequests,
-      title: "Pending Requests",
-      subtitle: "Awaiting approval",
+      title: "Pending L1",
+      subtitle: "Awaiting Level 1 approval",
       color: "#6C63FF",
       bg: "#F5F3FF",
       image: kpi_img1,
@@ -313,8 +313,8 @@ export default function History() {
     },
     {
       count: kpiData?.data?.awaitingFinalApproval,
-      title: "Awaiting Final Approval",
-      subtitle: "Pending higher-level approval",
+      title: "Pending L2",
+      subtitle: "Awaiting Level 2 approval",
       color: "#5B7CFA",
       bg: "#EEF4FF",
       image: kpi_img2,
@@ -325,8 +325,8 @@ export default function History() {
     },
     {
       count: kpiData?.data?.rejectedRequests,
-      title: "Rejected Requests",
-      subtitle: "I need your action",
+      title: "L2 Rejected",
+      subtitle: "Rejected at Level 2",
       color: "#FF9800",
       bg: "#FFF7EC",
       image: kpi_img3,
@@ -338,7 +338,7 @@ export default function History() {
     {
       count: kpiData?.data?.approvedRequests,
       title: "Approved Requests",
-      subtitle: "Approved and moved to next stage",
+      subtitle: "Successfully approved",
       color: "#18C5C8",
       bg: "#ECFCFC",
       image: kpi_img4,
@@ -441,9 +441,9 @@ export default function History() {
                     >
                       {/* Image */}
                       <Box
-                        component='img'
+                        component="img"
                         src={item.image}
-                        alt=''
+                        alt=""
                         sx={{
                           position: "absolute",
                           inset: 0,
@@ -533,7 +533,7 @@ export default function History() {
           <Grid size={{ lg: 7, xs: 12, md: 12, sm: 12 }}>
             <img
               src={right_icon}
-              alt='icon'
+              alt="icon"
               style={{
                 width: "100%",
                 objectFit: "contain",
@@ -566,7 +566,7 @@ export default function History() {
             }}
           >
             <Typography
-              variant='h5'
+              variant="h5"
               sx={{
                 fontWeight: 700,
                 color: "#1a1a2e",
@@ -580,13 +580,13 @@ export default function History() {
             <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
               {/* Search */}
               <TextField
-                size='small'
-                placeholder='Search...'
+                size="small"
+                placeholder="Search..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 InputProps={{
                   startAdornment: (
-                    <InputAdornment position='start'>
+                    <InputAdornment position="start">
                       <SearchIcon sx={{ fontSize: 18, color: "#9ca3af" }} />
                     </InputAdornment>
                   ),
@@ -605,8 +605,8 @@ export default function History() {
 
               {/* Filter */}
               <Button
-                variant='outlined'
-                size='small'
+                variant="outlined"
+                size="small"
                 onClick={handleFilterOpen}
                 endIcon={<KeyboardArrowDownIcon />}
                 startIcon={<FilterListIcon />}
@@ -641,7 +641,7 @@ export default function History() {
                   <MenuItem key={s} onClick={() => toggleStatus(s)} dense>
                     <Checkbox
                       checked={selectedStatuses.includes(s)}
-                      size='small'
+                      size="small"
                       sx={{ p: 0.5 }}
                     />
                     <ListItemText
@@ -732,7 +732,7 @@ export default function History() {
               <TableBody>
                 {loading ? (
                   <TableRow>
-                    <TableCell colSpan={100} align='center'>
+                    <TableCell colSpan={100} align="center">
                       <Box
                         sx={{
                           minHeight: "50px",
@@ -741,13 +741,13 @@ export default function History() {
                           alignItems: "center",
                         }}
                       >
-                        <CircularProgress aria-label='Loading...' />
+                        <CircularProgress aria-label="Loading..." />
                       </Box>
                     </TableCell>
                   </TableRow>
                 ) : filtered.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={100} align='center'>
+                    <TableCell colSpan={100} align="center">
                       <Typography
                         sx={{
                           fontFamily: "Poppins",
@@ -925,8 +925,8 @@ export default function History() {
           <Modal
             open={open}
             onClose={handleClose}
-            aria-labelledby='modal-modal-title'
-            aria-describedby='modal-modal-description'
+            aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description"
           >
             <Box sx={{ ...style, outline: "none" }}>
               <Grid
