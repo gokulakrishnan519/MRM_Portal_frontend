@@ -160,6 +160,7 @@ export default function CreateMaterialRequest(props) {
 
   const [value, setValue] = useState({});
   const [validData, setValidData] = useState(null);
+  const [uom, setUom] = useState([]);
 
   const navigate = useNavigate();
 
@@ -220,7 +221,11 @@ export default function CreateMaterialRequest(props) {
               : item.materialName?.name,
           UOM: item.uom,
           AvailableStock:
-            item.availableStock == "" ? "0" : String(item.availableStock),
+            item.availableStock == ""
+              ? "0"
+              : item.availableStock == null
+                ? "0"
+                : String(item.availableStock),
           Quantity: item.quantity == "" ? "0" : String(item.quantity),
           ItemTag:
             item.objectitem === "New" ? "2" : String(item.materialName?.tag),
@@ -330,7 +335,11 @@ export default function CreateMaterialRequest(props) {
               : item.materialName?.name,
           UOM: item.uom,
           AvailableStock:
-            item.availableStock == "" ? "0" : String(item.availableStock),
+            item.availableStock == ""
+              ? "0"
+              : item.availableStock == null
+                ? "0"
+                : String(item.availableStock),
           Quantity: item.quantity == "" ? "0" : String(item.quantity),
           ItemTag:
             item.objectitem === "New" ? "2" : String(item.materialName?.tag),
@@ -470,6 +479,27 @@ export default function CreateMaterialRequest(props) {
       console.log(error);
     }
   };
+
+  const uomDropdown = async () => {
+    await axios
+      .post("http://10.10.0.101:8000/mrmuser/uomsymbols")
+      .then((res) => {
+        console.log(res.data);
+        setUom(res.data.data);
+      })
+      .catch((err) => {
+        const errorMessage =
+          err.response?.data?.detail || err.detail || "Something went wrong";
+
+        sessionStorage.setItem("errormessge", errorMessage);
+
+        navigate("/ErrorHandling");
+      });
+  };
+
+  useEffect(() => {
+    uomDropdown();
+  }, []);
 
   useEffect(() => {
     getLabels();
@@ -1060,6 +1090,7 @@ export default function CreateMaterialRequest(props) {
                                     PaperComponent={({ children }) => (
                                       <Paper
                                         sx={{
+                                          minWidth: 400,
                                           fontFamily: tokens.fontFamily,
                                           fontSize: "12px",
                                           borderRadius: tokens.radius.md,
@@ -1087,7 +1118,7 @@ export default function CreateMaterialRequest(props) {
                                         <span>
                                           {option.name} — {option.Itemid}
                                         </span>
-                                        {Number(option.tag) === 1 && (
+                                        {option.tag == 1 && (
                                           <Chip
                                             label='Critical'
                                             size='small'
@@ -1374,7 +1405,7 @@ export default function CreateMaterialRequest(props) {
                           </TableCell>
 
                           {/* UOM */}
-                          <TableCell sx={bodyCellSx}>
+                          {/* <TableCell sx={bodyCellSx}>
                             {row.objectitem === "New" ? (
                               <TextField
                                 size='small'
@@ -1392,6 +1423,90 @@ export default function CreateMaterialRequest(props) {
                                 }
                                 sx={inputSx}
                                 style={{ width: 50 }}
+                              />
+                            ) : (
+                              <Typography
+                                sx={{
+                                  fontSize: "12px",
+                                  color: row.uom
+                                    ? tokens.colors.text.primary
+                                    : tokens.colors.text.muted,
+                                  fontFamily: tokens.fontFamily,
+                                }}
+                              >
+                                {row.uom || "—"}
+                              </Typography>
+                            )}
+                          </TableCell> */}
+
+                          <TableCell sx={bodyCellSx}>
+                            {row.objectitem === "New" ? (
+                              <Autocomplete
+                                disableClearable
+                                size='small'
+                                options={uom}
+                                value={row.uom || null}
+                                onChange={(event, newValue) =>
+                                  setRows((prevRows) =>
+                                    prevRows.map((item, i) =>
+                                      i === index
+                                        ? { ...item, uom: newValue || "" }
+                                        : item,
+                                    ),
+                                  )
+                                }
+                                sx={{
+                                  width: 100,
+                                  "& .MuiOutlinedInput-root": {
+                                    fontSize: "12px",
+                                    fontFamily: tokens.fontFamily,
+                                    backgroundColor: "#fff",
+                                    borderRadius: tokens.radius.sm,
+                                    minHeight: "36px",
+
+                                    "& .MuiOutlinedInput-notchedOutline": {
+                                      borderColor: tokens.colors.border,
+                                    },
+
+                                    "&:hover .MuiOutlinedInput-notchedOutline":
+                                      {
+                                        borderColor: "#9DA5B4",
+                                      },
+
+                                    "&.Mui-focused .MuiOutlinedInput-notchedOutline":
+                                      {
+                                        borderColor:
+                                          tokens.colors.accent.indigo,
+                                      },
+                                  },
+                                }}
+                                renderInput={(params) => (
+                                  <TextField
+                                    {...params}
+                                    placeholder='UOM'
+                                    InputProps={{
+                                      ...params.InputProps,
+                                      sx: {
+                                        fontSize: "12px",
+                                        fontFamily: tokens.fontFamily,
+                                        padding: "0 !important",
+                                      },
+                                    }}
+                                  />
+                                )}
+                                slotProps={{
+                                  paper: {
+                                    sx: {
+                                      "& .MuiAutocomplete-option": {
+                                        minHeight: "30px",
+                                        fontSize: "0.75rem",
+                                        fontFamily: "Poppins",
+                                        paddingTop: "4px",
+                                        paddingBottom: "4px",
+                                      },
+                                    },
+                                  },
+                                }}
                               />
                             ) : (
                               <Typography

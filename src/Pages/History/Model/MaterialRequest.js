@@ -208,15 +208,21 @@ export default function MaterialRequest({ data }) {
         </Typography>
         <Typography sx={{ fontFamily: "Poppins", fontSize: "12px" }}>
           <span style={{ fontWeight: 500 }}>Requested Date</span>{" "}
-          {dayjs(value.requestedDate).format("DD-MMM-YYYY")}
+          {value.approvedDate == null
+            ? "-"
+            : dayjs(value.requestedDate).format("DD MMM YYYY")}
         </Typography>
         <Typography sx={{ fontFamily: "Poppins", fontSize: "12px" }}>
           <span style={{ fontWeight: 500 }}>Approved on</span>{" "}
-          {dayjs(value.approvedDate).format("DD-MMM-YYYY")}
+          {value.approvedDate == null
+            ? "-"
+            : dayjs(value.approvedDate).format("DD MMM YYYY")}
         </Typography>
         <Typography sx={{ fontFamily: "Poppins", fontSize: "12px" }}>
           <span style={{ fontWeight: 500 }}>Fulfilled Date</span>{" "}
-          {dayjs(value.fulfilledDate).format("DD-MMM-YYYY")}
+          {value.approvedDate == null
+            ? "-"
+            : dayjs(value.fulfilledDate).format("DD MMM YYYY")}
         </Typography>
       </Box>
       <Box
@@ -319,6 +325,7 @@ export default function MaterialRequest({ data }) {
                 fontWeight: 500,
                 fontSize: "11px",
                 fontWeight: 600,
+                fontFamily: "Poppins",
               }}
             >
               {" "}
@@ -442,16 +449,30 @@ export default function MaterialRequest({ data }) {
                     <TableCell
                       sx={{
                         color: "#6B7280",
-                        textAlign: "center",
+                        textAlign: "left",
                         fontSize: "0.7rem",
+                        fontFamily: "Poppins",
                       }}
                     >
                       {row.category ? row.category : "-"}
                     </TableCell>
-                    <TableCell sx={{ color: "#6B7280", fontSize: "0.7rem" }}>
+                    <TableCell
+                      sx={{
+                        color: "#6B7280",
+                        fontSize: "0.7rem",
+                        fontFamily: "Poppins",
+                      }}
+                    >
                       {row.uom}
                     </TableCell>
-                    <TableCell sx={{ color: "#6B7280", fontSize: "0.7rem" }}>
+                    <TableCell
+                      sx={{
+                        color: "#6B7280",
+                        fontSize: "0.7rem",
+                        fontFamily: "Poppins",
+                        // textAlign: "right",
+                      }}
+                    >
                       {row.availableStock}
                     </TableCell>
                     <TableCell
@@ -460,6 +481,7 @@ export default function MaterialRequest({ data }) {
                         fontWeight: 600,
                         color: "#111827",
                         fontSize: "0.7rem",
+                        fontFamily: "Poppins",
                       }}
                     >
                       {row.quantity}

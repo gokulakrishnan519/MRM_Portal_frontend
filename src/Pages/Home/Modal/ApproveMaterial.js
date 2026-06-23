@@ -322,15 +322,21 @@ function MaterialDetails({ data }) {
                     color: colors.labelGray,
                   }}
                 >
-                  {row.categoryId}
+                  {row.category}
                 </TableCell>
                 <TableCell sx={{ fontFamily: POPPINS, fontSize: "0.72rem" }}>
                   {row.uom}
                 </TableCell>
-                <TableCell sx={{ fontFamily: POPPINS, fontSize: "0.72rem" }}>
+                <TableCell
+                  align='right'
+                  sx={{ fontFamily: POPPINS, fontSize: "0.72rem" }}
+                >
                   {row.availableStock}
                 </TableCell>
-                <TableCell sx={{ fontFamily: POPPINS, fontSize: "0.72rem" }}>
+                <TableCell
+                  sx={{ fontFamily: POPPINS, fontSize: "0.72rem" }}
+                  align='right'
+                >
                   {row.quantity}
                 </TableCell>
               </TableRow>
@@ -571,7 +577,7 @@ export default function ApproveMaterial(props) {
 
           LineNum: i + 1,
 
-          CategoryId: item.categoryId,
+          CategoryId: item.category,
 
           UOM: item.uom,
 
@@ -732,7 +738,7 @@ export default function ApproveMaterial(props) {
 
           LineNum: i + 1,
 
-          CategoryId: item.categoryId,
+          CategoryId: item.category,
 
           UOM: item.uom,
 
@@ -883,12 +889,6 @@ export default function ApproveMaterial(props) {
                         }}
                       >
                         Review Notes
-                        <Box
-                          component='span'
-                          sx={{ color: colors.approveBtn, ml: 0.25 }}
-                        >
-                          (A)
-                        </Box>
                       </Typography>
                       <TextField
                         fullWidth
@@ -964,15 +964,6 @@ export default function ApproveMaterial(props) {
                     >
                       Reject
                     </Button>
-                    <Typography
-                      sx={{
-                        fontFamily: POPPINS,
-                        fontSize: "0.72rem",
-                        color: colors.labelGray,
-                      }}
-                    >
-                      (A)
-                    </Typography>
                   </Box>
                 </>
               )}

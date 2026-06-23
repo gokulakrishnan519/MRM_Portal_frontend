@@ -42,7 +42,7 @@ const theme = createTheme({
         root: {
           fontFamily: "Poppins, sans-serif",
           fontSize: 13,
-          // padding: "10px 14px",
+          padding: "10px 14px",
           whiteSpace: "nowrap",
         },
         head: {
@@ -91,9 +91,17 @@ function StatusChip({ status }) {
       bg: "#FEE2E2",
       color: "#EF4444",
     },
-    "L2 Under Review": {
+    Closed: {
+      bg: "#E5E7EB",
+      color: "#4B5563",
+    },
+    "In Review": {
       bg: "#DBEAFE",
       color: "#2563EB",
+    },
+    "Not Found": {
+      bg: "#FEF3C7",
+      color: "#D97706",
     },
   };
 
@@ -171,20 +179,52 @@ function ReviewerBadge({ name, badge }) {
 // ── Header Badge ──────────────────────────────────────────────────────────────
 function HeaderStatusBadge({ label }) {
   const statusStyles = {
-    "L2 Rejected": {
-      border: "#F87171",
-      color: "#EF4444",
-      bg: "#FEF2F2",
-    },
-    "L2 Partial Approved": {
-      border: "#FBBF24",
-      color: "#D97706",
-      bg: "#FFFBEB",
-    },
     "L2 Under Review": {
-      border: "#60A5FA",
-      color: "#2563EB",
       bg: "#EFF6FF",
+      color: "#2563EB",
+      border: "#BFDBFE",
+    },
+
+    "L1 Review": {
+      bg: "#FEEFDA",
+      color: "#F99709",
+      border: "#FDE68A",
+    },
+
+    "L1 Rejected": {
+      bg: "#FBE3EA",
+      color: "#E34472",
+      border: "#FECACA",
+    },
+
+    "L2 Review": {
+      bg: "#EBE9FD",
+      color: "#7C6CF2",
+      border: "#DDD6FE",
+    },
+
+    "L2 Approved": {
+      bg: "#DCF7F7",
+      color: "#16C8C7",
+      border: "#A7F3D0",
+    },
+
+    "L2 Partial Approved": {
+      bg: "#F3E8FF",
+      color: "#9333EA",
+      border: "#DDD6FE",
+    },
+
+    "L2 Rejected": {
+      bg: "#FBE3EA",
+      color: "#E34472",
+      border: "#FECACA",
+    },
+
+    "L2 Mixed": {
+      bg: "#E8EDFF",
+      color: "#7C3AED",
+      border: "#DDD6FE",
     },
   };
 
@@ -441,12 +481,14 @@ export default function L2RejectModal(props) {
                       <Table size='small'>
                         <TableHead>
                           <TableRow>
-                            <TableCell sx>Material Name</TableCell>
+                            <TableCell>Material Name</TableCell>
                             <TableCell>Material Category</TableCell>
                             <TableCell>UOM</TableCell>
                             <TableCell>Available Stock</TableCell>
                             <TableCell>Quantity</TableCell>
-                            <TableCell align='center'>Status</TableCell>
+                            <TableCell align='center'>
+                              Workflow Status
+                            </TableCell>
                             <TableCell>Reference No.</TableCell>
                             <TableCell>Review Notes</TableCell>
                           </TableRow>
@@ -521,11 +563,15 @@ export default function L2RejectModal(props) {
                                 {item.uom}
                               </TableCell>
 
-                              <TableCell sx={{ color: "#6B7280" }}>
+                              <TableCell
+                                align='right'
+                                sx={{ color: "#6B7280" }}
+                              >
                                 {item.availableStock}
                               </TableCell>
 
                               <TableCell
+                                align='right'
                                 sx={{ fontWeight: 600, color: "#111827" }}
                               >
                                 {item.quantity}
@@ -608,16 +654,6 @@ export default function L2RejectModal(props) {
                       >
                         Cancel
                       </Button>
-                      <Typography
-                        sx={{
-                          fontSize: 13,
-                          color: "#EF4444",
-                          fontWeight: 600,
-                          fontFamily: "Poppins, sans-serif",
-                        }}
-                      >
-                        (R)
-                      </Typography>
                     </Stack>
                   </>
                 )}

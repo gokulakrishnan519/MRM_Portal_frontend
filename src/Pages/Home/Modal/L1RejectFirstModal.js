@@ -410,7 +410,7 @@ export default function L1RejectFirstModal({
                         {row.category}
                       </TableCell>
                       <TableCell sx={{ color: "#6B7280" }}>{row.uom}</TableCell>
-                      <TableCell sx={{ color: "#6B7280" }}>
+                      <TableCell sx={{ color: "#6B7280" }} align='right'>
                         {row.availableStock}
                       </TableCell>
                       <TableCell

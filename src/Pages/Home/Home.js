@@ -29,6 +29,7 @@ import ReplayIcon from "@mui/icons-material/Replay";
 import InsertDriveFileOutlinedIcon from "@mui/icons-material/InsertDriveFileOutlined";
 import CheckIcon from "@mui/icons-material/Check";
 import right_icon from "../../Images/Home/Right_icon.png";
+import addfile from "../../Images/Home/add_file.png";
 
 import ClearIcon from "@mui/icons-material/Clear";
 
@@ -131,23 +132,23 @@ function BadgeIcon({ type }) {
         <img height={20} width={20} cursor='Pointer' src={warning} />
       </Tooltip>
     );
-  if (type === "New")
-    return (
-      <Chip
-        label='New(A)'
-        size='small'
-        sx={{
-          height: 20,
-          fontSize: "0.6rem",
-          fontWeight: 500,
-          fontFamily: "Poppins, sans-serif",
-          bgcolor: "#DBEAFE",
-          color: "#2563EB",
-          borderRadius: "10px",
-          "& .MuiChip-label": { px: 1 },
-        }}
-      />
-    );
+  // if (type === "New")
+  //   return (
+  //     <Chip
+  //       label='New'
+  //       size='small'
+  //       sx={{
+  //         height: 20,
+  //         fontSize: "0.6rem",
+  //         fontWeight: 500,
+  //         fontFamily: "Poppins, sans-serif",
+  //         bgcolor: "#DBEAFE",
+  //         color: "#2563EB",
+  //         borderRadius: "10px",
+  //         "& .MuiChip-label": { px: 1 },
+  //       }}
+  //     />
+  //   );
   return null;
 }
 
@@ -487,15 +488,17 @@ export default function Home() {
                             sx={{
                               position: "absolute",
                               bottom: 18,
-                              left: "48%",
+                              left: "38%",
                               transform: "translateX(-50%)",
-                              width: "80%",
+                              // width: "100%",
+                              maxWidth: "80%",
                               fontSize: "11px",
                               color: "#555",
                               fontStyle: "italic",
                               textAlign: "left",
                               fontFamily: "Poppins, sans-serif",
                               lineHeight: 1.2,
+                              // border: "1px solid red",
                             }}
                           >
                             {item.subtitle}
@@ -766,19 +769,6 @@ export default function Home() {
                           }}
                         >
                           Requester
-                          <Typography
-                            component='span'
-                            sx={{
-                              color: "#DC2626",
-                              fontWeight: 600,
-                              ml: 0.5,
-                              fontFamily: "Poppins, sans-serif",
-                              fontSize: "0.8rem",
-                              textAlign: "center",
-                            }}
-                          >
-                            (Approver)
-                          </Typography>
                         </TableCell>
                       )}
 
@@ -840,7 +830,7 @@ export default function Home() {
                           fontSize: "0.8rem",
                         }}
                       >
-                        Status
+                        Material Status
                       </TableCell>
                     </TableRow>
                   </TableHead>
@@ -886,6 +876,7 @@ export default function Home() {
                                   setModalName("");
                                 }
                               } else {
+                                setApproveModal(true);
                                 if (row.Status_text == "L1 Rejected") {
                                   setModalName("L1RejectFirstModal");
                                   setPassRowData(row);
@@ -893,7 +884,8 @@ export default function Home() {
                                   row.Status_text == "L2 Under Review" ||
                                   row.Status_text == "L2 Partial Approved" ||
                                   row.Status_text == "L2 Approved" ||
-                                  row.Status_text == "L2 Rejected"
+                                  row.Status_text == "L2 Rejected" ||
+                                  row.Status_text == "L1 Review"
                                 ) {
                                   setModalName("L2RejectModal");
                                   setPassRowData(row);
@@ -929,6 +921,15 @@ export default function Home() {
                                     style={{ width: "20px" }}
                                   />
                                 ) : null}
+                                {row.CriticalStatus?.includes("New") ? (
+                                  <img
+                                    src={addfile}
+                                    alt='Resubmitted'
+                                    style={{ width: "20px" }}
+                                  />
+                                ) : (
+                                  ""
+                                )}
                               </Stack>
                             </TableCell>
 
@@ -1029,7 +1030,7 @@ export default function Home() {
                                 sx={{
                                   fontFamily: "Poppins, sans-serif",
                                   fontSize: "0.76rem",
-                                  textAlign: "center",
+                                  textAlign: "left",
                                 }}
                               >
                                 {row.ReferenceNo == "" ? "-" : row.ReferenceNo}

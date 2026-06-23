@@ -161,11 +161,11 @@ export default function Navbar({ children }) {
     setAnchorEl2(event.currentTarget);
   };
 
-  // React.useEffect(() => {
-  //   if (sessionStorage.getItem("name") == null) {
-  //     navigate("/");
-  //   }
-  // }, []);
+  React.useEffect(() => {
+    if (sessionStorage.getItem("user_id") == null) {
+      navigate("/");
+    }
+  }, []);
 
   // React.useEffect(() => {
   //   sessionStorage.setItem("activeStep", activeStep);
