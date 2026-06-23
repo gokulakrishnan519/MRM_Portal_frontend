@@ -752,6 +752,7 @@ export default function Home() {
                   <TableHead>
                     <TableRow>
                       <TableCell
+                        align="left"
                         sx={{
                           fontFamily: "Poppins, sans-serif",
                           fontSize: "0.8rem",
@@ -762,10 +763,10 @@ export default function Home() {
                       </TableCell>
                       {sessionStorage.getItem("role") == "L1_APPROVER" && (
                         <TableCell
+                          align="left"
                           sx={{
                             fontFamily: "Poppins, sans-serif",
                             fontSize: "0.8rem",
-                            textAlign: "center",
                           }}
                         >
                           Requester
@@ -773,60 +774,63 @@ export default function Home() {
                       )}
 
                       <TableCell
-                        align="center"
+                        align="right"
                         sx={{
                           fontFamily: "Poppins, sans-serif",
                           fontSize: "0.8rem",
-                          textAlign: "center",
+
                           whiteSpace: "nowrap",
                         }}
                       >
                         Number of Materials
                       </TableCell>
                       <TableCell
+                        align="left"
                         sx={{
                           fontFamily: "Poppins, sans-serif",
                           fontSize: "0.8rem",
-                          textAlign: "center",
+
                           whiteSpace: "nowrap",
                         }}
                       >
                         Requested On
                       </TableCell>
                       <TableCell
+                        align="left"
                         sx={{
                           fontFamily: "Poppins, sans-serif",
                           fontSize: "0.8rem",
-                          textAlign: "center",
+
                           whiteSpace: "nowrap",
                         }}
                       >
                         Required Date
                       </TableCell>
                       <TableCell
+                        align="left"
                         sx={{
                           fontFamily: "Poppins, sans-serif",
                           fontSize: "0.8rem",
-                          textAlign: "center",
                         }}
                       >
                         Handled by
                       </TableCell>
                       <TableCell
+                        align="left"
                         sx={{
                           fontFamily: "Poppins, sans-serif",
                           fontSize: "0.8rem",
-                          textAlign: "center",
+
                           whiteSpace: "nowrap",
                         }}
                       >
                         Reference No
                       </TableCell>
                       <TableCell
-                        // align="right"
+                        align="center"
                         sx={{
                           fontFamily: "Poppins, sans-serif",
-                          textAlign: "center",
+
                           fontSize: "0.8rem",
                         }}
                       >

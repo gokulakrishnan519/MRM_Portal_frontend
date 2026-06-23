@@ -103,6 +103,10 @@ function StatusChip({ status }) {
       bg: "#FEF3C7",
       color: "#D97706",
     },
+    Submitted: {
+      bg: "#EFF6FF",
+      color: "#2563EB",
+    },
   };
 
   const config = statusConfig[status] || {
@@ -135,7 +139,7 @@ function StatusChip({ status }) {
 // ── L2 Badge ──────────────────────────────────────────────────────────────────
 function ReviewerBadge({ name, badge }) {
   return (
-    <Stack direction='row' spacing={0.7} alignItems='center' sx={{ mt: 0.8 }}>
+    <Stack direction="row" spacing={0.7} alignItems="center" sx={{ mt: 0.8 }}>
       <Typography
         sx={{
           fontSize: 11,
@@ -311,7 +315,7 @@ export default function L2RejectModal(props) {
             alignItems: "center",
           }}
         >
-          <CircularProgress aria-label='Loading…' />
+          <CircularProgress aria-label="Loading…" />
         </Grid>
       ) : (
         <ThemeProvider theme={theme}>
@@ -329,10 +333,10 @@ export default function L2RejectModal(props) {
               }}
             >
               <InboxIcon sx={{ fontSize: 60, color: "#BDBDBD" }} />
-              <Typography variant='h6' color='text.secondary'>
+              <Typography variant="h6" color="text.secondary">
                 No Data Available
               </Typography>
-              <Typography variant='body2' color='text.secondary'>
+              <Typography variant="body2" color="text.secondary">
                 There is nothing to display at the moment.
               </Typography>
             </Box>
@@ -367,7 +371,7 @@ export default function L2RejectModal(props) {
                   }}
                 >
                   <Typography
-                    variant='h6'
+                    variant="h6"
                     sx={{
                       fontWeight: 700,
                       fontSize: 18,
@@ -409,7 +413,7 @@ export default function L2RejectModal(props) {
                       mb: 2,
                     }}
                   >
-                    <Stack direction='row' spacing={3} alignItems='center'>
+                    <Stack direction="row" spacing={3} alignItems="center">
                       <Typography
                         sx={{
                           fontWeight: 700,
@@ -429,7 +433,7 @@ export default function L2RejectModal(props) {
                       >
                         Required Date{" "}
                         <Box
-                          component='span'
+                          component="span"
                           sx={{ fontWeight: 600, color: "#111827" }}
                         >
                           {dayjs(data?.requiredDate).format("DD MMM YYYY")}
@@ -443,7 +447,7 @@ export default function L2RejectModal(props) {
                         }}
                       >
                         Purpose{" "}
-                        <Box component='span' sx={{ color: "#9CA3AF" }}>
+                        <Box component="span" sx={{ color: "#9CA3AF" }}>
                           {data?.purpose}
                         </Box>
                       </Typography>
@@ -478,7 +482,7 @@ export default function L2RejectModal(props) {
                         // overflow: "hidden",
                       }}
                     >
-                      <Table size='small'>
+                      <Table size="small">
                         <TableHead>
                           <TableRow>
                             <TableCell>Material Name</TableCell>
@@ -486,7 +490,7 @@ export default function L2RejectModal(props) {
                             <TableCell>UOM</TableCell>
                             <TableCell>Available Stock</TableCell>
                             <TableCell>Quantity</TableCell>
-                            <TableCell align='center'>
+                            <TableCell align="center">
                               Workflow Status
                             </TableCell>
                             <TableCell>Reference No.</TableCell>
@@ -501,9 +505,9 @@ export default function L2RejectModal(props) {
                             >
                               <TableCell>
                                 <Stack
-                                  direction='row'
+                                  direction="row"
                                   spacing={0.8}
-                                  alignItems='center'
+                                  alignItems="center"
                                 >
                                   <Typography
                                     sx={{
@@ -526,7 +530,7 @@ export default function L2RejectModal(props) {
                                             ? "New"
                                             : item.itemtag
                                       }
-                                      size='small'
+                                      size="small"
                                       sx={{
                                         fontFamily: "Poppins, sans-serif",
                                         fontSize: "0.62rem",
@@ -564,14 +568,14 @@ export default function L2RejectModal(props) {
                               </TableCell>
 
                               <TableCell
-                                align='right'
+                                align="right"
                                 sx={{ color: "#6B7280" }}
                               >
                                 {item.availableStock}
                               </TableCell>
 
                               <TableCell
-                                align='right'
+                                align="right"
                                 sx={{ fontWeight: 600, color: "#111827" }}
                               >
                                 {item.quantity}
@@ -606,14 +610,14 @@ export default function L2RejectModal(props) {
                   <>
                     {/* ── Action Buttons ── */}
                     <Stack
-                      direction='row'
+                      direction="row"
                       spacing={1.5}
-                      justifyContent='center'
-                      alignItems='center'
+                      justifyContent="center"
+                      alignItems="center"
                       sx={{ mt: 2 }}
                     >
                       <Button
-                        variant='contained'
+                        variant="contained"
                         sx={{
                           bgcolor: "#F43F5E",
                           color: "#fff",
@@ -637,7 +641,7 @@ export default function L2RejectModal(props) {
                         Create New Request
                       </Button>
                       <Button
-                        variant='outlined'
+                        variant="outlined"
                         sx={{
                           borderColor: "#E5E7EB",
                           color: "#374151",

@@ -118,7 +118,7 @@ function DialogHeader({ data, props }) {
       }}
     >
       <Typography
-        variant='h6'
+        variant="h6"
         sx={{
           fontFamily: POPPINS,
           fontWeight: 600,
@@ -141,8 +141,8 @@ function DialogHeader({ data, props }) {
         {props?.rowData?.Resubmitted === true ? (
           <Chip
             icon={<ReplayIcon sx={{ fontSize: "0.75rem !important" }} />}
-            label='Resubmitted'
-            size='small'
+            label="Resubmitted"
+            size="small"
             sx={{
               fontFamily: POPPINS,
               fontSize: "0.68rem",
@@ -222,19 +222,19 @@ function InfoPair({ label, value }) {
 // ── Request Details Section ───────────────────────────────────
 function RequestDetails({ data }) {
   return (
-    <SectionCard title='Request Details'>
+    <SectionCard title="Request Details">
       <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2.5, mb: 1 }}>
         <InfoPair
-          label='Required Date'
+          label="Required Date"
           value={dayjs(data?.requiredDate).format("DD MMM YYYY")}
         />
-        <InfoPair label='Requested By' value={data?.requestedBy} />
+        <InfoPair label="Requested By" value={data?.requestedBy} />
         <InfoPair
-          label='Requested On'
+          label="Requested On"
           value={dayjs(data?.requestedOn).format("DD MMM YYYY")}
         />
       </Box>
-      <InfoPair label='Purpose' value={data?.purpose} />
+      <InfoPair label="Purpose" value={data?.purpose} />
     </SectionCard>
   );
 }
@@ -243,11 +243,11 @@ function RequestDetails({ data }) {
 
 function MaterialDetails({ data }) {
   return (
-    <SectionCard title='Material Details' sx={{ mt: 2 }}>
+    <SectionCard title="Material Details" sx={{ mt: 2 }}>
       <TableContainer
         sx={{ borderRadius: 1.5, border: `1px solid ${colors.border}` }}
       >
-        <Table size='small'>
+        <Table size="small">
           <TableHead>
             <TableRow sx={{ bgcolor: colors.headerDivider }}>
               {[
@@ -292,7 +292,7 @@ function MaterialDetails({ data }) {
                               ? "New"
                               : row.itemtag
                         }
-                        size='small'
+                        size="small"
                         sx={{
                           fontFamily: POPPINS,
                           fontSize: "0.62rem",
@@ -328,14 +328,14 @@ function MaterialDetails({ data }) {
                   {row.uom}
                 </TableCell>
                 <TableCell
-                  align='right'
+                  align="right"
                   sx={{ fontFamily: POPPINS, fontSize: "0.72rem" }}
                 >
                   {row.availableStock}
                 </TableCell>
                 <TableCell
                   sx={{ fontFamily: POPPINS, fontSize: "0.72rem" }}
-                  align='right'
+                  align="right"
                 >
                   {row.quantity}
                 </TableCell>
@@ -351,7 +351,7 @@ function MaterialDetails({ data }) {
 // ── Previous Review Comments Section ─────────────────────────
 function ReviewComments({ data }) {
   return (
-    <SectionCard title='Previous Review Comments' sx={{ mt: 2 }}>
+    <SectionCard title="Previous Review Comments" sx={{ mt: 2 }}>
       <Box
         sx={{
           display: "flex",
@@ -415,7 +415,7 @@ function ReviewComments({ data }) {
 // ── Requester Resubmission Note Section ──────────────────────
 function ResubmissionNote({ data }) {
   return (
-    <SectionCard title='Requester Resubmission Note' sx={{ mt: 2 }}>
+    <SectionCard title="Requester Resubmission Note" sx={{ mt: 2 }}>
       <Box
         sx={{
           display: "flex",
@@ -724,7 +724,7 @@ export default function ApproveMaterial(props) {
 
           HIQ_SyncStatus: "0",
 
-          HIQ_ManagerAction: "0",
+          HIQ_ManagerAction: "1",
 
           resubmissionReason: "",
         },
@@ -812,7 +812,7 @@ export default function ApproveMaterial(props) {
             alignItems: "center",
           }}
         >
-          <CircularProgress aria-label='Loading…' />
+          <CircularProgress aria-label="Loading…" />
         </Grid>
       ) : (
         <>
@@ -892,8 +892,8 @@ export default function ApproveMaterial(props) {
                       </Typography>
                       <TextField
                         fullWidth
-                        size='small'
-                        placeholder='Add optional approval comments'
+                        size="small"
+                        placeholder="Add optional approval comments"
                         value={note}
                         onChange={(e) => setNote(e.target.value)}
                         sx={{
@@ -924,7 +924,7 @@ export default function ApproveMaterial(props) {
                     }}
                   >
                     <Button
-                      variant='contained'
+                      variant="contained"
                       sx={{
                         fontFamily: POPPINS,
                         fontWeight: 600,
@@ -943,7 +943,7 @@ export default function ApproveMaterial(props) {
                       Approve
                     </Button>
                     <Button
-                      variant='outlined'
+                      variant="outlined"
                       sx={{
                         fontFamily: POPPINS,
                         fontWeight: 600,
@@ -978,7 +978,7 @@ export default function ApproveMaterial(props) {
             open={modal.open}
             onClose={() => setModal({ ...modal, open: false })}
             fullWidth
-            maxWidth='xs'
+            maxWidth="xs"
             PaperProps={{
               sx: {
                 overflow: "hidden",
@@ -995,9 +995,9 @@ export default function ApproveMaterial(props) {
               }}
             >
               {modal.type === "success" ? (
-                <CheckCircleIcon color='success' />
+                <CheckCircleIcon color="success" />
               ) : (
-                <ErrorIcon color='error' />
+                <ErrorIcon color="error" />
               )}
 
               {modal.title}
@@ -1012,8 +1012,8 @@ export default function ApproveMaterial(props) {
               }}
             >
               <Typography
-                variant='body2'
-                color='text.secondary'
+                variant="body2"
+                color="text.secondary"
                 sx={{ fontFamily: "'Inter', 'Poppins', sans-serif" }}
               >
                 {modal.message}
@@ -1022,7 +1022,7 @@ export default function ApproveMaterial(props) {
 
             <DialogActions sx={{ p: 2 }}>
               <Button
-                variant='contained'
+                variant="contained"
                 onClick={() => {
                   props.loadingFalse();
                 }}

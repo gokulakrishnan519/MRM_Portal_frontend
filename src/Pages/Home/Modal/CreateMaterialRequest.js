@@ -315,7 +315,7 @@ export default function CreateMaterialRequest(props) {
           HIQ_purcharse_Req_Id: "",
           HIQ_commentL1: value?.rejectionReason,
           HIQ_commentL2: "",
-          HIQ_resubmit_count: value?.resubmitCount + 1,
+          HIQ_resubmit_count: String(Number(value?.ResubmitCount || 0) + 1),
           HIQ_submitted_at: dayjs().format("YYYY-MM-DD[T]HH:mm:ss"),
           HIQ_ApproveDateL1: "",
           HIQ_synced_at: "",
@@ -606,7 +606,7 @@ export default function CreateMaterialRequest(props) {
             alignItems: "center",
           }}
         >
-          <CircularProgress aria-label='Loading…' />
+          <CircularProgress aria-label="Loading…" />
         </Grid>
       ) : (
         <>
@@ -817,7 +817,7 @@ export default function CreateMaterialRequest(props) {
                         minDate={dayjs()}
                         value={requiredDate}
                         onChange={(newValue) => setRequiredDate(newValue)}
-                        format='DD/MM/YYYY'
+                        format="DD/MM/YYYY"
                         slots={
                           {
                             // optional: keep default field but block typing
@@ -878,9 +878,9 @@ export default function CreateMaterialRequest(props) {
                       <span style={{ color: tokens.colors.danger }}>*</span>
                     </Typography>
                     <TextField
-                      size='small'
+                      size="small"
                       fullWidth
-                      placeholder='Describe the purpose of this request'
+                      placeholder="Describe the purpose of this request"
                       value={purpose}
                       onChange={(e) => setPurpose(e.target.value)}
                       sx={inputSx}
@@ -953,7 +953,7 @@ export default function CreateMaterialRequest(props) {
                     overflow: "hidden",
                   }}
                 >
-                  <Table size='small'>
+                  <Table size="small">
                     <TableHead>
                       <TableRow>
                         <TableCell sx={{ ...headerCellSx, width: "28%" }}>
@@ -1025,7 +1025,7 @@ export default function CreateMaterialRequest(props) {
                                   <Autocomplete
                                     disableClearable
                                     freeSolo
-                                    size='small'
+                                    size="small"
                                     onOpen={() => {
                                       if (materialNameList.length === 0) {
                                         getLabels();
@@ -1120,8 +1120,8 @@ export default function CreateMaterialRequest(props) {
                                         </span>
                                         {option.tag == 1 && (
                                           <Chip
-                                            label='Critical'
-                                            size='small'
+                                            label="Critical"
+                                            size="small"
                                             sx={{
                                               fontSize: "10px",
                                               height: 18,
@@ -1136,7 +1136,7 @@ export default function CreateMaterialRequest(props) {
                                     renderInput={(params) => (
                                       <TextField
                                         {...params}
-                                        placeholder='Search material…'
+                                        placeholder="Search material…"
                                         sx={{ ...inputSx, width: 200 }}
                                         InputProps={{
                                           ...params.InputProps,
@@ -1243,8 +1243,8 @@ export default function CreateMaterialRequest(props) {
                               {/* New / Cancel button */}
                               {row.objectitem === "New" ? (
                                 <Button
-                                  variant='outlined'
-                                  size='small'
+                                  variant="outlined"
+                                  size="small"
                                   onClick={() =>
                                     setRows((prevRows) =>
                                       prevRows.map((item, i) =>
@@ -1284,8 +1284,8 @@ export default function CreateMaterialRequest(props) {
                                 </Button>
                               ) : row.newmaterialName?.trim() ? (
                                 <Button
-                                  variant='contained'
-                                  size='small'
+                                  variant="contained"
+                                  size="small"
                                   onClick={() =>
                                     setRows((prevRows) =>
                                       prevRows.map((item, i) =>
@@ -1324,7 +1324,7 @@ export default function CreateMaterialRequest(props) {
                           <TableCell sx={bodyCellSx}>
                             {row.objectitem === "New" ? (
                               <Select
-                                size='small'
+                                size="small"
                                 fullWidth
                                 displayEmpty
                                 value={row.materialCategory}
@@ -1443,7 +1443,7 @@ export default function CreateMaterialRequest(props) {
                             {row.objectitem === "New" ? (
                               <Autocomplete
                                 disableClearable
-                                size='small'
+                                size="small"
                                 options={uom}
                                 value={row.uom || null}
                                 onChange={(event, newValue) =>
@@ -1483,7 +1483,7 @@ export default function CreateMaterialRequest(props) {
                                 renderInput={(params) => (
                                   <TextField
                                     {...params}
-                                    placeholder='UOM'
+                                    placeholder="UOM"
                                     InputProps={{
                                       ...params.InputProps,
                                       sx: {
@@ -1565,10 +1565,10 @@ export default function CreateMaterialRequest(props) {
                           {/* Quantity */}
                           <TableCell sx={bodyCellSx}>
                             <TextField
-                              size='small'
+                              size="small"
                               fullWidth
-                              placeholder='0'
-                              type='number'
+                              placeholder="0"
+                              type="number"
                               value={row.quantity}
                               onChange={(e) =>
                                 setRows((prevRows) =>
@@ -1604,9 +1604,9 @@ export default function CreateMaterialRequest(props) {
                               }}
                             >
                               <IconButton
-                                size='small'
+                                size="small"
                                 onClick={() => handleRefreshRow(index)}
-                                title='Reset row'
+                                title="Reset row"
                                 sx={{
                                   color: tokens.colors.text.muted,
                                   p: 0.6,
@@ -1622,10 +1622,10 @@ export default function CreateMaterialRequest(props) {
                                 <Refresh sx={{ fontSize: 15 }} />
                               </IconButton>
                               <IconButton
-                                size='small'
+                                size="small"
                                 onClick={() => handleRemoveRow(index)}
                                 disabled={rows.length === 1}
-                                title='Remove row'
+                                title="Remove row"
                                 sx={{
                                   color: tokens.colors.text.muted,
                                   p: 0.6,
@@ -1720,7 +1720,7 @@ export default function CreateMaterialRequest(props) {
                       >
                         {value.rejectionReason}
                       </Typography>
-                      <Stack direction='row' spacing={1} alignItems='center'>
+                      <Stack direction="row" spacing={1} alignItems="center">
                         <Typography
                           sx={{
                             fontSize: 12,
@@ -1780,16 +1780,16 @@ export default function CreateMaterialRequest(props) {
                       }}
                     >
                       Resubmission Reason{" "}
-                      <Box component='span' sx={{ color: "#EF4444" }}>
+                      <Box component="span" sx={{ color: "#EF4444" }}>
                         * (R)
                       </Box>
                     </Typography>
                     <TextField
                       fullWidth
-                      placeholder='Explain the changes made or justify the update'
+                      placeholder="Explain the changes made or justify the update"
                       value={resubmitReason}
                       onChange={(e) => setResubmitReason(e.target.value)}
-                      size='small'
+                      size="small"
                       sx={{
                         "& .MuiInputBase-root": {
                           fontFamily: "Poppins, sans-serif",
@@ -1940,7 +1940,7 @@ export default function CreateMaterialRequest(props) {
             <Dialog
               open={modal.open}
               fullWidth
-              maxWidth='xs'
+              maxWidth="xs"
               PaperProps={{
                 sx: {
                   overflow: "hidden",
@@ -1957,9 +1957,9 @@ export default function CreateMaterialRequest(props) {
                 }}
               >
                 {modal.type === "success" ? (
-                  <CheckCircleIcon color='success' />
+                  <CheckCircleIcon color="success" />
                 ) : (
-                  <ErrorIcon color='error' />
+                  <ErrorIcon color="error" />
                 )}
 
                 {modal.title}
@@ -1974,8 +1974,8 @@ export default function CreateMaterialRequest(props) {
                 }}
               >
                 <Typography
-                  variant='body2'
-                  color='text.secondary'
+                  variant="body2"
+                  color="text.secondary"
                   sx={{ fontFamily: "'Inter', 'Poppins', sans-serif" }}
                 >
                   {modal.message}
@@ -1984,7 +1984,7 @@ export default function CreateMaterialRequest(props) {
 
               <DialogActions sx={{ p: 2 }}>
                 <Button
-                  variant='contained'
+                  variant="contained"
                   onClick={() => {
                     setModal({ ...modal, open: false });
                     setRows([emptyRow()]);
