@@ -298,6 +298,22 @@ export default function L2RejectModal(props) {
             </Box>
           ) : (
             <Box>
+              {!loading && (
+                <Grid
+                  sx={{
+                    position: "absolute",
+                    top: 10,
+                    right: 10,
+                    cursor: "pointer",
+                  }}
+                >
+                  <CloseIcon
+                    onClick={() => {
+                      props.loadingFalse();
+                    }}
+                  />
+                </Grid>
+              )}
               {/* Modal Card */}
               <Box sx={{ padding: 1 }}>
                 {/* ── Header ── */}

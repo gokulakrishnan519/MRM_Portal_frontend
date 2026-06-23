@@ -375,6 +375,7 @@ export default function Home() {
   const loadingFalse = () => {
     setLoading(false);
     setApproveModal(false);
+    KpiData();
   };
 
   const openCreateMateralRequestModal = (Status, MaterialRequestId, level) => {
@@ -1169,23 +1170,6 @@ export default function Home() {
               aria-describedby='modal-modal-description'
             >
               <Box sx={style}>
-                {!loading && (
-                  <Grid
-                    sx={{
-                      position: "absolute",
-                      top: 10,
-                      right: 10,
-                      cursor: "pointer",
-                    }}
-                  >
-                    <CloseIcon
-                      onClick={() => {
-                        setApproveModal(false);
-                      }}
-                    />
-                  </Grid>
-                )}
-
                 {modalName == "ApproveModal" ? (
                   <ApproveMaterial
                     rowData={passRowData}

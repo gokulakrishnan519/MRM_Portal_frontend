@@ -15,6 +15,7 @@ import {
   Paper,
   Divider,
   Stack,
+  Grid,
 } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import CloseIcon from "@mui/icons-material/Close";
@@ -184,6 +185,36 @@ export default function L1RejectFirstModal({
   }, [rowData]);
   return (
     <ThemeProvider theme={theme}>
+      <Grid
+        sx={{
+          position: "absolute",
+          top: 10,
+          right: 10,
+          cursor: "pointer",
+        }}
+      >
+        <CloseIcon
+          onClick={() => {
+            loadingFalse();
+          }}
+        />
+      </Grid>
+
+      <Grid
+        sx={{
+          position: "absolute",
+          top: 10,
+          right: 10,
+          cursor: "pointer",
+        }}
+      >
+        <CloseIcon
+          onClick={() => {
+            loadingFalse();
+          }}
+        />
+      </Grid>
+
       <Box sx={{ padding: 3 }}>
         {/* ── Header ── */}
         <Box

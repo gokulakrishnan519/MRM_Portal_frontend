@@ -646,7 +646,7 @@ export default function ApproveMaterial(props) {
       setModal({
         open: true,
         type: "success",
-        title: "Request Rejected",
+        title: "Request Approved",
         message: response.data.data.DebugMessage,
       });
     } catch (error) {
@@ -810,6 +810,23 @@ export default function ApproveMaterial(props) {
         </Grid>
       ) : (
         <>
+          {!loading && (
+            <Grid
+              sx={{
+                position: "absolute",
+                top: 10,
+                right: 10,
+                cursor: "pointer",
+              }}
+            >
+              <CloseIcon
+                onClick={() => {
+                  props.loadingFalse();
+                }}
+              />
+            </Grid>
+          )}
+
           <Grid>
             <DialogHeader data={data} props={props} />
 
@@ -1016,8 +1033,7 @@ export default function ApproveMaterial(props) {
               <Button
                 variant='contained'
                 onClick={() => {
-                  setModal({ ...modal, open: false });
-                  window.location.reload();
+                  props.loadingFalse();
                 }}
                 sx={{ fontFamily: "'Inter', 'Poppins', sans-serif" }}
               >

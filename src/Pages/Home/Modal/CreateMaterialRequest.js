@@ -159,6 +159,7 @@ export default function CreateMaterialRequest(props) {
   });
 
   const [value, setValue] = useState({});
+  const [validData, setValidData] = useState(null);
 
   const navigate = useNavigate();
 
@@ -279,6 +280,15 @@ export default function CreateMaterialRequest(props) {
   };
 
   const RehandleSubmit = async () => {
+    // const isChanged = Object.keys(validData).some(
+    //   (key) => value[key] !== validData[key],
+    // );
+
+    // if (!isChanged) {
+    //   alert("No changes detected.");
+    //   return;
+    // }
+
     // props.loadingTrue();
     setLoading(true);
     const payload = {
@@ -533,6 +543,12 @@ export default function CreateMaterialRequest(props) {
           : updateData,
       );
 
+      setValidData(
+        props.l1ReSubmit?.level == "L2 Reject"
+          ? updateData.filter((item) => item.status === "Rejected")
+          : updateData,
+      );
+
       setValue(res.data.data);
     } catch (err) {
       // navigate("/ErrorHandling");
@@ -611,7 +627,9 @@ export default function CreateMaterialRequest(props) {
                     mt: 0.4,
                   }}
                 >
-                  Fill in the details below to raise a new material request.
+                  {props.l1ReSubmit?.level == "L1 Reject"
+                    ? "Review and update the details below before resubmitting your material request."
+                    : "Fill in the details below to raise a new material request."}
                 </Typography>
               </Box>
 
