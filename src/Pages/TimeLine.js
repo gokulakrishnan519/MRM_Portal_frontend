@@ -82,7 +82,7 @@ function Timeline({ id }) {
           }}
         >
           <Typography
-            variant='h6'
+            variant="h6"
             sx={{ fontFamily: "Poppins", fontSize: "15px" }}
           >
             Activity Timeline
@@ -97,7 +97,7 @@ function Timeline({ id }) {
         </Box>
         {open && (
           <TableContainer>
-            <Table size='small'>
+            <Table size="small">
               <TableBody>
                 {value?.data?.map((item, index) => (
                   <TableRow key={index}>
@@ -120,6 +120,14 @@ function Timeline({ id }) {
                       {`${dayjs(item.date).format("DD MMM YYYY, hh:mm A")} * ${
                         item.actor
                       }`}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        ...bodyCellSx,
+                        borderBottom: "none",
+                      }}
+                    >
+                      {item.referenceNo || "-"}
                     </TableCell>
 
                     <TableCell

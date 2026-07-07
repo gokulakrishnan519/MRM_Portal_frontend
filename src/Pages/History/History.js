@@ -428,7 +428,7 @@ export default function History() {
         >
           <Grid size={{ lg: 5, xs: 12, md: 12, sm: 12 }}>
             <Paper sx={{ padding: 2 }} elevation={0}>
-              <Grid container spacing={2}>
+              <Grid container spacing={2} rowGap={1}>
                 {cardData.map((item, index) => (
                   <Grid size={{ lg: 6, xs: 12, md: 12, sm: 12 }} key={index}>
                     {/* Full Image */}
